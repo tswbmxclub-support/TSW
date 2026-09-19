@@ -1,22 +1,20 @@
 import Image from "next/image";
 
 import { Badge, CardEnlace, CardCuerpo } from "@/components/ui";
+import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { formatearPrecio } from "@/lib/utils";
-import { disponible, type ProductoConVariantes } from "../types";
-import { precioDesde } from "../queries";
-
-const ETIQUETA_CATEGORIA: Record<ProductoConVariantes["categoria"], string> = {
-  uniformes: "Uniformes",
-  proteccion: "Protección",
-  merchandising: "Merchandising",
-};
+import {
+  BUCKET_PRODUCTOS,
+  ETIQUETA_CATEGORIA,
+  disponible,
+  precioDesde,
+  type ProductoConVariantes,
+} from "../types";
 
 /**
  * Tarjeta de catálogo. Server Component: no tiene estado ni eventos.
- *
- * NOTA: `producto` no tiene columna de imagen en el esquema —solo `competencia`
- * la tiene—, así que aquí va un marcador. Añadir `imagen_path` a `producto` es
- * una migración pendiente antes de publicar fotos reales del catálogo.
+ * La foto vive en el bucket `productos` (migración 12); sin ella va un
+ * marcador local, igual que en competencias.
  */
 export function TarjetaProducto({
   producto,
@@ -28,13 +26,16 @@ export function TarjetaProducto({
   const desde = precioDesde(producto);
   const unidades = producto.variantes.reduce((total, v) => total + (v.activo ? disponible(v) : 0), 0);
   const agotado = unidades <= 0;
+  const foto = producto.imagen_path
+    ? urlPublicaStorage(BUCKET_PRODUCTOS, producto.imagen_path)
+    : "/imagenes/producto.jpg";
 
   return (
     <CardEnlace href={`/tienda/${producto.slug}`} className="h-full overflow-hidden">
       <div className="relative aspect-square bg-gris-frio">
         <Image
-          src="/imagenes/producto.jpg"
-          alt={`[Foto de ${producto.nombre}]`}
+          src={foto}
+          alt={producto.imagen_path ? `Foto de ${producto.nombre}` : `[Foto de ${producto.nombre}]`}
           fill
           priority={prioridad}
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

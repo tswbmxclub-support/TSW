@@ -54,10 +54,3 @@ export async function listarProductosDestacados(limite = 4): Promise<ProductoCon
   }));
 }
 
-/** Precio más bajo entre las variantes disponibles, en centavos. */
-export function precioDesde(producto: ProductoConVariantes): number | null {
-  const precios = producto.variantes
-    .filter((v) => v.activo)
-    .map((v) => v.precio_centavos);
-  return precios.length === 0 ? null : Math.min(...precios);
-}
