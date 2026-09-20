@@ -84,11 +84,21 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
   }
 
   /**
-   * Navegación por teclado del desplegable de escritorio: ↑↓ mueven el
-   * resaltado, Enter o Espacio confirman, Tab cierra sin elegir. En la hoja
-   * móvil no aplica: son botones reales que recorre el Tab normal.
+   * Teclas del botón cuando la lista está abierta. El foco nunca sale del
+   * botón (patrón aria-activedescendant): ↑↓ mueven el resaltado, Enter o
+   * Espacio confirman, Escape y Tab cierran. Si la lista está cerrada, ↓ la
+   * abre. Funciona igual en escritorio; la hoja móvil no lo usa porque sus
+   * opciones son botones reales que recorre el Tab.
    */
-  function alTeclearLista(evento: React.KeyboardEvent) {
+  function alTeclearBoton(evento: React.KeyboardEvent<HTMLButtonElement>) {
+    if (!abierto) {
+      if (evento.key === "ArrowDown") {
+        evento.preventDefault();
+        abrir();
+      }
+      return;
+    }
+
     const indice = deportes.findIndex((d) => d.id === resaltado);
     if (evento.key === "ArrowDown") {
       evento.preventDefault();
@@ -99,7 +109,7 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
     } else if (evento.key === "Enter" || evento.key === " ") {
       evento.preventDefault();
       if (resaltado) elegir(resaltado);
-    } else if (evento.key === "Tab") {
+    } else if (evento.key === "Escape" || evento.key === "Tab") {
       setAbierto(false);
     }
   }
@@ -114,13 +124,9 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-controls={listaId}
+        aria-activedescendant={abierto && resaltado ? `${listaId}-opcion-${resaltado}` : undefined}
         onClick={() => (abierto ? setAbierto(false) : abrir())}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowDown" && !abierto) {
-            e.preventDefault();
-            abrir();
-          }
-        }}
+        onKeyDown={alTeclearBoton}
         className={cn(
           "flex min-h-[44px] items-center gap-2 rounded-md border px-3 text-sm font-semibold",
           "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
@@ -143,12 +149,11 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
           <motion.ul
             id={listaId}
             role="listbox"
-            aria-label="Deportes"
+            aria-labelledby={`${listaId}-titulo`}
             initial={reducido ? false : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reducido ? undefined : { opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
-            onKeyDown={alTeclearLista}
             className={cn(
               "absolute left-0 top-full z-50 mt-2 hidden w-56 overflow-hidden rounded-lg border p-1 shadow-xl lg:block",
               fondo === "oscuro"
@@ -160,7 +165,15 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
               const esActivo = deporte.id === activo.id;
               const esResaltado = deporte.id === resaltado;
               return (
-                <li key={deporte.id} role="option" aria-selected={esActivo}>
+                <li
+                  key={deporte.id}
+                  id={`${listaId}-opcion-${deporte.id}`}
+                  role="option"
+                  aria-selected={esActivo}
+                  className={cn(
+                    esResaltado && (fondo === "oscuro" ? "bg-blanco/10" : "bg-gris-frio"),
+                  )}
+                >
                   <button
                     type="button"
                     tabIndex={-1}
@@ -208,9 +221,7 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
               transition={{ duration: 0.25 }}
             >
               <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-gris-borde" aria-hidden="true" />
-              <p id={`${listaId}-hoja`} className="text-sm font-semibold uppercase tracking-wide text-texto-sec">
-                Elegir deporte
-              </p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-texto-sec">Elegir deporte</p>
               <ul className="mt-3 flex flex-col gap-2">
                 {deportes.map((deporte) => {
                   const esActivo = deporte.id === activo.id;
