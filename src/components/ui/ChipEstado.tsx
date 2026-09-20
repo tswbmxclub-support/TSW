@@ -28,12 +28,26 @@ const ACTIVO: Record<"true" | "false", Definicion> = {
   false: { etiqueta: "Inactivo", tono: "neutro" },
 };
 
+/** Máquinas de estado del módulo de usuario (cambio de alcance 2026-09-19). */
+const MENSUALIDAD: Record<"pagada" | "pendiente" | "vencida", Definicion> = {
+  pagada: { etiqueta: "Pagada", tono: "exito" },
+  pendiente: { etiqueta: "Pendiente", tono: "aviso" },
+  vencida: { etiqueta: "Vencida", tono: "acento" },
+};
+
+const JERSEY: Record<"entregado" | "pendiente", Definicion> = {
+  entregado: { etiqueta: "Entregado", tono: "exito" },
+  pendiente: { etiqueta: "Pendiente", tono: "aviso" },
+};
+
 export type ChipEstadoProps = {
   className?: string;
 } & (
   | { tipo: "pedido"; valor: EstadoPedido }
   | { tipo: "publicacion"; valor: EstadoPublicacion }
   | { tipo: "activo"; valor: boolean }
+  | { tipo: "mensualidad"; valor: "pagada" | "pendiente" | "vencida" }
+  | { tipo: "jersey"; valor: "entregado" | "pendiente" }
 );
 
 /**
@@ -47,7 +61,11 @@ export function ChipEstado(props: ChipEstadoProps) {
       ? PEDIDO[props.valor]
       : props.tipo === "publicacion"
         ? PUBLICACION[props.valor]
-        : ACTIVO[String(props.valor) as "true" | "false"];
+        : props.tipo === "mensualidad"
+          ? MENSUALIDAD[props.valor]
+          : props.tipo === "jersey"
+            ? JERSEY[props.valor]
+            : ACTIVO[String(props.valor) as "true" | "false"];
 
   return (
     <Badge tono={definicion.tono} className={cn("gap-1.5", props.className)}>
@@ -65,3 +83,7 @@ export const ETIQUETA_ESTADO_PEDIDO = Object.fromEntries(
 export const ETIQUETA_ESTADO_PUBLICACION = Object.fromEntries(
   Object.entries(PUBLICACION).map(([k, v]) => [k, v.etiqueta]),
 ) as Record<EstadoPublicacion, string>;
+
+export const ETIQUETA_ESTADO_MENSUALIDAD = Object.fromEntries(
+  Object.entries(MENSUALIDAD).map(([k, v]) => [k, v.etiqueta]),
+) as Record<"pagada" | "pendiente" | "vencida", string>;

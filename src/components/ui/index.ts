@@ -29,3 +29,11 @@ export {
 } from "./ChipEstado";
 export { Aviso, type AvisoProps, type TonoAviso } from "./Aviso";
 export { Archivo, type ArchivoProps } from "./Archivo";
+export {
+  SelectorDeporte,
+  type SelectorDeporteProps,
+  type OpcionDeporte,
+} from "./SelectorDeporte";
+export { TarjetaMensualidad, type TarjetaMensualidadProps, type EstadoMensualidad } from "./TarjetaMensualidad";
+export { TarjetaJersey, type TarjetaJerseyProps, type EstadoJersey } from "./TarjetaJersey";
+export { ResumenCuenta, type ResumenCuentaProps } from "./TarjetaJersey";

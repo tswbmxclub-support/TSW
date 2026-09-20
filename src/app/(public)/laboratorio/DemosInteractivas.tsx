@@ -2,7 +2,23 @@
 
 import { useState } from "react";
 
-import { Aviso, Archivo, Boton, CampoMoneda, EstadoError, Filtros, Modal, PieModal, Stepper, Tabs } from "@/components/ui";
+import {
+  Aviso,
+  Archivo,
+  Boton,
+  CampoMoneda,
+  EstadoError,
+  Filtros,
+  Modal,
+  PieModal,
+  ResumenCuenta,
+  SelectorDeporte,
+  Stepper,
+  Tabs,
+  TarjetaJersey,
+  TarjetaMensualidad,
+} from "@/components/ui";
+import { DEPORTES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
 
 /** Pestañas con panel: navegación con flechas, Inicio y Fin. */
 export function DemoTabs() {
@@ -161,6 +177,63 @@ export function DemoCampoMoneda() {
   );
 }
 
+/** Tarjeta de mensualidad en sus tres estados y dos variantes. */
+export function DemoTarjetaMensualidad() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <TarjetaMensualidad
+        mes="[MES ACTUAL]"
+        estado="pendiente"
+        montoCentavos={null}
+        fecha="[FECHA VENCIMIENTO]"
+        variante="destacada"
+      />
+      <TarjetaMensualidad mes="[MES 1]" estado="pagada" montoCentavos={null} fecha="[FECHA DE PAGO]" />
+      <TarjetaMensualidad mes="[MES 2]" estado="vencida" montoCentavos={null} fecha="[FECHA VENCIMIENTO]" />
+      <TarjetaMensualidad
+        mes="[MES CON NOMBRE LARGO PARA PROBAR EL CORTE DE LÍNEA EN LA TARJETA]"
+        estado="pendiente"
+        montoCentavos={null}
+        fecha="[FECHA VENCIMIENTO]"
+        deportista="[DEPORTISTA CON NOMBRE LARGO]"
+      />
+      <TarjetaMensualidad
+        mes="[MES 3]"
+        estado="pagada"
+        montoCentavos={null}
+        fecha="[FECHA DE PAGO]"
+        deportista="[DEPORTISTA 2]"
+      />
+    </div>
+  );
+}
+
+/** Tarjeta de jersey: asignado entregado, pendiente y estado vacío. */
+export function DemoTarjetaJersey() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <TarjetaJersey talla="[TALLA]" estado="entregado" fechaEntrega="[FECHA DE ENTREGA]" impresion="[NOMBRE IMPRESO]" />
+      <TarjetaJersey talla="[TALLA]" estado="pendiente" fechaEntrega="[FECHA DE ENTREGA]" />
+      <TarjetaJersey talla={null} estado="pendiente" fechaEntrega={null} />
+    </div>
+  );
+}
+
+/** Cabecera de cuenta con dos deportistas y enlace al historial. */
+export function DemoResumenCuenta() {
+  return (
+    <ResumenCuenta
+      titular="[NOMBRE]"
+      deportistas={[
+        { nombre: "[DEPORTISTA 1]", deporte: "BMX", nivel: "[NIVEL 1]" },
+        { nombre: "[DEPORTISTA CON NOMBRE LARGO]", deporte: "[DEPORTE 2]", nivel: "[NIVEL 2]" },
+      ]}
+      enlaceHistorial={{ href: "/cuenta/mensualidades", etiqueta: "Ver mensualidades →" }}
+      className="max-w-2xl"
+    />
+  );
+}
+
 /** Pie estándar de los modales del panel, con estado de carga. */
 export function DemoPieModal() {
   const [abierto, setAbierto] = useState(false);
@@ -187,6 +260,30 @@ export function DemoPieModal() {
         <PieModal alCerrar={() => setAbierto(false)} cargando={guardando} onGuardar={guardar} etiquetaGuardar="Guardar cambios" />
       </Modal>
     </>
+  );
+}
+
+/** Selector de deporte: desplegable en escritorio, hoja inferior en móvil. */
+export function DemoSelectorDeporte() {
+  const [deporte, setDeporte] = useState(DEPORTES_MUESTRA[0]?.id ?? "");
+
+  return (
+    <div className="flex flex-col items-start gap-4">
+      <SelectorDeporte deportes={DEPORTES_MUESTRA} valor={deporte} alCambiar={setDeporte} fondo="claro" />
+      <p className="text-sm text-texto-sec">
+        Abre con clic o ↓, navega con ↑↓, confirma con Enter, cierra con Escape o clic fuera. En
+        pantallas bajo lg abre una hoja inferior con el foco atrapado. Prueba a 360px y a 1280px.
+      </p>
+    </div>
+  );
+}
+
+/** La misma demo sobre azul profundo: variante del panel. */
+export function DemoSelectorDeporteOscuro() {
+  const [deporte, setDeporte] = useState(DEPORTES_MUESTRA[0]?.id ?? "");
+
+  return (
+    <SelectorDeporte deportes={DEPORTES_MUESTRA} valor={deporte} alCambiar={setDeporte} fondo="oscuro" />
   );
 }
 

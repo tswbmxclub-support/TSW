@@ -39,9 +39,14 @@ import {
   DemoFiltros,
   DemoModal,
   DemoPieModal,
+  DemoResumenCuenta,
+  DemoSelectorDeporte,
+  DemoSelectorDeporteOscuro,
   DemoStepper,
   DemoTabs,
   DemoTabsLargas,
+  DemoTarjetaJersey,
+  DemoTarjetaMensualidad,
 } from "./DemosInteractivas";
 
 export const metadata: Metadata = {
@@ -618,6 +623,76 @@ export default function PaginaLaboratorio() {
         </SeccionTitulo>
         <div className="mt-8">
           <DemoBotonCargando />
+        </div>
+      </Seccion>
+
+      {/* =================================================================
+          Primitivos del módulo de usuario y corporación multideporte
+          (cambio de alcance 2026-09-19). Datos de muestra mientras no hay
+          esquema: se borrarán al conectar la base.
+          ================================================================= */}
+
+      {/* --- SelectorDeporte ---------------------------------------------- */}
+      <Seccion tono="claro" tituloId="titulo-selectordeporte">
+        <SeccionTitulo
+          id="titulo-selectordeporte"
+          bajada="Deporte activo de la corporación. Desplegable en escritorio; hoja inferior con foco atrapado en móvil. Muestra el activo con el lenguaje de ChipEstado."
+        >
+          SelectorDeporte
+        </SeccionTitulo>
+        <div className="mt-8">
+          <DemoSelectorDeporte />
+        </div>
+      </Seccion>
+
+      <Seccion tituloId="titulo-selectordeporte-oscuro">
+        <SeccionTitulo
+          id="titulo-selectordeporte-oscuro"
+          bajada="fondo=&quot;oscuro&quot;: así vive en la cabecera del panel, sobre azul profundo."
+        >
+          SelectorDeporte sobre oscuro
+        </SeccionTitulo>
+        <div className="mt-8 rounded-lg bg-azul-profundo p-5">
+          <DemoSelectorDeporteOscuro />
+        </div>
+      </Seccion>
+
+      {/* --- TarjetaMensualidad ------------------------------------------- */}
+      <Seccion tituloId="titulo-mensualidad">
+        <SeccionTitulo
+          id="titulo-mensualidad"
+          bajada="Mes, estado (pagada / pendiente / vencida vía ChipEstado), monto y fecha de pago o vencimiento. Compacta para listas; destacada para el mes actual."
+        >
+          TarjetaMensualidad
+        </SeccionTitulo>
+        <div className="mt-8">
+          <DemoTarjetaMensualidad />
+        </div>
+      </Seccion>
+
+      {/* --- TarjetaJersey ------------------------------------------------ */}
+      <Seccion tono="claro" tituloId="titulo-jersey">
+        <SeccionTitulo
+          id="titulo-jersey"
+          bajada="Talla, estado (entregado / pendiente), fecha de entrega y estampado si aplica. Con jersey sin asignar muestra el estado vacío."
+        >
+          TarjetaJersey
+        </SeccionTitulo>
+        <div className="mt-8">
+          <DemoTarjetaJersey />
+        </div>
+      </Seccion>
+
+      {/* --- ResumenCuenta ------------------------------------------------ */}
+      <Seccion tituloId="titulo-resumencuenta">
+        <SeccionTitulo
+          id="titulo-resumencuenta"
+          bajada="Cabecera del área de usuario: titular, deportistas asociados, deporte y nivel de cada uno."
+        >
+          ResumenCuenta
+        </SeccionTitulo>
+        <div className="mt-8">
+          <DemoResumenCuenta />
         </div>
       </Seccion>
 
