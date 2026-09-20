@@ -9,11 +9,23 @@ import { Aviso, Boton, Campo } from "@/components/ui";
 import { iniciarSesion } from "../acciones";
 import { esquemaAcceso, type EntradaAcceso } from "../schemas";
 
+export type FormularioAccesoProps = {
+  redirigir?: string;
+  /** Textos de la puerta: por defecto, los del panel de administración. */
+  titulo?: string;
+  textoAyuda?: string;
+  /** Destino del enlace de recuperación. */
+  enlaceRecuperar?: string;
+};
+
 /**
- * Acceso al panel. La validación de aquí es comodidad para quien escribe; la
- * que cuenta es la de la Server Action. Sin enlace de registro: no existe.
+ * Acceso con correo y contraseña. Un solo formulario para las dos puertas:
+ * `/admin/login` (administradores) y `/cuenta/acceso` (usuarios), que cambian
+ * título, texto de ayuda y destino. La validación de aquí es comodidad para
+ * quien escribe; la que cuenta es la de la Server Action. Sin enlace de
+ * registro: no existe.
  */
-export function FormularioAcceso({ redirigir }: { redirigir?: string }) {
+export function FormularioAcceso({ redirigir, titulo, textoAyuda, enlaceRecuperar = "/admin/recuperar" }: FormularioAccesoProps) {
   const [enviando, iniciarEnvio] = useTransition();
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
 
@@ -42,41 +54,46 @@ export function FormularioAcceso({ redirigir }: { redirigir?: string }) {
   });
 
   return (
-    <form onSubmit={enviar} noValidate className="flex flex-col gap-5">
-      {errorGeneral && <Aviso tono="error">{errorGeneral}</Aviso>}
+    <>
+      {titulo && <h1 className="text-2xl">{titulo}</h1>}
+      {textoAyuda && <p className="mt-2 mb-6 text-sm text-texto-sec">{textoAyuda}</p>}
 
-      <input type="hidden" {...register("redirigir")} />
+      <form onSubmit={enviar} noValidate className="flex flex-col gap-5">
+        {errorGeneral && <Aviso tono="error">{errorGeneral}</Aviso>}
 
-      <Campo
-        etiqueta="Correo"
-        type="email"
-        inputMode="email"
-        autoComplete="username"
-        required
-        error={errors.correo?.message}
-        {...register("correo")}
-      />
-      <Campo
-        etiqueta="Contraseña"
-        type="password"
-        autoComplete="current-password"
-        required
-        error={errors.contrasena?.message}
-        {...register("contrasena")}
-      />
+        <input type="hidden" {...register("redirigir")} />
 
-      <Boton type="submit" cargando={enviando} completo>
-        Entrar
-      </Boton>
+        <Campo
+          etiqueta="Correo"
+          type="email"
+          inputMode="email"
+          autoComplete="username"
+          required
+          error={errors.correo?.message}
+          {...register("correo")}
+        />
+        <Campo
+          etiqueta="Contraseña"
+          type="password"
+          autoComplete="current-password"
+          required
+          error={errors.contrasena?.message}
+          {...register("contrasena")}
+        />
 
-      <p className="text-center text-sm">
-        <Link
-          href="/admin/recuperar"
-          className="inline-flex min-h-[44px] items-center text-azul-profundo underline underline-offset-4 hover:text-rojo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
-        >
-          ¿Olvidaste la contraseña?
-        </Link>
-      </p>
-    </form>
+        <Boton type="submit" cargando={enviando} completo>
+          Entrar
+        </Boton>
+
+        <p className="text-center text-sm">
+          <Link
+            href={enlaceRecuperar}
+            className="inline-flex min-h-[44px] items-center text-azul-profundo underline underline-offset-4 hover:text-rojo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          >
+            ¿Olvidaste la contraseña?
+          </Link>
+        </p>
+      </form>
+    </>
   );
 }

@@ -149,6 +149,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Discreto, como el de Administración en el pie: quien lo busca, lo encuentra. */}
+          <Link
+            href="/cuenta/acceso"
+            className="hidden min-h-[44px] items-center rounded-md px-3 text-sm font-semibold text-blanco/85 underline-offset-4 hover:bg-blanco/10 hover:text-blanco hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo sm:inline-flex"
+          >
+            Mi cuenta
+          </Link>
+
           <EnlaceCarrito />
 
           <button
@@ -273,6 +281,14 @@ function MenuMovil({
                   )}
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/cuenta/acceso"
+                  className="flex min-h-[56px] items-center border-b border-blanco/10 font-display text-2xl text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                >
+                  Mi cuenta
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/carrito"

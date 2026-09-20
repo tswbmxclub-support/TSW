@@ -16,10 +16,10 @@ export default async function PaginaAcceso({
   const { redirigir } = await searchParams;
 
   return (
-    <>
-      <h1 className="text-2xl">Acceso al panel</h1>
-      <p className="mt-2 mb-6 text-sm text-texto-sec">Solo para la administración del club.</p>
-      <FormularioAcceso redirigir={redirigir} />
-    </>
+    <FormularioAcceso
+      redirigir={redirigir}
+      titulo="Acceso al panel"
+      textoAyuda="Solo para la administración del club."
+    />
   );
 }
