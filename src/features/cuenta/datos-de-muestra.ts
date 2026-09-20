@@ -170,60 +170,6 @@ export const JERSEY_MUESTRA: JerseyMuestra = {
   impresion: "[NOMBRE IMPRESO]",
 };
 
-// --- Usuarios del panel (sección /admin/usuarios) ----------------------------
-
-export type EstadoUsuarioPanel = "activo" | "inactivo";
-
-export type UsuarioPanelMuestra = {
-  id: string;
-  nombre: string;
-  correo: string;
-  estado: EstadoUsuarioPanel;
-  deporte: string;
-  deportistas: DeportistaResumen[];
-};
-
-export const USUARIOS_PANEL_MUESTRA: UsuarioPanelMuestra[] = [
-  {
-    id: "u-1",
-    nombre: "[NOMBRE USUARIO 1]",
-    correo: "[correo1@dominio.com]",
-    estado: "activo",
-    deporte: "BMX",
-    deportistas: RESUMEN_CUENTA_MUESTRA.deportistas,
-  },
-  {
-    id: "u-2",
-    nombre: "[NOMBRE USUARIO 2]",
-    correo: "[correo2@dominio.com]",
-    estado: "inactivo",
-    deporte: "[DEPORTE 2]",
-    deportistas: [{ nombre: "[DEPORTISTA 3]", deporte: "[DEPORTE 2]", nivel: "[NIVEL 3]" }],
-  },
-  {
-    id: "u-3",
-    nombre: "[NOMBRE USUARIO 3]",
-    correo: "[correo3@dominio.com]",
-    estado: "activo",
-    deporte: "BMX",
-    deportistas: [{ nombre: "[DEPORTISTA 4]", deporte: "BMX", nivel: "[NIVEL 4]" }],
-  },
-];
-
-// --- Administradores del panel (sección /admin/administradores) --------------
-
-export type AdministradorMuestra = {
-  id: string;
-  nombre: string;
-  correo: string;
-  activo: boolean;
-};
-
-export const ADMINISTRADORES_MUESTRA: AdministradorMuestra[] = [
-  { id: "a-1", nombre: "[NOMBRE ADMIN 1]", correo: "[admin1@dominio.com]", activo: true },
-  { id: "a-2", nombre: "[NOMBRE ADMIN 2]", correo: "[admin2@dominio.com]", activo: false },
-];
-
 // --- Historial por año (para /cuenta/mensualidades) ---------------------------
 
 export type AnioMensualidades = {

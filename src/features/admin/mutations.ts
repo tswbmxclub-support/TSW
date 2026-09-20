@@ -127,6 +127,10 @@ const MENSAJE_POR_CONSTRAINT: Record<string, Traduccion> = {
   competencia_imagen_requiere_autorizacion: validacion(
     "Esta competencia tiene foto: quítala antes de retirar la autorización.",
   ),
+  // migración 13: perfiles
+  perfil_admin_nombre_no_vacio: validacion("El nombre no puede quedar vacío."),
+  perfil_usuario_nombre_no_vacio: validacion("El nombre no puede quedar vacío."),
+  perfil_usuario_telefono_no_vacio: validacion("El teléfono no puede quedar en blanco: déjalo vacío o escribe uno."),
 
   // --- UNIQUE (23505) --------------------------------------------------------
   // migración 02: catálogo

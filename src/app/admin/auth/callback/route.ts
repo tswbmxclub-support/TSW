@@ -1,24 +1,18 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { canjearEnlaceDeCorreo } from "@/lib/auth/callback";
 
 /**
- * Retorno del enlace de recuperación de contraseña (flujo PKCE de Supabase).
- * Canjea el `code` por una sesión y lleva a la página de nueva contraseña.
- * Sin código o con código vencido, vuelve a la solicitud con un aviso.
+ * Retorno del enlace de correo del panel (recuperación de contraseña o alta
+ * de un administrador). Canjea el enlace por una sesión y lleva a la página
+ * de nueva contraseña; con enlace inválido o vencido, vuelve a la solicitud
+ * con un aviso. Solo acepta destinos bajo /admin. La mecánica del canje
+ * (PKCE vs token_hash) está documentada en src/lib/auth/callback.ts.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl;
-  const codigo = searchParams.get("code");
-  const siguiente = searchParams.get("siguiente") ?? "/admin/restablecer";
-  // Solo destinos del panel: nada de redirecciones abiertas.
-  const destino = siguiente.startsWith("/admin") && !siguiente.startsWith("//") ? siguiente : "/admin";
-
-  if (codigo) {
-    const supabase = await crearClienteServidor();
-    const { error } = await supabase.auth.exchangeCodeForSession(codigo);
-    if (!error) return NextResponse.redirect(`${origin}${destino}`);
-  }
-
-  return NextResponse.redirect(`${origin}/admin/recuperar?error=enlace`);
+  return canjearEnlaceDeCorreo(request, {
+    prefijo: "/admin",
+    destinoPorDefecto: "/admin/restablecer",
+    rutaError: "/admin/recuperar?error=enlace",
+  });
 }

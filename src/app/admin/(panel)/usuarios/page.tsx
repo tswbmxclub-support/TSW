@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
-import { Aviso, Boton } from "@/components/ui";
+import { Boton } from "@/components/ui";
 import { SECCIONES_PANEL } from "@/config/panel";
 import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
-import { UsuariosAdmin } from "@/features/cuenta/components/UsuariosAdmin";
+import { UsuariosAdmin } from "@/features/admin/components/UsuariosAdmin";
+import { listarUsuarios } from "@/features/admin/queries-perfiles";
 
 export const metadata: Metadata = { title: "Usuarios" };
 
 const SECCION = SECCIONES_PANEL.find((s) => s.href === "/admin/usuarios");
 
-/** Usuarios de la corporación: titulares de cuenta y sus deportistas. */
+/** Titulares de cuenta (perfil_usuario) con el correo de Auth. */
 export default async function PaginaUsuariosPanel() {
   await exigirAdminPagina("/admin/usuarios");
-  const deporte = await deporteActivo();
+  const [deporte, usuarios] = await Promise.all([deporteActivo(), listarUsuarios()]);
 
   return (
     <PaginaPanel
@@ -27,10 +28,7 @@ export default async function PaginaUsuariosPanel() {
         </Boton>
       }
     >
-      <Aviso tono="info" className="mb-6">
-        Vista previa con datos de muestra: los usuarios reales llegarán con la tabla perfil_usuario.
-      </Aviso>
-      <UsuariosAdmin deporteNombre={deporte.nombre} />
+      <UsuariosAdmin usuarios={usuarios} />
     </PaginaPanel>
   );
 }

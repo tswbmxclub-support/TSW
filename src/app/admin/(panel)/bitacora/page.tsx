@@ -5,6 +5,7 @@ import { SECCIONES_PANEL } from "@/config/panel";
 import { exigirAdminPagina } from "@/lib/auth";
 import { BitacoraAdmin } from "@/features/admin/components/BitacoraAdmin";
 import { POR_PAGINA_BITACORA, listarBitacora } from "@/features/admin/queries";
+import { nombresDeActores } from "@/features/admin/queries-perfiles";
 
 export const metadata: Metadata = { title: "Bitácora" };
 
@@ -27,6 +28,7 @@ export default async function PaginaBitacoraPanel({
     hasta: params.hasta,
     pagina,
   });
+  const nombresActores = await nombresDeActores(eventos.map((e) => e.actor_id));
 
   return (
     <PaginaPanel titulo="Bitácora" descripcion={SECCION?.descripcion}>
@@ -41,6 +43,7 @@ export default async function PaginaBitacoraPanel({
         pagina={pagina}
         total={total}
         porPagina={POR_PAGINA_BITACORA}
+        nombresActores={nombresActores}
       />
     </PaginaPanel>
   );

@@ -248,3 +248,53 @@ export const esquemaFiltrosBitacora = z.object({
 });
 
 export type EntradaFiltrosBitacora = z.infer<typeof esquemaFiltrosBitacora>;
+
+// --- Perfiles: administradores y usuarios (migración 13) ---------------------
+
+const NOMBRE_PERFIL = z
+  .string()
+  .trim()
+  .min(2, "El nombre es obligatorio.")
+  .max(120, "Máximo 120 caracteres.");
+
+const CORREO = z.string().trim().toLowerCase().email("Escribe un correo válido.");
+
+/** Teléfono opcional: en blanco es "sin teléfono", nunca cadena vacía. */
+const TELEFONO = z
+  .string()
+  .trim()
+  .max(30, "Máximo 30 caracteres.")
+  .regex(/^[0-9+() -]*$/, "Solo números, espacios y el signo +.")
+  .transform((valor) => (valor === "" ? null : valor))
+  .nullable()
+  .optional();
+
+export const esquemaInvitacionAdmin = z.object({
+  nombre: NOMBRE_PERFIL,
+  correo: CORREO,
+});
+
+export type EntradaInvitacionAdmin = z.infer<typeof esquemaInvitacionAdmin>;
+
+export const esquemaInvitacionUsuario = z.object({
+  nombre: NOMBRE_PERFIL,
+  correo: CORREO,
+  telefono: TELEFONO,
+});
+
+export type EntradaInvitacionUsuario = z.infer<typeof esquemaInvitacionUsuario>;
+
+export const esquemaEdicionAdmin = z.object({
+  id: UUID,
+  nombre: NOMBRE_PERFIL,
+});
+
+export type EntradaEdicionAdmin = z.infer<typeof esquemaEdicionAdmin>;
+
+export const esquemaEdicionUsuario = z.object({
+  id: UUID,
+  nombre: NOMBRE_PERFIL,
+  telefono: TELEFONO,
+});
+
+export type EntradaEdicionUsuario = z.infer<typeof esquemaEdicionUsuario>;

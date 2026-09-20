@@ -468,12 +468,35 @@ y se contrasta contra la API de Wompi.
 
 ---
 
-## Propuesta `perfil_admin` (aprobada con el cambio de alcance, no implementada)
+## Perfiles: `perfil_admin` y `perfil_usuario` (migración 13, rama `feat/admins-usuarios`)
 
-No arregla el login (eso es el toggle de Auth), pero sí resuelve dos carencias
-reales: la bitácora guarda `actor_id` sin poder mostrar quién es, y no hay
-forma de revocar acceso sin borrar de `auth.users`. Con usuarios en el sistema
-pasa a ser **obligatoria**: es lo que distingue a un admin de un deportista.
+Implementado el 20-09-2026. Migración 13 aplicada en remoto; las 15 políticas
+`authenticated` exigen `es_admin()`. Dos puertas: `/admin/login` y
+`/cuenta/acceso`; `exigirAdmin*` / `exigirUsuario*` en cada página y acción.
+
+**Cuentas nuevas — cómo se crean y por qué así:**
+
+- El trigger `crear_perfil_al_registrar` decide el tipo por
+  `raw_app_meta_data->>'tipo'` **en el INSERT** de `auth.users`.
+  `inviteUserByEmail` no acepta `app_metadata`, así que un **administrador**
+  se crea con `auth.admin.createUser({ app_metadata: { tipo: 'admin' } })` y
+  después recibe `resetPasswordForEmail`; un **usuario** va por
+  `inviteUserByEmail` (tipo por defecto). Está en
+  `features/admin/acciones-perfiles.ts`.
+- Toda cuenta nace **inactiva**; activar es un paso deliberado desde el panel.
+- **Los enlaces de correo se canjean por `token_hash`** (`verifyOtp`) en
+  `/admin/auth/callback` y `/cuenta/auth/callback` (`lib/auth/callback.ts`).
+  El formato `?code=` (PKCE) solo funciona en el navegador que pidió el
+  enlace; una invitación la pide el admin y la abre otra persona. **Requisito
+  de configuración en Supabase** (Authentication → Email Templates):
+  - "Reset password": enlace a `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery`
+  - "Invite user": enlace a `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=invite`
+  y en URL Configuration → Redirect URLs, los dos callbacks con el dominio
+  real. Sin esto, invitar crea la cuenta pero el enlace del correo falla.
+- El SMTP por defecto de Supabase limita los correos por hora: configurar
+  Resend como SMTP antes de invitar en serie.
+
+Lo que sigue vigente de la propuesta original:
 
 ```
 perfil_admin

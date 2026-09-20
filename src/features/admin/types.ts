@@ -14,7 +14,9 @@ export type EntidadAuditable =
   | "nivel"
   | "pedido"
   | "pedido_item"
-  | "transaccion";
+  | "transaccion"
+  | "perfil_admin"
+  | "perfil_usuario";
 
 /** Etiquetas de la bitácora para la interfaz del panel. */
 export const ETIQUETA_ACCION: Record<AccionAuditoria, string> = {
@@ -38,6 +40,8 @@ export const ETIQUETA_ENTIDAD: Record<EntidadAuditable, string> = {
   pedido: "Pedido",
   pedido_item: "Ítem de pedido",
   transaccion: "Transacción",
+  perfil_admin: "Administrador",
+  perfil_usuario: "Usuario",
 };
 
 export function etiquetaEntidad(entidad: string): string {

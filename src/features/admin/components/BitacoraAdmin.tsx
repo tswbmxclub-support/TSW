@@ -26,6 +26,8 @@ const ENTIDADES = [
   "pedido",
   "pedido_item",
   "transaccion",
+  "perfil_admin",
+  "perfil_usuario",
 ] as const;
 
 const ACCIONES = ["crear", "actualizar", "eliminar", "publicar", "archivar", "cambiar_estado"] as const;
@@ -41,12 +43,15 @@ export function BitacoraAdmin({
   pagina,
   total,
   porPagina,
+  nombresActores,
 }: {
   eventos: EventoAuditoria[];
   filtros: Filtros;
   pagina: number;
   total: number;
   porPagina: number;
+  /** id de actor → nombre en perfil_admin. Los ids ausentes se muestran recortados. */
+  nombresActores: Record<string, string>;
 }) {
   const router = useRouter();
   const [expandido, setExpandido] = useState<string | null>(null);
@@ -87,6 +92,8 @@ export function BitacoraAdmin({
         <span className="whitespace-nowrap">
           {e.actor_id === null ? (
             <span className="text-texto-sec">Sistema</span>
+          ) : nombresActores[e.actor_id] ? (
+            <span>{nombresActores[e.actor_id]}</span>
           ) : (
             <span className="font-mono text-sm">{e.actor_id.slice(0, 8)}</span>
           )}
@@ -163,7 +170,12 @@ export function BitacoraAdmin({
           comprador que el trigger ya recortó. */}
       {eventos.map((e) =>
         expandido === e.id ? (
-          <DetalleEvento key={`detalle-${e.id}`} evento={e} alCerrar={() => setExpandido(null)} />
+          <DetalleEvento
+            key={`detalle-${e.id}`}
+            evento={e}
+            nombreActor={e.actor_id ? nombresActores[e.actor_id] : undefined}
+            alCerrar={() => setExpandido(null)}
+          />
         ) : null,
       )}
 
@@ -191,7 +203,15 @@ export function BitacoraAdmin({
   );
 }
 
-function DetalleEvento({ evento, alCerrar }: { evento: EventoAuditoria; alCerrar: () => void }) {
+function DetalleEvento({
+  evento,
+  nombreActor,
+  alCerrar,
+}: {
+  evento: EventoAuditoria;
+  nombreActor?: string;
+  alCerrar: () => void;
+}) {
   return (
     <div
       role="region"
@@ -209,6 +229,10 @@ function DetalleEvento({ evento, alCerrar }: { evento: EventoAuditoria; alCerrar
             Actor:{" "}
             {evento.actor_id === null ? (
               "Sistema (cron o webhook, sin actor identificado)"
+            ) : nombreActor ? (
+              <>
+                {nombreActor} <span className="font-mono text-xs">({evento.actor_id.slice(0, 8)})</span>
+              </>
             ) : (
               <span className="font-mono">{evento.actor_id}</span>
             )}

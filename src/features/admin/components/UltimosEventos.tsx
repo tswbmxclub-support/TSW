@@ -1,7 +1,7 @@
 import { formatearFechaHora } from "@/lib/utils";
 import { ETIQUETA_ACCION, etiquetaEntidad, type EventoAuditoria } from "../types";
 
-type Actor = { id: string; correo: string };
+type Actor = { id: string; nombre: string };
 
 /** Nombre corto del registro afectado, sacado del JSON de después (o de antes). */
 function nombreDe(evento: EventoAuditoria): string | null {
@@ -16,10 +16,19 @@ function nombreDe(evento: EventoAuditoria): string | null {
 
 /**
  * Lista compacta de eventos de la bitácora, para el inicio del panel. El
- * único actor posible es el administrador; un actor nulo significa que la
- * escritura no pasó por una RPC (webhook de Wompi, cron o un UPDATE directo).
+ * actor se muestra por su nombre de perfil_admin ("Tú" si es quien mira); un
+ * actor nulo significa que la escritura no pasó por una RPC (webhook de
+ * Wompi, cron o un UPDATE directo).
  */
-export function UltimosEventos({ eventos, actorActual }: { eventos: EventoAuditoria[]; actorActual: Actor }) {
+export function UltimosEventos({
+  eventos,
+  actorActual,
+  nombresActores,
+}: {
+  eventos: EventoAuditoria[];
+  actorActual: Actor;
+  nombresActores: Record<string, string>;
+}) {
   return (
     <ol className="divide-y divide-gris-borde rounded-lg border border-gris-borde bg-blanco">
       {eventos.map((evento) => {
@@ -28,8 +37,8 @@ export function UltimosEventos({ eventos, actorActual }: { eventos: EventoAudito
           evento.actor_id === null
             ? "Sistema"
             : evento.actor_id === actorActual.id
-              ? actorActual.correo
-              : `Usuario ${evento.actor_id.slice(0, 8)}`;
+              ? `Tú (${actorActual.nombre})`
+              : (nombresActores[evento.actor_id] ?? `Administrador ${evento.actor_id.slice(0, 8)}`);
         return (
           <li key={evento.id} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
             <p className="min-w-0">

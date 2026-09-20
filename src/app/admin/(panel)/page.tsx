@@ -5,13 +5,15 @@ import { Boton, EstadoVacio, Indicador } from "@/components/ui";
 import { exigirAdminPagina } from "@/lib/auth";
 import { UltimosEventos } from "@/features/admin/components/UltimosEventos";
 import { listarAuditoria, resumenPanel } from "@/features/admin/queries";
+import { nombresDeActores } from "@/features/admin/queries-perfiles";
 
 export const metadata: Metadata = { title: "Inicio" };
 
 /** Inicio del panel: cuatro cifras y los últimos cambios. */
 export default async function PaginaInicioPanel() {
-  const { usuario } = await exigirAdminPagina("/admin");
+  const { usuario, perfil } = await exigirAdminPagina("/admin");
   const [resumen, eventos] = await Promise.all([resumenPanel(), listarAuditoria(5)]);
+  const nombresActores = await nombresDeActores(eventos.map((e) => e.actor_id));
 
   return (
     <PaginaPanel
@@ -73,7 +75,11 @@ export default async function PaginaInicioPanel() {
               texto="Cada creación, edición o publicación desde el panel aparecerá aquí con quién la hizo."
             />
           ) : (
-            <UltimosEventos eventos={eventos} actorActual={{ id: usuario.id, correo: usuario.email ?? "" }} />
+            <UltimosEventos
+              eventos={eventos}
+              actorActual={{ id: usuario.id, nombre: perfil.nombre }}
+              nombresActores={nombresActores}
+            />
           )}
         </div>
       </section>
