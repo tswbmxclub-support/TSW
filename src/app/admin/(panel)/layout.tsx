@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { ArmazonPanel } from "@/components/admin/ArmazonPanel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
  * armazón. Es preferencia de vista: no filtra consultas todavía.
  */
 export default async function LayoutPanel({ children }: { children: ReactNode }) {
-  const { usuario } = await exigirSesionPagina("/admin");
+  const { usuario } = await exigirAdminPagina("/admin");
   const deporte = await deporteActivo();
 
   return (

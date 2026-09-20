@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { Boton, EstadoVacio, Indicador } from "@/components/ui";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { UltimosEventos } from "@/features/admin/components/UltimosEventos";
 import { listarAuditoria, resumenPanel } from "@/features/admin/queries";
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Inicio" };
 
 /** Inicio del panel: cuatro cifras y los últimos cambios. */
 export default async function PaginaInicioPanel() {
-  const { usuario } = await exigirSesionPagina("/admin");
+  const { usuario } = await exigirAdminPagina("/admin");
   const [resumen, eventos] = await Promise.all([resumenPanel(), listarAuditoria(5)]);
 
   return (

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { Badge, Boton, ChipEstado } from "@/components/ui";
 import { formatearFechaHora, formatearPrecio } from "@/lib/utils";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { TransicionesPedido } from "@/features/admin/components/TransicionesPedido";
 import { eventosDelPedido, obtenerPedidoPanel } from "@/features/admin/queries-pedidos";
 import { ETIQUETA_ACCION, etiquetaEntidad } from "@/features/admin/types";
@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Detalle de pedido" };
  */
 export default async function PaginaPedidoDetalle({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  await exigirSesionPagina("/admin/pedidos");
+  await exigirAdminPagina("/admin/pedidos");
 
   const pedido = await obtenerPedidoPanel(id);
   const eventos = await eventosDelPedido(pedido.id);

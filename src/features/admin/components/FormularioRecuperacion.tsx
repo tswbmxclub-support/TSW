@@ -6,11 +6,30 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Aviso, Boton, Campo } from "@/components/ui";
-import { solicitarRecuperacion } from "../acciones";
+import { solicitarRecuperacion, type ResultadoAccion } from "../acciones";
 import { esquemaRecuperacion, type EntradaRecuperacion } from "../schemas";
 
-/** Pide el correo y envía el enlace de recuperación. */
-export function FormularioRecuperacion({ avisoInicial }: { avisoInicial?: string }) {
+export type FormularioRecuperacionProps = {
+  avisoInicial?: string;
+  /** Acción de recuperación: la del panel por defecto; /cuenta pasa la suya. */
+  accion?: (entrada: EntradaRecuperacion) => Promise<ResultadoAccion>;
+  /** Etiqueta del campo de correo (varía entre panel y área de cuenta). */
+  etiquetaCorreo?: string;
+  /** Destino del enlace "Volver al acceso". */
+  enlaceVolver?: string;
+};
+
+/**
+ * Pide el correo y envía el enlace de recuperación. Compartido por las dos
+ * puertas: /admin/recuperar usa la acción del panel y /cuenta/recuperar la
+ * suya, cuyo enlace vuelve por /cuenta/auth/callback.
+ */
+export function FormularioRecuperacion({
+  avisoInicial,
+  accion = solicitarRecuperacion,
+  etiquetaCorreo = "Correo del administrador",
+  enlaceVolver = "/admin/login",
+}: FormularioRecuperacionProps) {
   const [enviando, iniciarEnvio] = useTransition();
   const [mensaje, setMensaje] = useState<{ tono: "error" | "exito"; texto: string } | null>(
     avisoInicial ? { tono: "error", texto: avisoInicial } : null,
@@ -28,7 +47,7 @@ export function FormularioRecuperacion({ avisoInicial }: { avisoInicial?: string
   const enviar = handleSubmit((datos) => {
     setMensaje(null);
     iniciarEnvio(async () => {
-      const resultado = await solicitarRecuperacion(datos);
+      const resultado = await accion(datos);
       setMensaje(
         resultado.ok
           ? { tono: "exito", texto: resultado.mensaje ?? "Revisa tu correo." }
@@ -42,7 +61,7 @@ export function FormularioRecuperacion({ avisoInicial }: { avisoInicial?: string
       {mensaje && <Aviso tono={mensaje.tono}>{mensaje.texto}</Aviso>}
 
       <Campo
-        etiqueta="Correo del administrador"
+        etiqueta={etiquetaCorreo}
         type="email"
         inputMode="email"
         autoComplete="username"
@@ -57,7 +76,7 @@ export function FormularioRecuperacion({ avisoInicial }: { avisoInicial?: string
 
       <p className="text-center text-sm">
         <Link
-          href="/admin/login"
+          href={enlaceVolver}
           className="inline-flex min-h-[44px] items-center text-azul-profundo underline underline-offset-4 hover:text-rojo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
         >
           Volver al acceso

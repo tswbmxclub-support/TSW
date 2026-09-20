@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
 import { USUARIOS_PANEL_MUESTRA } from "@/features/cuenta/datos-de-muestra";
 import { DetalleUsuarioAdmin } from "@/features/cuenta/components/UsuariosAdmin";
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PaginaDetalleUsuarioPanel({ params }: Props) {
-  await exigirSesionPagina("/admin/usuarios");
+  await exigirAdminPagina("/admin/usuarios");
   const { id } = await params;
   const deporte = await deporteActivo();
 

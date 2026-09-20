@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { SECCIONES_PANEL } from "@/config/panel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import type { EstadoPedido } from "@/features/pedidos/types";
 import { PedidosAdmin } from "@/features/admin/components/PedidosAdmin";
 import { listarPedidosPanel } from "@/features/admin/queries-pedidos";
@@ -27,7 +27,7 @@ export default async function PaginaPedidosPanel({
 }: {
   searchParams: Promise<{ estado?: string; desde?: string; hasta?: string }>;
 }) {
-  await exigirSesionPagina("/admin/pedidos");
+  await exigirAdminPagina("/admin/pedidos");
 
   const params = await searchParams;
   const estado = ESTADOS.find((e) => e === params.estado);

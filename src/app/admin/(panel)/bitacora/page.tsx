@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { SECCIONES_PANEL } from "@/config/panel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { BitacoraAdmin } from "@/features/admin/components/BitacoraAdmin";
 import { POR_PAGINA_BITACORA, listarBitacora } from "@/features/admin/queries";
 
@@ -16,7 +16,7 @@ export default async function PaginaBitacoraPanel({
 }: {
   searchParams: Promise<{ entidad?: string; accion?: string; desde?: string; hasta?: string; pagina?: string }>;
 }) {
-  await exigirSesionPagina("/admin/bitacora");
+  await exigirAdminPagina("/admin/bitacora");
 
   const params = await searchParams;
   const pagina = Math.max(1, Number.parseInt(params.pagina ?? "1", 10) || 1);

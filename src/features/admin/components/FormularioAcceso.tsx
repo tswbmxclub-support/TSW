@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Aviso, Boton, Campo } from "@/components/ui";
-import { iniciarSesion } from "../acciones";
+import { iniciarSesion, type ResultadoAccion } from "../acciones";
 import { esquemaAcceso, type EntradaAcceso } from "../schemas";
 
 export type FormularioAccesoProps = {
@@ -16,16 +16,27 @@ export type FormularioAccesoProps = {
   textoAyuda?: string;
   /** Destino del enlace de recuperación. */
   enlaceRecuperar?: string;
+  /**
+   * Acción de inicio de sesión: la del panel por defecto; /cuenta/acceso pasa
+   * la suya, que exige perfil_usuario activo en vez de perfil_admin.
+   */
+  accion?: (entrada: EntradaAcceso) => Promise<ResultadoAccion>;
 };
 
 /**
  * Acceso con correo y contraseña. Un solo formulario para las dos puertas:
  * `/admin/login` (administradores) y `/cuenta/acceso` (usuarios), que cambian
- * título, texto de ayuda y destino. La validación de aquí es comodidad para
- * quien escribe; la que cuenta es la de la Server Action. Sin enlace de
+ * título, texto de ayuda, destino y acción. La validación de aquí es comodidad
+ * para quien escribe; la que cuenta es la de la Server Action. Sin enlace de
  * registro: no existe.
  */
-export function FormularioAcceso({ redirigir, titulo, textoAyuda, enlaceRecuperar = "/admin/recuperar" }: FormularioAccesoProps) {
+export function FormularioAcceso({
+  redirigir,
+  titulo,
+  textoAyuda,
+  enlaceRecuperar = "/admin/recuperar",
+  accion = iniciarSesion,
+}: FormularioAccesoProps) {
   const [enviando, iniciarEnvio] = useTransition();
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
 
@@ -42,7 +53,7 @@ export function FormularioAcceso({ redirigir, titulo, textoAyuda, enlaceRecupera
   const enviar = handleSubmit((datos) => {
     setErrorGeneral(null);
     iniciarEnvio(async () => {
-      const resultado = await iniciarSesion(datos);
+      const resultado = await accion(datos);
       // Con éxito la acción redirige y nunca llega aquí.
       if (!resultado.ok) {
         setErrorGeneral(resultado.error);

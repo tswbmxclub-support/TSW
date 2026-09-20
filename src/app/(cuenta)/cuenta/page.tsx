@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { exigirUsuarioPagina } from "@/lib/auth";
 import { Boton, EstadoVacio, ResumenCuenta, TarjetaJersey, TarjetaMensualidad } from "@/components/ui";
 import {
   JERSEY_MUESTRA,
@@ -16,7 +17,11 @@ export const metadata: Metadata = { title: "Resumen" };
  * Con la cuenta sin deportistas no hay mensualidad ni jersey que mostrar: se
  * dice y se remite a la sede, en vez de pintar tarjetas vacías.
  */
-export default function PaginaCuenta() {
+export default async function PaginaCuenta() {
+  // Puerta de la página (no solo del layout): sin sesión lleva a /cuenta/acceso,
+  // una sesión de administrador vuelve al panel y una inactiva a la puerta.
+  await exigirUsuarioPagina("/cuenta");
+
   const cuenta = RESUMEN_CUENTA_MUESTRA;
   const sinDeportistas = cuenta.deportistas.length === 0;
   const mensualidad = sinDeportistas ? null : MENSUALIDAD_ACTUAL_MUESTRA;

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { SECCIONES_PANEL } from "@/config/panel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { NivelesAdmin } from "@/features/admin/components/NivelesAdmin";
 import { listarNivelesPanel } from "@/features/admin/queries";
 
@@ -12,7 +12,7 @@ const SECCION = SECCIONES_PANEL.find((s) => s.href === "/admin/niveles");
 
 /** Niveles y semilleros: orden de la ruta formativa, edades y horarios. */
 export default async function PaginaNivelesPanel() {
-  await exigirSesionPagina("/admin/niveles");
+  await exigirAdminPagina("/admin/niveles");
   const niveles = await listarNivelesPanel();
 
   return (

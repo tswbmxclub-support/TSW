@@ -1,16 +1,25 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-import { RUTA_LOGIN, RUTA_PANEL, esRutaAdminPublica } from "@/lib/auth/rutas";
+import {
+  RUTA_ACCESO_USUARIO,
+  RUTA_LOGIN,
+  esRutaAdminPublica,
+  esRutaCuentaPublica,
+} from "@/lib/auth/rutas";
 
 /**
  * Hace dos cosas en cada petición:
  *  1. Refresca la sesión de Supabase (las cookies se renuevan aquí, no en los
  *     Server Components, que no pueden escribirlas).
- *  2. Protege /admin: sin sesión se redirige al acceso guardando el destino.
+ *  2. Protege /admin y /cuenta: sin sesión redirige a la puerta correspondiente
+ *     guardando el destino.
  *
- * Es conveniencia, no la defensa real: cada página y cada Server Action del
- * panel vuelve a verificar la sesión con `exigirSesionPagina` / `exigirAdmin`.
+ * Es conveniencia, no la defensa real. TENER SESIÓN YA NO ES SER
+ * ADMINISTRADOR: hay cuentas de administración y cuentas de usuario, y qué
+ * perfil tiene la sesión lo comprueba cada página y cada Server Action con
+ * `exigirAdminPagina` / `exigirUsuarioPagina` / `exigirAdmin` / `exigirUsuario`.
+ * Aquí solo se comprueba que HAYA sesión, sin tocar la base.
  *
  * Solo se consulta al servidor de Auth cuando hay cookie de sesión: la mayoría
  * del tráfico es anónimo y no tiene sentido pagar una ida a Auth por cada
@@ -21,9 +30,10 @@ export async function middleware(request: NextRequest) {
 
   const ruta = request.nextUrl.pathname;
   const esRutaAdmin = ruta.startsWith("/admin");
+  const esRutaCuenta = ruta.startsWith("/cuenta");
   const hayCookieSesion = request.cookies.getAll().some((c) => c.name.startsWith("sb-"));
 
-  if (!esRutaAdmin && !hayCookieSesion) return respuesta;
+  if (!esRutaAdmin && !esRutaCuenta && !hayCookieSesion) return respuesta;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,26 +61,31 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!esRutaAdmin) return respuesta;
+  if (!esRutaAdmin && !esRutaCuenta) return respuesta;
 
-  // Un solo usuario en el sistema: tener sesión es ser administrador. El
-  // registro público está cerrado en Supabase Auth y el usuario se crea a
-  // mano, así que no hay forma de obtener sesión sin ser el admin.
-  if (!user && !esRutaAdminPublica(ruta)) {
-    const destino = request.nextUrl.clone();
-    destino.pathname = RUTA_LOGIN;
-    destino.search = "";
-    destino.searchParams.set("redirigir", ruta + request.nextUrl.search);
-    return NextResponse.redirect(destino);
+  if (!user) {
+    if (esRutaAdmin && !esRutaAdminPublica(ruta)) {
+      const destino = request.nextUrl.clone();
+      destino.pathname = RUTA_LOGIN;
+      destino.search = "";
+      destino.searchParams.set("redirigir", ruta + request.nextUrl.search);
+      return NextResponse.redirect(destino);
+    }
+    if (esRutaCuenta && !esRutaCuentaPublica(ruta)) {
+      const destino = request.nextUrl.clone();
+      destino.pathname = RUTA_ACCESO_USUARIO;
+      destino.search = "";
+      destino.searchParams.set("redirigir", ruta + request.nextUrl.search);
+      return NextResponse.redirect(destino);
+    }
+    return respuesta;
   }
 
-  // Con sesión, el acceso y la recuperación no tienen sentido: al panel.
-  if (user && (ruta === RUTA_LOGIN || ruta === "/admin/recuperar")) {
-    const destino = request.nextUrl.clone();
-    destino.pathname = RUTA_PANEL;
-    destino.search = "";
-    return NextResponse.redirect(destino);
-  }
+  // Con sesión, la puerta correcta la decide cada página, no el middleware:
+  // este no consulta perfiles en la base, y una sesión válida puede ser de un
+  // administrador INACTIVO (desactivado desde el panel) que solo debe ver la
+  // puerta con el aviso correspondiente. Redirigir aquí a /admin o /cuenta
+  // provocaría un rebote infinito entre la puerta y la página protegida.
 
   return respuesta;
 }

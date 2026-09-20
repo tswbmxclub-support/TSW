@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { Aviso, Boton } from "@/components/ui";
 import { SECCIONES_PANEL } from "@/config/panel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
 import { UsuariosAdmin } from "@/features/cuenta/components/UsuariosAdmin";
 
@@ -13,7 +13,7 @@ const SECCION = SECCIONES_PANEL.find((s) => s.href === "/admin/usuarios");
 
 /** Usuarios de la corporación: titulares de cuenta y sus deportistas. */
 export default async function PaginaUsuariosPanel() {
-  await exigirSesionPagina("/admin/usuarios");
+  await exigirAdminPagina("/admin/usuarios");
   const deporte = await deporteActivo();
 
   return (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { exigirUsuarioPagina } from "@/lib/auth";
 import { Boton, EstadoVacio, TarjetaMensualidad } from "@/components/ui";
 import { HISTORIAL_MENSUALIDADES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
 
@@ -10,7 +11,10 @@ export const metadata: Metadata = { title: "Mensualidades" };
  * tarjetas van en variante compacta; el mes vivo se distingue solo en el
  * resumen.
  */
-export default function PaginaMensualidades() {
+export default async function PaginaMensualidades() {
+  // Puerta de la página (no solo del layout): igual que en el resumen.
+  await exigirUsuarioPagina("/cuenta/mensualidades");
+
   return (
     <div className="flex flex-col gap-8">
       <div>

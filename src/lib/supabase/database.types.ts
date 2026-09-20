@@ -341,6 +341,57 @@ export type Database = {
           },
         ]
       }
+      perfil_admin: {
+        Row: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          actualizado_en?: string
+          creado_en?: string
+          id: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          actualizado_en?: string
+          creado_en?: string
+          id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
+      perfil_usuario: {
+        Row: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+          telefono: string | null
+        }
+        Insert: {
+          activo?: boolean
+          actualizado_en?: string
+          creado_en?: string
+          id: string
+          nombre: string
+          telefono?: string | null
+        }
+        Update: {
+          activo?: boolean
+          actualizado_en?: string
+          creado_en?: string
+          id?: string
+          nombre?: string
+          telefono?: string | null
+        }
+        Relationships: []
+      }
       producto: {
         Row: {
           activo: boolean
@@ -511,28 +562,265 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activar_admin: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_admin"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      activar_usuario: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+          telefono: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_usuario"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      alternar_documento_activo: {
+        Args: { p_activo: boolean; p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          descripcion: string | null
+          id: string
+          orden: number
+          titulo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "documento"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      alternar_nivel_activo: {
+        Args: { p_activo: boolean; p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          criterio_promocion: string | null
+          descripcion: string | null
+          horario: string | null
+          id: string
+          nombre: string
+          orden: number
+          rango_edad: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "nivel"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      alternar_producto_activo: {
+        Args: { p_activo: boolean; p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          categoria: Database["public"]["Enums"]["categoria_producto"]
+          creado_en: string
+          descripcion: string | null
+          id: string
+          imagen_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "producto"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      alternar_variante_activa: {
+        Args: { p_activo: boolean; p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          precio_centavos: number
+          producto_id: string
+          sku: string | null
+          stock: number
+          stock_reservado: number
+          talla: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "variante"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      archivar_competencia: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          actualizado_en: string
+          autorizacion_imagen_en: string | null
+          creado_en: string
+          cuerpo: string | null
+          destacado: boolean
+          estado: Database["public"]["Enums"]["estado_publicacion"]
+          fecha: string
+          id: string
+          imagen_path: string | null
+          slug: string
+          titulo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "competencia"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       consumir_reserva: {
         Args: { p_cantidad: number; p_variante_id: string }
         Returns: number
       }
-      eliminar_resultado: { Args: { p_actor_id: string; p_id: string }; Returns: undefined }
+      desactivar_admin: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_admin"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      desactivar_usuario: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+          telefono: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_usuario"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      destacar_competencia: {
+        Args: { p_actor_id: string; p_destacado: boolean; p_id: string }
+        Returns: {
+          actualizado_en: string
+          autorizacion_imagen_en: string | null
+          creado_en: string
+          cuerpo: string | null
+          destacado: boolean
+          estado: Database["public"]["Enums"]["estado_publicacion"]
+          fecha: string
+          id: string
+          imagen_path: string | null
+          slug: string
+          titulo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "competencia"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      eliminar_resultado: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: undefined
+      }
+      es_admin: { Args: never; Returns: boolean }
+      es_usuario: { Args: never; Returns: boolean }
       establecer_actor: { Args: { p_actor_id: string }; Returns: undefined }
+      establecer_imagen_competencia: {
+        Args: { p_actor_id: string; p_id: string; p_imagen_path: string }
+        Returns: {
+          actualizado_en: string
+          autorizacion_imagen_en: string | null
+          creado_en: string
+          cuerpo: string | null
+          destacado: boolean
+          estado: Database["public"]["Enums"]["estado_publicacion"]
+          fecha: string
+          id: string
+          imagen_path: string | null
+          slug: string
+          titulo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "competencia"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      establecer_imagen_producto: {
+        Args: { p_actor_id: string; p_id: string; p_imagen_path: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          categoria: Database["public"]["Enums"]["categoria_producto"]
+          creado_en: string
+          descripcion: string | null
+          id: string
+          imagen_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "producto"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       generar_referencia_pedido: { Args: never; Returns: string }
       guardar_competencia: {
         Args: {
           p_actor_id: string
           p_autorizacion_imagen?: boolean
           p_cuerpo?: string
-          p_destacado?: boolean
-          p_estado?: Database["public"]["Enums"]["estado_publicacion"]
           p_fecha?: string
           p_id?: string
-          p_imagen_path?: string
           p_slug?: string
           p_titulo?: string
         }
         Returns: {
           actualizado_en: string
+          autorizacion_imagen_en: string | null
           creado_en: string
           cuerpo: string | null
           destacado: boolean
@@ -606,6 +894,44 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      guardar_perfil_admin: {
+        Args: { p_actor_id: string; p_id: string; p_nombre: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_admin"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      guardar_perfil_usuario: {
+        Args: {
+          p_actor_id: string
+          p_id: string
+          p_nombre: string
+          p_telefono: string
+        }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+          telefono: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_usuario"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       guardar_producto: {
         Args: {
           p_activo?: boolean
@@ -613,7 +939,6 @@ export type Database = {
           p_categoria?: Database["public"]["Enums"]["categoria_producto"]
           p_descripcion?: string
           p_id?: string
-          p_imagen_path?: string
           p_nombre?: string
           p_orden?: number
           p_slug?: string
@@ -695,7 +1020,28 @@ export type Database = {
         Args: { p_cantidad: number; p_variante_id: string }
         Returns: number
       }
-      reordenar_niveles: { Args: { p_actor_id: string; p_ids: string[] }; Returns: undefined }
+      publicar_competencia: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: {
+          actualizado_en: string
+          autorizacion_imagen_en: string | null
+          creado_en: string
+          cuerpo: string | null
+          destacado: boolean
+          estado: Database["public"]["Enums"]["estado_publicacion"]
+          fecha: string
+          id: string
+          imagen_path: string | null
+          slug: string
+          titulo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "competencia"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       publicar_documento_version: {
         Args: {
           p_actor_id: string
@@ -723,6 +1069,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      reordenar_niveles: {
+        Args: { p_actor_id: string; p_ids: string[] }
+        Returns: undefined
       }
       reservar_stock: {
         Args: { p_cantidad: number; p_variante_id: string }

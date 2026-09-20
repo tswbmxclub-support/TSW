@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { Aviso } from "@/components/ui";
+import { Aviso, Boton } from "@/components/ui";
 import { Footer } from "@/components/layout/Footer";
+import { cerrarSesionUsuario } from "@/features/cuenta/acciones";
 
 export const metadata: Metadata = {
   title: { default: "Mi cuenta", template: "%s | Mi cuenta TSW" },
@@ -11,10 +12,13 @@ export const metadata: Metadata = {
 };
 
 /**
- * Área de usuario. Cabecera pública ligera (logo, enlace Salir sin acción
- * todavía) y el pie compartido del sitio. En esta etapa no hay protección
- * real: el Aviso fijo de vista previa evita que nadie confunda estos datos
- * de muestra con información real.
+ * Área de usuario. Cabecera ligera con el cierre de sesión real (Server
+ * Action) y el pie compartido del sitio.
+ *
+ * La verificación de perfil NO vive solo aquí: cada página llama a
+ * exigirUsuarioPagina, porque Next no re-ejecuta el layout al navegar entre
+ * páginas hermanas. El aviso de muestra sigue porque mensualidades y jerseys
+ * todavía se sirven de datos de muestra hasta la migración siguiente.
  */
 export default function LayoutCuenta({ children }: { children: ReactNode }) {
   return (
@@ -22,27 +26,22 @@ export default function LayoutCuenta({ children }: { children: ReactNode }) {
       <header className="border-b border-blanco/10 bg-azul-profundo text-blanco">
         <div className="contenedor flex h-16 items-center justify-between">
           <Link
-            href="/"
+            href="/cuenta"
             className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
           >
             TSW
             <span className="ml-2 text-xs font-normal uppercase tracking-[0.2em] text-blanco/60">Mi cuenta</span>
           </Link>
 
-          {/* Sin acción todavía: la sesión de usuario llega en la siguiente etapa. */}
-          <span
-            aria-disabled="true"
-            title="Disponible en la siguiente etapa"
-            className="inline-flex min-h-[44px] cursor-not-allowed items-center rounded-md px-3 text-sm font-semibold text-blanco/60"
-          >
-            Salir
-          </span>
+          <form action={cerrarSesionUsuario}>
+            <Boton type="submit" variante="fantasma">Salir</Boton>
+          </form>
         </div>
       </header>
 
       <main id="contenido" tabIndex={-1} className="contenedor flex-1 py-8 sm:py-10 lg:py-12">
         <Aviso tono="info" className="mb-6">
-          Vista previa con datos de muestra.
+          Mensualidades y jerseys se muestran con datos de muestra: su esquema llega en la siguiente etapa.
         </Aviso>
         {children}
       </main>

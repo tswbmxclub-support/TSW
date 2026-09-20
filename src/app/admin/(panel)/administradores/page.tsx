@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { Aviso } from "@/components/ui";
 import { SECCIONES_PANEL } from "@/config/panel";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
 import { AdministradoresAdmin } from "@/features/cuenta/components/AdministradoresAdmin";
 
@@ -13,7 +13,7 @@ const SECCION = SECCIONES_PANEL.find((s) => s.href === "/admin/administradores")
 
 /** Administradores del panel: futura tabla perfil_admin, hoy datos de muestra. */
 export default async function PaginaAdministradoresPanel() {
-  await exigirSesionPagina("/admin/administradores");
+  await exigirAdminPagina("/admin/administradores");
   const deporte = await deporteActivo();
 
   return (

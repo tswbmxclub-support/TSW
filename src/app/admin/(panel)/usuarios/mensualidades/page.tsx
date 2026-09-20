@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PaginaPanel } from "@/components/admin/PaginaPanel";
 import { Boton } from "@/components/ui";
-import { exigirSesionPagina } from "@/lib/auth";
+import { exigirAdminPagina } from "@/lib/auth";
 import { deporteActivo } from "@/features/cuenta/deporte-servidor";
 import { MensualidadesDelMesAdmin } from "@/features/cuenta/components/MensualidadesDelMesAdmin";
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Mensualidades del mes" };
  * siendo el sitio para ver el historial completo.
  */
 export default async function PaginaMensualidadesDelMesPanel() {
-  await exigirSesionPagina("/admin/usuarios/mensualidades");
+  await exigirAdminPagina("/admin/usuarios/mensualidades");
   const deporte = await deporteActivo();
 
   return (
