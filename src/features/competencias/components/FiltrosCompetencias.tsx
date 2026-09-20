@@ -39,13 +39,14 @@ export function useFiltrosCompetencias(): EstadoFiltros {
   return contexto;
 }
 
-/** Píldoras de año, para el lateral del hero. Sin años, no pinta nada. */
+/** Píldoras de año, para el lateral del hero oscuro. Sin años, no pinta nada. */
 export function FiltroAnio() {
   const { anio, setAnio, setCategoria, anios } = useFiltrosCompetencias();
   if (anios.length === 0) return null;
 
   return (
     <Filtros
+      fondo="oscuro"
       etiqueta="Año de la competencia"
       opciones={anios.map((a) => ({ valor: a, etiqueta: a }))}
       valor={anio}

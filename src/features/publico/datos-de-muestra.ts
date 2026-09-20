@@ -119,6 +119,15 @@ export const CATEGORIAS_MATRICULA_MUESTRA: CategoriaMatricula[] = [
   },
 ];
 
+// --- Semilleros: cifras de la metodología ---------------------------------------
+
+/** Tres cifras de la ruta formativa, sin valor real: la etiqueta dice qué irá. */
+export const CIFRAS_SEMILLEROS_MUESTRA = [
+  { id: "etapas", etiqueta: "[Etapas formativas]", detalle: "[Desde la iniciación hasta la competencia.]" },
+  { id: "ratio", etiqueta: "[Deportistas por entrenador]", detalle: "[Ratio máximo por grupo.]" },
+  { id: "entrenadores", etiqueta: "[Entrenadores certificados]", detalle: "[Formación del cuerpo técnico.]" },
+];
+
 // --- Tienda: beneficios -----------------------------------------------------------
 
 export const BENEFICIOS_TIENDA_MUESTRA = [

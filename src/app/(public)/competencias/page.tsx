@@ -8,10 +8,13 @@ import {
   ProveedorFiltrosCompetencias,
 } from "@/features/competencias/components/FiltrosCompetencias";
 import { HistorialCompetencias } from "@/features/competencias/components/HistorialCompetencias";
+import { ProximaCompetencia } from "@/features/competencias/components/ProximaCompetencia";
 import { aniosDisponibles, listarCompetenciasConResultados } from "@/features/competencias/queries";
+import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
+import { DEPORTES_PUBLICO, deporteDeParametros, enlaceConDeporte, type ParametrosBusqueda } from "@/features/publico/deporte-publico";
 
 const TITULO = "Competencias";
-const DESCRIPCION = "Calendario y resultados de los riders de la escuela de BMX TSW, por año y categoría.";
+const DESCRIPCION = "Calendario y resultados de los deportistas de la corporación TSW, por deporte, año y categoría.";
 
 export const metadata: Metadata = {
   title: TITULO,
@@ -19,24 +22,49 @@ export const metadata: Metadata = {
   openGraph: { title: `${TITULO} | TSW`, description: DESCRIPCION, type: "website" },
 };
 
+type Props = { searchParams: Promise<ParametrosBusqueda> };
+
+/** Día de hoy en Bogotá como "AAAA-MM-DD", comparable con `competencia.fecha`. */
+function hoyEnBogota(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
+}
+
 /**
  * Competencias publicadas con sus resultados. Server Component: una sola
- * consulta; la destacada sale de la misma lista y los filtros son islas de
- * cliente que comparten estado por contexto.
+ * consulta; de la misma lista salen la próxima (fecha futura más cercana), la
+ * destacada y el historial. Los filtros son islas de cliente con estado
+ * compartido por contexto.
+ *
+ * El deporte todavía no filtra la consulta: la columna no existe. Se muestra
+ * en la cabecera para que el recorrido por deporte sea el mismo que en el
+ * resto del sitio.
  */
-export default async function PaginaCompetencias() {
-  const competencias = await listarCompetenciasConResultados();
+export default async function PaginaCompetencias({ searchParams }: Props) {
+  const [competencias, parametros] = await Promise.all([listarCompetenciasConResultados(), searchParams]);
+  const deporte = deporteDeParametros(parametros);
   const destacada = competencias.find((c) => c.destacado) ?? null;
   const anios = aniosDisponibles(competencias).map(String);
+
+  const hoy = hoyEnBogota();
+  // La lista viene en orden descendente: la última con fecha >= hoy es la más cercana.
+  const proxima = [...competencias].reverse().find((c) => c.fecha >= hoy) ?? null;
 
   return (
     <ProveedorFiltrosCompetencias anios={anios}>
       <HeroPagina
+        tono="oscuro"
         antetitulo="Resultados"
-        titulo="Competencias"
-        bajada="Calendario y resultados de nuestros riders, válida por válida."
-        lateral={<FiltroAnio />}
+        titulo={`Competencias · ${deporte.nombre}`}
+        bajada="Calendario y resultados de nuestros deportistas, válida por válida."
+        lateral={
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+            <SelectorDeportePublico deportes={DEPORTES_PUBLICO} valor={deporte.id} fondo="oscuro" />
+            <FiltroAnio />
+          </div>
+        }
       />
+
+      <ProximaCompetencia competencia={proxima} />
 
       {destacada && (
         <Seccion tituloId="titulo-destacada">
@@ -52,7 +80,7 @@ export default async function PaginaCompetencias() {
       <Seccion tono="claro" tituloId="titulo-historial">
         <Aparece>
           <SeccionTitulo id="titulo-historial" bajada="Filtra por año y por categoría.">
-            Historial
+            Resultados oficiales
           </SeccionTitulo>
         </Aparece>
         <Aparece indice={1} className="mt-8">
@@ -62,10 +90,10 @@ export default async function PaginaCompetencias() {
 
       <BloqueCTA
         tituloId="titulo-cta-competencias"
-        titulo="¿Quieres competir con el club?"
-        texto="Conoce los semilleros y niveles: la ruta que lleva de la iniciación a la pista de competencia."
+        titulo="¿Quieres competir con la corporación?"
+        texto="Conoce los semilleros y niveles: la ruta que lleva de la iniciación a la competencia."
         acciones={
-          <Boton href="/semilleros" fondo="acento" tamano="lg">
+          <Boton href={enlaceConDeporte("/semilleros", deporte.id)} fondo="acento" tamano="lg">
             Conocer los semilleros
           </Boton>
         }

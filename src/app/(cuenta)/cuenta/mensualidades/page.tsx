@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { TarjetaMensualidad } from "@/components/ui";
+import { Boton, EstadoVacio, TarjetaMensualidad } from "@/components/ui";
 import { HISTORIAL_MENSUALIDADES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
 
 export const metadata: Metadata = { title: "Mensualidades" };
@@ -19,13 +19,24 @@ export default function PaginaMensualidades() {
       </div>
 
       {HISTORIAL_MENSUALIDADES_MUESTRA.length === 0 ? (
-        <p className="text-texto-sec">Todavía no hay mensualidades registradas.</p>
+        <EstadoVacio
+          titulo="Todavía no hay mensualidades registradas"
+          texto="Aparecerán aquí a medida que el club las genere y registre los pagos."
+          accion={
+            <Boton href="/cuenta" variante="secundario">
+              Volver al resumen
+            </Boton>
+          }
+        />
       ) : (
         HISTORIAL_MENSUALIDADES_MUESTRA.map((grupo) => (
           <section key={grupo.anio} aria-labelledby={`titulo-anio-${grupo.anio}`} className="flex flex-col gap-4">
             <h2 id={`titulo-anio-${grupo.anio}`} className="text-2xl">
               {grupo.anio}
             </h2>
+            {grupo.mensualidades.length === 0 && (
+              <p className="text-sm text-texto-sec">Sin mensualidades registradas en {grupo.anio}.</p>
+            )}
             <ul className="grid gap-3 lg:grid-cols-2">
               {grupo.mensualidades.map((m) => (
                 <li key={m.id}>

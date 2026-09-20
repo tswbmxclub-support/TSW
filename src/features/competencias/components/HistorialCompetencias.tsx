@@ -16,23 +16,22 @@ type Fila = {
   puesto: number | null;
 };
 
+/**
+ * La posición va primero y con énfasis, como en la tabla de resultados del
+ * rediseño; en móvil ocupa la esquina de la tarjeta. Sin puesto (competencia
+ * sin resultados) se muestra un guion, no un cero.
+ */
 const COLUMNAS: ColumnaTabla<Fila>[] = [
-  { clave: "fecha", titulo: "Fecha", render: (f) => formatearFecha(f.fecha), className: "whitespace-nowrap" },
-  { clave: "competencia", titulo: "Competencia", principal: true, render: (f) => f.competencia },
-  { clave: "rider", titulo: "Rider", render: (f) => f.rider },
   {
-    clave: "resultado",
-    titulo: "Resultado",
-    render: (f) =>
-      f.puesto === null ? (
-        <span className="text-texto-sec">Pendiente</span>
-      ) : (
-        <span>
-          <span className="font-display text-lg text-rojo">{f.puesto}.º</span>
-          {f.categoria && <span className="ml-2 text-sm text-texto-sec">{f.categoria}</span>}
-        </span>
-      ),
+    clave: "puesto",
+    titulo: "Posición",
+    render: (f) => (f.puesto === null ? <span aria-label="Pendiente">—</span> : `${f.puesto}.º`),
+    className: "w-24 whitespace-nowrap",
   },
+  { clave: "rider", titulo: "Rider", principal: true, render: (f) => f.rider },
+  { clave: "competencia", titulo: "Competencia", render: (f) => f.competencia },
+  { clave: "categoria", titulo: "Categoría", render: (f) => f.categoria ?? <span className="text-texto-sec">Pendiente</span> },
+  { clave: "fecha", titulo: "Fecha", render: (f) => formatearFecha(f.fecha), className: "whitespace-nowrap" },
 ];
 
 /**
@@ -116,6 +115,7 @@ export function HistorialCompetencias({ competencias }: { competencias: Competen
           columnas={COLUMNAS}
           filas={filas}
           claveFila={(f) => f.id}
+          enfasis="puesto"
         />
       )}
     </div>

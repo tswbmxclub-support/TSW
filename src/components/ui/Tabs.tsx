@@ -116,9 +116,17 @@ export function Filtros({
   valor,
   alCambiar,
   etiqueta,
+  fondo = "claro",
   className,
-}: Omit<TabsProps, "children">) {
+}: Omit<TabsProps, "children"> & {
+  /**
+   * Sobre azul profundo el texto va en blanco: el rojo como texto no alcanza
+   * contraste ahí (3.47:1) y se queda solo en el borde y el indicador.
+   */
+  fondo?: "claro" | "oscuro";
+}) {
   const base = useId();
+  const oscuro = fondo === "oscuro";
 
   return (
     <div role="group" aria-label={etiqueta} className={cn("flex flex-wrap gap-2", className)}>
@@ -133,9 +141,11 @@ export function Filtros({
             className={cn(
               "relative min-h-[44px] overflow-hidden rounded-full border-2 px-4 py-2 text-sm font-semibold transition-colors",
               "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
-              activo
-                ? "border-rojo text-rojo"
-                : "border-gris-borde text-texto-sec hover:border-azul-medio hover:text-azul-profundo",
+              activo && (oscuro ? "border-rojo text-blanco" : "border-rojo text-rojo"),
+              !activo &&
+                (oscuro
+                  ? "border-blanco/30 text-blanco/85 hover:border-blanco hover:text-blanco"
+                  : "border-gris-borde text-texto-sec hover:border-azul-medio hover:text-azul-profundo"),
             )}
           >
             {opcion.etiqueta}

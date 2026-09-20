@@ -25,6 +25,7 @@ export {
   ChipEstado,
   ETIQUETA_ESTADO_PEDIDO,
   ETIQUETA_ESTADO_PUBLICACION,
+  ETIQUETA_ESTADO_MENSUALIDAD,
   type ChipEstadoProps,
 } from "./ChipEstado";
 export { Aviso, type AvisoProps, type TonoAviso } from "./Aviso";

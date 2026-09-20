@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import {
   Aviso,
   AreaTexto,
+  Badge,
   Boton,
   Campo,
   ChipEstado,
@@ -16,6 +17,7 @@ import {
   TarjetaMensualidad,
 } from "@/components/ui";
 import {
+  AUTORIZACION_DATOS_MUESTRA,
   MENSUALIDAD_ACTUAL_MUESTRA,
   MENSUALIDADES_MUESTRA,
   USUARIOS_PANEL_MUESTRA,
@@ -149,6 +151,28 @@ export function DetalleUsuarioAdmin() {
           Desactivar
         </Boton>
       </div>
+
+      {/* --- Tratamiento de datos (Ley 1581) ------------------------------ */}
+      <section aria-labelledby="titulo-datos-usuario" className="flex flex-col gap-3">
+        <h2 id="titulo-datos-usuario" className="text-lg uppercase">Autorización de datos</h2>
+        <Aviso
+          tono={AUTORIZACION_DATOS_MUESTRA.estado === "firmada" ? "exito" : "aviso"}
+          titulo={
+            AUTORIZACION_DATOS_MUESTRA.estado === "firmada"
+              ? "Autorización del acudiente firmada"
+              : "Autorización del acudiente pendiente"
+          }
+        >
+          <p>
+            Con menores en la cuenta, la Ley 1581 exige constancia de la autorización del acudiente para tratar
+            sus datos. El formato firmado se radica en sede; aquí solo se registra que existe.
+          </p>
+          <p className="mt-2 flex flex-wrap items-center gap-2">
+            <Badge tono="neutro">{AUTORIZACION_DATOS_MUESTRA.documento ?? "[FORMATO]"}</Badge>
+            <span>{AUTORIZACION_DATOS_MUESTRA.fecha ?? "[FECHA DE FIRMA PENDIENTE]"}</span>
+          </p>
+        </Aviso>
+      </section>
 
       {/* --- Historial de mensualidades ---------------------------------- */}
       <section aria-labelledby="titulo-mensualidades-usuario" className="flex flex-col gap-3">
