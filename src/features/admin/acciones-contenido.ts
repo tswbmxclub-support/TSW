@@ -143,15 +143,14 @@ export async function guardarCompetencia(entrada: EntradaCompetencia): Promise<R
     const c = datos.data;
     // La autorización se registra en la misma transacción: la bitácora guarda
     // quién la marcó y cuándo (columna autorizacion_imagen_en, migración 11).
+    // guardar_competencia (migración 11) es reemplazo total del FORMULARIO: no
+    // toca estado, destacado ni imagen_path, cada uno tiene su RPC propia.
     await ejecutarRpc("guardar_competencia", {
       p_id: c.id,
       p_titulo: c.titulo,
       p_slug: c.slug,
       p_fecha: c.fecha,
       p_cuerpo: c.cuerpo ?? undefined,
-      p_estado: "borrador",
-      p_destacado: false,
-      p_imagen_path: c.imagenPath ?? undefined,
       p_autorizacion_imagen: c.autorizacionImagen,
     });
     revalidarPublico("competencia");
@@ -168,13 +167,9 @@ export async function publicarCompetencia(id: string, autorizacionImagen: boolea
   }
 
   try {
-    // publicar es actualizar el estado; guardar_competencia con p_estado publicado.
-    await ejecutarRpc("guardar_competencia", {
-      p_id: id,
-      p_estado: "publicado",
-      p_autorizacion_imagen: autorizacionImagen,
-      p_imagen_path: imagenPath ?? undefined,
-    });
+    // El estado solo cambia por publicar_competencia (migración 11); la
+    // autorización de imagen la exige el CHECK de la tabla si hay foto.
+    await ejecutarRpc("publicar_competencia", { p_id: id });
     revalidarPublico("competencia");
     return { ok: true, mensaje: "Competencia publicada." };
   } catch (error) {
@@ -184,7 +179,7 @@ export async function publicarCompetencia(id: string, autorizacionImagen: boolea
 
 export async function archivarCompetencia(id: string): Promise<ResultadoEscritura> {
   try {
-    await ejecutarRpc("guardar_competencia", { p_id: id, p_estado: "archivado" });
+    await ejecutarRpc("archivar_competencia", { p_id: id });
     revalidarPublico("competencia");
     return { ok: true, mensaje: "Competencia archivada." };
   } catch (error) {
@@ -195,7 +190,7 @@ export async function archivarCompetencia(id: string): Promise<ResultadoEscritur
 /** Destacar: el trigger desmarca la anterior. La UI advierte el efecto. */
 export async function destacarCompetencia(id: string, destacar: boolean): Promise<ResultadoEscritura> {
   try {
-    await ejecutarRpc("guardar_competencia", { p_id: id, p_destacado: destacar });
+    await ejecutarRpc("destacar_competencia", { p_id: id, p_destacado: destacar });
     revalidarPublico("competencia");
     return {
       ok: true,
@@ -238,7 +233,8 @@ export async function subirImagenCompetencia(id: string, archivo: File): Promise
     });
     if (error) throw error;
 
-    await ejecutarRpc("guardar_competencia", { p_id: id, p_imagen_path: ruta });
+    // La única forma de escribir competencia.imagen_path (migración 11).
+    await ejecutarRpc("establecer_imagen_competencia", { p_id: id, p_imagen_path: ruta });
     revalidarPublico("competencia");
     return { ok: true, mensaje: "Imagen cargada.", imagenPath: ruta };
   } catch (error) {

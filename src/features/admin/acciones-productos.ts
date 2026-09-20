@@ -86,7 +86,8 @@ export async function subirImagenProducto(
     });
     if (error) throw error;
 
-    await ejecutarRpc("guardar_producto", { p_id: id, p_imagen_path: ruta });
+    // La única forma de escribir producto.imagen_path (migración 12).
+    await ejecutarRpc("establecer_imagen_producto", { p_id: id, p_imagen_path: ruta });
     revalidarPublico("producto");
     return { ok: true, mensaje: "Imagen cargada.", imagenPath: ruta };
   } catch (error) {
@@ -102,7 +103,8 @@ export async function subirImagenProducto(
  */
 export async function alternarProducto(id: string, activo: boolean): Promise<ResultadoEscritura> {
   try {
-    await ejecutarRpc("guardar_producto", { p_id: id, p_activo: activo });
+    // Un booleano, una RPC mínima (migración 12): alternar no es guardar.
+    await ejecutarRpc("alternar_producto_activo", { p_id: id, p_activo: activo });
     revalidarPublico("producto");
     return {
       ok: true,
