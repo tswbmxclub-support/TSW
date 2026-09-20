@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type TonoBadge = "neutro" | "acento" | "exito" | "aviso" | "oscuro";
+export type TonoBadge = "neutro" | "acento" | "exito" | "aviso" | "oscuro" | "rojo" | "claro";
 
 const TONOS: Record<TonoBadge, string> = {
   neutro: "bg-gris-frio text-texto-sec border-gris-borde",
@@ -12,6 +12,10 @@ const TONOS: Record<TonoBadge, string> = {
   exito: "bg-exito-fondo text-exito border-exito/30",
   aviso: "bg-aviso-fondo text-aviso border-aviso/30",
   oscuro: "bg-azul-profundo text-blanco border-azul-profundo",
+  // Rojo sólido: solo sobre azul profundo, como chip de antetítulo (blanco sobre rojo 4.96:1).
+  rojo: "bg-rojo text-blanco border-rojo",
+  // Translúcido sobre azul profundo, para etiquetas secundarias del hero.
+  claro: "bg-blanco/10 text-blanco border-blanco/25",
 };
 
 export type BadgeProps = {

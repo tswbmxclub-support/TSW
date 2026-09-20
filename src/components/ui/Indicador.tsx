@@ -4,8 +4,11 @@ import { cn } from "@/lib/utils";
 
 export type IndicadorProps = {
   etiqueta: string;
-  /** Número ya formateado, o null cuando el dato no existe todavía. */
-  valor: number | string | null;
+  /**
+   * Número ya formateado (o un nodo como CuentaAscendente), o null cuando el
+   * dato no existe todavía.
+   */
+  valor: ReactNode | null;
   /** Línea de contexto: "este mes", "esperando pago". */
   detalle?: ReactNode;
   /** Enlace a la sección que explica la cifra. */

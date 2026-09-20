@@ -8,10 +8,12 @@
 
 export const SITIO = {
   nombre: "TSW",
-  nombreLargo: "[Club Deportivo TSW]",
-  lema: "[Lema del club]",
+  nombreLargo: "[Corporación Deportiva TSW]",
+  /** Texto corto bajo el logo: qué es la entidad. */
+  subtitulo: "Corporación deportiva",
+  lema: "[Lema de la corporación]",
   descripcion:
-    "Escuela de BMX: matrículas, uniformes, competencias y niveles de formación.",
+    "Corporación deportiva: matrículas, semilleros, competencias y dotación oficial de cada deporte.",
 } as const;
 
 export const CONTACTO = {
@@ -50,7 +52,10 @@ export const CIFRAS: Cifra[] = [
   { valor: null, sufijo: "", etiqueta: "[Niveles de formación]" },
 ];
 
-/** Navegación principal. "La escuela" despliega submenú. */
+/**
+ * Navegación principal, plana como en el rediseño: cinco puertas, sin
+ * submenú. El submenú sigue soportado por Header por si vuelve a hacer falta.
+ */
 export type EnlaceNav = {
   etiqueta: string;
   href: string;
@@ -58,25 +63,28 @@ export type EnlaceNav = {
 };
 
 export const NAVEGACION: EnlaceNav[] = [
-  {
-    etiqueta: "La escuela",
-    href: "/semilleros",
-    submenu: [
-      {
-        etiqueta: "Semilleros y niveles",
-        href: "/semilleros",
-        descripcion: "La ruta de formación, de la iniciación a la competencia.",
-      },
-      {
-        etiqueta: "Matrículas",
-        href: "/matriculas",
-        descripcion: "Documentos para descargar. La radicación es presencial.",
-      },
-    ],
-  },
+  { etiqueta: "Corporación", href: "/" },
+  { etiqueta: "Semilleros", href: "/semilleros" },
   { etiqueta: "Competencias", href: "/competencias" },
+  { etiqueta: "Matrículas", href: "/matriculas" },
   { etiqueta: "Tienda", href: "/tienda" },
 ];
+
+/** Columnas del pie, como en el rediseño: institucional, servicios y sede. */
+export const PIE_INSTITUCIONAL = [
+  { etiqueta: "Nuestros pilares", href: "/#titulo-pilares" },
+  { etiqueta: "Nuestros deportes", href: "/#titulo-deportes" },
+  { etiqueta: "Documentos", href: "/#titulo-documentos-portal" },
+  { etiqueta: "[Estatutos y reglamentos]", href: "/matriculas" },
+] as const;
+
+export const PIE_SERVICIOS = [
+  { etiqueta: "Semilleros y niveles", href: "/semilleros" },
+  { etiqueta: "Competencias y resultados", href: "/competencias" },
+  { etiqueta: "Matrículas", href: "/matriculas" },
+  { etiqueta: "Dotación y tienda", href: "/tienda" },
+  { etiqueta: "Mi cuenta", href: "/cuenta/acceso" },
+] as const;
 
 export const ENLACES_LEGALES = [
   { etiqueta: "Política de tratamiento de datos", href: "/legal/datos" },

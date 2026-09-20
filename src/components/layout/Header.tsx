@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useTrampaFoco } from "@/lib/accesibilidad/trampaFoco";
 import { AnimatePresence, motion, useMovimientoReducido } from "@/lib/animaciones";
-import { NAVEGACION } from "@/config/sitio";
+import { NAVEGACION, SITIO } from "@/config/sitio";
 import { useCarrito } from "@/features/pedidos/carrito";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +62,7 @@ export function Header() {
         >
           TSW
           <span className="ml-2 hidden text-xs font-normal uppercase tracking-[0.2em] text-blanco/60 sm:inline">
-            BMX
+            {SITIO.subtitulo}
           </span>
         </Link>
 

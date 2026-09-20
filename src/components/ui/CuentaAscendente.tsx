@@ -2,49 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { CIFRAS, type Cifra } from "@/config/sitio";
 import { useMovimientoReducido } from "@/lib/animaciones";
-
-/**
- * Franja roja de cifras clave. El rojo se usa aquí como fondo de una banda
- * corta, no como fondo dominante de la página, y el texto va en blanco.
- *
- * Las cifras que todavía no existen se muestran como pendientes: no se inventa
- * un número para que la animación quede bonita.
- */
-export function FranjaCifras() {
-  return (
-    <section aria-label="Cifras del club" className="bg-rojo text-blanco">
-      <div className="contenedor grid grid-cols-2 gap-x-6 gap-y-8 py-10 lg:grid-cols-4 lg:py-12">
-        {CIFRAS.map((cifra) => (
-          <div key={cifra.etiqueta} className="text-center">
-            <ValorCifra cifra={cifra} />
-            <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-blanco/85">
-              {cifra.etiqueta}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ValorCifra({ cifra }: { cifra: Cifra }) {
-  if (cifra.valor === null) {
-    return (
-      <p className="font-display text-2xl leading-none sm:text-3xl" title="Dato pendiente de confirmar">
-        [dato]
-      </p>
-    );
-  }
-
-  return (
-    <p className="font-display text-4xl leading-none sm:text-5xl lg:text-6xl">
-      <CuentaAscendente hasta={cifra.valor} />
-      {cifra.sufijo}
-    </p>
-  );
-}
 
 const DURACION_MS = 1200;
 
@@ -59,7 +17,7 @@ const DURACION_MS = 1200;
  * está a la vista, se queda con el número final: bajarlo a cero para contar
  * hacia arriba sería un salto delante de los ojos del lector.
  */
-function CuentaAscendente({ hasta }: { hasta: number }) {
+export function CuentaAscendente({ hasta }: { hasta: number }) {
   const reducido = useMovimientoReducido();
   const [valor, setValor] = useState<number | null>(null);
   const ancla = useRef<HTMLSpanElement>(null);

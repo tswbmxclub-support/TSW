@@ -40,3 +40,4 @@ export { ResumenCuenta, type ResumenCuentaProps, type DeportistaResumen } from "
 export { PasosRuta, type PasosRutaProps, type PasoRuta } from "./PasosRuta";
 export { TarjetaDeporte, type TarjetaDeporteProps } from "./TarjetaDeporte";
 export { ContadorRegresivo, type ContadorRegresivoProps } from "./ContadorRegresivo";
+export { CuentaAscendente } from "./CuentaAscendente";

@@ -83,6 +83,10 @@ export default function PaginaLaboratorio() {
         >
           Carrusel del hero
         </SeccionTitulo>
+        <p className="mt-3 text-sm text-texto-sec">
+          Ya no se usa en la portada (el rediseño la abre con HeroPortal, texto y tarjeta de deportes). Se
+          conserva aquí por si el club lo quiere de vuelta; si no, se elimina con Hero.tsx.
+        </p>
       </Seccion>
       <Hero />
 
