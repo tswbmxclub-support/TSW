@@ -13,6 +13,16 @@ export const SECCIONES_PANEL: SeccionPanel[] = [
   { href: "/admin/niveles", etiqueta: "Niveles", descripcion: "Semilleros y niveles de formación." },
   { href: "/admin/productos", etiqueta: "Productos", descripcion: "Catálogo, tallas, precios e inventario." },
   { href: "/admin/pedidos", etiqueta: "Pedidos", descripcion: "Pedidos de la tienda y su estado." },
+  {
+    href: "/admin/usuarios",
+    etiqueta: "Usuarios",
+    descripcion: "Titulares de cuenta, mensualidades y jerseys.",
+  },
+  {
+    href: "/admin/administradores",
+    etiqueta: "Administradores",
+    descripcion: "Quién puede entrar al panel y revocar accesos.",
+  },
   { href: "/admin/bitacora", etiqueta: "Bitácora", descripcion: "Quién cambió qué y cuándo." },
 ];
 

@@ -7,6 +7,8 @@ export type PaginaPanelProps = {
   descripcion?: ReactNode;
   /** Botón de acción principal de la sección: "Nuevo producto", "Publicar versión". */
   accion?: ReactNode;
+  /** Deporte activo de la corporación: se muestra bajo el título si llega. */
+  deporte?: { nombre: string };
   children: ReactNode;
   className?: string;
 };
@@ -16,13 +18,22 @@ export type PaginaPanelProps = {
  * de cada página del panel vive aquí; la acción principal queda a la derecha
  * en escritorio y debajo del título en móvil.
  */
-export function PaginaPanel({ titulo, descripcion, accion, children, className }: PaginaPanelProps) {
+export function PaginaPanel({ titulo, descripcion, accion, deporte, children, className }: PaginaPanelProps) {
   return (
     <div className={cn("px-4 py-6 sm:px-6 lg:px-8 lg:py-8", className)}>
       <header className="flex flex-col gap-4 border-b border-gris-borde pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl">{titulo}</h1>
           {descripcion && <p className="mt-1 text-texto-sec">{descripcion}</p>}
+          {deporte && (
+            <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-texto-sec">
+              Deporte activo:
+              <span className="inline-flex items-center rounded-full bg-azul-profundo px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blanco">
+                {deporte.nombre}
+              </span>
+              <span className="text-xs">(vista previa: aún no filtra los datos)</span>
+            </p>
+          )}
         </div>
         {accion && <div className="flex shrink-0 flex-col gap-2 sm:flex-row">{accion}</div>}
       </header>

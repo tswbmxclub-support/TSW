@@ -9,15 +9,34 @@ import { AnimatePresence, motion, useMovimientoReducido } from "@/lib/animacione
 import { Boton } from "@/components/ui";
 import { SECCIONES_PANEL } from "@/config/panel";
 import { cerrarSesion } from "@/features/admin/acciones";
+import { CabeceraDeporte } from "@/components/admin/CabeceraDeporte";
+import { DEPORTES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
 import { cn } from "@/lib/utils";
+
+/** Lista que alimenta el selector mientras no existe la tabla deporte. */
+const DEPORTES_PANEL = DEPORTES_MUESTRA;
 
 /**
  * Armazón del panel: barra lateral azul profundo con las secciones, correo
  * del usuario y cierre de sesión. Desde `lg` es una columna fija; por debajo,
  * una barra superior de 64px con hamburguesa y un cajón lateral con el foco
  * atrapado, cierre con Escape y con toque fuera.
+ *
+ * Con el cambio de alcance multideporte lleva también el SelectorDeporte,
+ * visible en escritorio y en el cajón móvil. DeporteActivo llega del servidor
+ * (cookie tsw.deporte); por ahora es solo un filtro visual: no filtra
+ * consultas porque la columna no existe.
  */
-export function ArmazonPanel({ correo, children }: { correo: string; children: ReactNode }) {
+export function ArmazonPanel({
+  correo,
+  deporte,
+  children,
+}: {
+  correo: string;
+  /** Deporte activo leído de la cookie en el servidor. */
+  deporte: { id: string; nombre: string };
+  children: ReactNode;
+}) {
   const ruta = usePathname();
   const [abierto, setAbierto] = useState(false);
   const reducido = useMovimientoReducido();
@@ -68,7 +87,7 @@ export function ArmazonPanel({ correo, children }: { correo: string; children: R
 
       {/* --- Barra lateral (escritorio) ---------------------------------- */}
       <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col">
-        <Navegacion ruta={ruta} correo={correo} />
+        <Navegacion ruta={ruta} correo={correo} deporte={deporte} />
       </aside>
 
       {/* --- Cajón lateral (móvil y tablet) -------------------------------- */}
@@ -96,7 +115,7 @@ export function ArmazonPanel({ correo, children }: { correo: string; children: R
               exit={reducido ? undefined : { x: -24, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Navegacion ruta={ruta} correo={correo} alCerrar={() => setAbierto(false)} />
+              <Navegacion ruta={ruta} correo={correo} deporte={deporte} alCerrar={() => setAbierto(false)} />
             </motion.div>
           </div>
         )}
@@ -110,17 +129,19 @@ export function ArmazonPanel({ correo, children }: { correo: string; children: R
 function Navegacion({
   ruta,
   correo,
+  deporte,
   alCerrar,
 }: {
   ruta: string;
   correo: string;
+  deporte: { id: string; nombre: string };
   alCerrar?: () => void;
 }) {
   const activa = (href: string) => (href === "/admin" ? ruta === "/admin" : ruta.startsWith(href));
 
   return (
     <div className="flex h-full w-full flex-col bg-azul-profundo text-blanco">
-      <div className="flex h-16 items-center justify-between px-5">
+      <div className="flex h-16 items-center justify-between gap-2 px-5">
         <Link
           href="/admin"
           className="flex min-h-[44px] items-center font-display text-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
@@ -140,6 +161,14 @@ function Navegacion({
             <span className="sr-only">Cerrar menú</span>
           </button>
         )}
+      </div>
+
+      {/* Selector de deporte: en todas las secciones, encima de la navegación. */}
+      <div className="px-4 pb-3">
+        <CabeceraDeporte deportes={DEPORTES_PANEL} valor={deporte.id} />
+        <p className="mt-2 text-xs text-blanco/60">
+          Administrando: <span className="font-semibold text-blanco/85">{deporte.nombre}</span>
+        </p>
       </div>
 
       <nav aria-label="Secciones del panel" className="flex-1 overflow-y-auto px-3 py-2">
