@@ -121,6 +121,9 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
       <button
         ref={boton}
         type="button"
+        // combobox de solo selección (patrón "select-only" de WAI-ARIA): es el
+        // único rol que admite aria-activedescendant con la lista aparte.
+        role="combobox"
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-controls={listaId}

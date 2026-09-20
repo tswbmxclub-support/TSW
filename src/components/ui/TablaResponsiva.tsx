@@ -21,6 +21,13 @@ export type TablaResponsivaProps<T> = {
   caption: string;
   /** Punto de quiebre desde el que se muestra como tabla. */
   desde?: "md" | "lg";
+  /**
+   * Clave de la columna que se muestra en grande y en display: la posición
+   * de una tabla de resultados, el puesto de un podio. En escritorio es una
+   * celda destacada; en móvil pasa a la esquina de la tarjeta, al lado del
+   * título, y sale de la lista de pares nombre/valor.
+   */
+  enfasis?: string;
   className?: string;
 };
 
@@ -39,12 +46,14 @@ export function TablaResponsiva<T>({
   claveFila,
   caption,
   desde = "md",
+  enfasis,
   className,
 }: TablaResponsivaProps<T>) {
   if (filas.length === 0) return null;
 
   const principal = columnas.find((c) => c.principal) ?? columnas[0];
-  const secundarias = columnas.filter((c) => c !== principal);
+  const enfatizada = enfasis ? columnas.find((c) => c.clave === enfasis) : undefined;
+  const secundarias = columnas.filter((c) => c !== principal && c !== enfatizada);
   const tabla = desde === "md" ? "hidden md:table" : "hidden lg:table";
   const tarjetas = desde === "md" ? "md:hidden" : "lg:hidden";
 
@@ -79,6 +88,7 @@ export function TablaResponsiva<T>({
                     "py-4 pr-4 align-top",
                     columna.alinear === "derecha" && "text-right",
                     columna === principal && "font-semibold text-azul-profundo",
+                    columna === enfatizada && "font-display text-2xl leading-none text-rojo-oscuro",
                     columna.className,
                   )}
                 >
@@ -93,9 +103,15 @@ export function TablaResponsiva<T>({
       <ul className={cn(tarjetas, "flex flex-col gap-3")} aria-label={caption}>
         {filas.map((fila) => (
           <li key={claveFila(fila)} className="rounded-lg border border-gris-borde bg-blanco p-4">
-            {principal && (
-              <p className="font-semibold text-azul-profundo">{principal.render(fila)}</p>
-            )}
+            <div className="flex items-start gap-3">
+              {enfatizada && (
+                <p className="shrink-0 font-display text-3xl leading-none text-rojo-oscuro">
+                  <span className="sr-only">{enfatizada.titulo}: </span>
+                  {enfatizada.render(fila)}
+                </p>
+              )}
+              {principal && <p className="font-semibold text-azul-profundo">{principal.render(fila)}</p>}
+            </div>
             <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
               {secundarias.map((columna) => (
                 <div key={columna.clave} className="contents">

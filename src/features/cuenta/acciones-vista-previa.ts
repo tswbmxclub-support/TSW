@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-import { DEPORTES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
+import { OPCIONES_SELECTOR_PANEL } from "@/features/cuenta/datos-de-muestra";
 import { NOMBRE_COOKIE_DEPORTE } from "@/features/cuenta/deporte-servidor";
 
 /**
@@ -18,7 +18,7 @@ import { NOMBRE_COOKIE_DEPORTE } from "@/features/cuenta/deporte-servidor";
  * deporte por defecto, igual que en la lectura.
  */
 export async function elegirDeporte(id: string): Promise<void> {
-  const deporte = DEPORTES_MUESTRA.find((d) => d.id === id);
+  const deporte = OPCIONES_SELECTOR_PANEL.find((d) => d.id === id);
   if (!deporte) return;
 
   const cookie = await cookies();

@@ -14,6 +14,8 @@ import {
   CardTitulo,
   ChipEstado,
   EstadoVacio,
+  PasosRuta,
+  TarjetaDeporte,
   HeroPagina,
   Indicador,
   ItemDescarga,
@@ -35,6 +37,7 @@ import {
   DemoArchivo,
   DemoBotonCargando,
   DemoCampoMoneda,
+  DemoContadorRegresivo,
   DemoEstadoError,
   DemoFiltros,
   DemoModal,
@@ -466,6 +469,18 @@ export default function PaginaLaboratorio() {
           filas={FILAS_EJEMPLO}
           claveFila={(f) => f.id}
         />
+        <p className="mt-10 text-sm font-semibold text-texto-sec">
+          Con <code className="font-mono">enfasis</code>: la posición sale de la lista de pares y se muestra en
+          display, para tablas de resultados.
+        </p>
+        <TablaResponsiva
+          className="mt-4"
+          caption="Resultados de ejemplo"
+          columnas={COLUMNAS_RESULTADOS}
+          filas={FILAS_RESULTADOS}
+          claveFila={(f) => f.id}
+          enfasis="puesto"
+        />
       </Seccion>
 
       {/* --- EstadoVacio y EstadoError ----------------------------------- */}
@@ -524,6 +539,37 @@ export default function PaginaLaboratorio() {
             />
           </li>
         </ul>
+        <p className="mt-10 text-sm font-semibold text-texto-sec">
+          Variante <code className="font-mono">cifra</code>: la fila de cifras del sitio público. Barra decorativa por
+          defecto; con <code className="font-mono">progreso</code> se vuelve medidor (cupos).
+        </p>
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <li>
+            <Indicador variante="cifra" etiqueta="[Deportistas]" valor="[CIFRA]" detalle="[Texto de apoyo de la cifra.]" />
+          </li>
+          <li>
+            <Indicador variante="cifra" etiqueta="[Cupos disponibles]" valor="[CIFRA]" detalle="[Ocupación del semestre.]" progreso={65} />
+          </li>
+          <li>
+            <Indicador variante="cifra" etiqueta="[Sin dato]" valor={null} detalle="El club no ha entregado esta cifra." progreso={null} />
+          </li>
+          <li>
+            <Indicador
+              variante="cifra"
+              etiqueta="[Etiqueta larga de una cifra que parte en dos líneas]"
+              valor="[CIFRA]"
+              detalle="[Apoyo largo que ocupa dos o tres líneas para comprobar que la barra queda siempre abajo.]"
+            />
+          </li>
+        </ul>
+        <ul className="mt-4 grid gap-4 rounded-lg bg-azul-profundo p-5 sm:grid-cols-2">
+          <li>
+            <Indicador variante="cifra" oscuro etiqueta="[Deportistas]" valor="[CIFRA]" detalle="[Sobre azul profundo.]" />
+          </li>
+          <li>
+            <Indicador variante="cifra" oscuro etiqueta="[Cupos]" valor="[CIFRA]" detalle="[Medidor sobre oscuro.]" progreso={30} />
+          </li>
+        </ul>
       </Seccion>
 
       <Seccion tituloId="titulo-chipestado">
@@ -575,6 +621,94 @@ export default function PaginaLaboratorio() {
             vuelve al inventario. Texto largo a propósito para ver cómo parte en varias líneas.
           </Aviso>
           <Aviso tono="info">Si el correo corresponde a la cuenta del administrador, recibirás un enlace.</Aviso>
+        </div>
+        <p className="mt-10 text-sm font-semibold text-texto-sec">
+          Variante <code className="font-mono">destacado</code>: bloque de página con borde lateral y acción, para avisos
+          que gobiernan un proceso.
+        </p>
+        <div className="mt-4 flex flex-col gap-4">
+          <Aviso
+            variante="destacado"
+            tono="error"
+            titulo="La radicación es presencial"
+            accion={
+              <Boton href="/matriculas" variante="secundario">
+                Ver el protocolo
+              </Boton>
+            }
+          >
+            Los formatos se entregan impresos y firmados en la sede. No se validan matrículas enviadas por
+            correo ni por mensajería. Texto largo a propósito para comprobar que la acción baja en móvil y se
+            queda a la derecha en escritorio.
+          </Aviso>
+          <Aviso variante="destacado" tono="info" titulo="Vista previa con datos de muestra">
+            Sin acción: el bloque ocupa todo el ancho.
+          </Aviso>
+        </div>
+      </Seccion>
+
+      {/* --- PasosRuta ---------------------------------------------------- */}
+      <Seccion tituloId="titulo-pasosruta">
+        <SeccionTitulo
+          id="titulo-pasosruta"
+          bajada="Hoja de ruta en tarjetas numeradas (es una <ol>). Una columna en móvil, cuatro en escritorio. Para procesos con detalle largo por paso sigue siendo SelectorDetalle."
+        >
+          PasosRuta
+        </SeccionTitulo>
+        <PasosRuta className="mt-8" etiqueta="Pasos de ejemplo" pasos={PASOS_RUTA_EJEMPLO} />
+        <div className="mt-6 rounded-lg bg-azul-profundo p-5">
+          <PasosRuta oscuro etiqueta="Pasos de ejemplo sobre oscuro" pasos={PASOS_RUTA_EJEMPLO.slice(0, 3)} />
+        </div>
+      </Seccion>
+
+      {/* --- TarjetaDeporte ----------------------------------------------- */}
+      <Seccion tono="claro" tituloId="titulo-tarjetadeporte">
+        <SeccionTitulo
+          id="titulo-tarjetadeporte"
+          bajada="Un deporte de la corporación: foto con chip, texto, puntos y pie con enlace. Solo el enlace es interactivo."
+        >
+          TarjetaDeporte
+        </SeccionTitulo>
+        <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <li>
+            <TarjetaDeporte
+              nombre="BMX"
+              categoria="[Categoría]"
+              descripcion="[Descripción corta del deporte y a quién va dirigido.]"
+              puntos={["[Punto 1]", "[Punto 2]"]}
+              href="/semilleros?deporte=bmx"
+              etiquetaEnlace="Ver semilleros"
+              pie="[Cupos por semestre]"
+              className="h-full"
+            />
+          </li>
+          <li>
+            <TarjetaDeporte
+              nombre="[DEPORTE 2 CON NOMBRE LARGO]"
+              categoria="[Categoría]"
+              descripcion="[Descripción larga para comprobar que el pie queda alineado abajo aunque el texto ocupe varias líneas y la lista de puntos sea más larga que la de al lado.]"
+              puntos={["[Punto 1 con texto largo que parte en dos líneas]", "[Punto 2]", "[Punto 3]"]}
+              href="/semilleros?deporte=deporte-2"
+              etiquetaEnlace="Ver semilleros"
+              className="h-full"
+            />
+          </li>
+          <li>
+            <TarjetaDeporte nombre="[DEPORTE 3]" descripcion="[Sin puntos, sin pie ni enlace: solo informativa.]" className="h-full" />
+          </li>
+        </ul>
+      </Seccion>
+
+      {/* --- ContadorRegresivo -------------------------------------------- */}
+      <Seccion tituloId="titulo-contador">
+        <SeccionTitulo
+          id="titulo-contador"
+          bajada="Cuenta regresiva a la próxima competencia. Sin números en el primer render (evita fallo de hidratación); con movimiento reducido actualiza por minuto; sin fecha futura, estado vacío."
+        >
+          ContadorRegresivo
+        </SeccionTitulo>
+        <div className="mt-8">
+          <DemoContadorRegresivo />
         </div>
       </Seccion>
 
@@ -687,7 +821,7 @@ export default function PaginaLaboratorio() {
       <Seccion tituloId="titulo-resumencuenta">
         <SeccionTitulo
           id="titulo-resumencuenta"
-          bajada="Cabecera del área de usuario: titular, deportistas asociados, deporte y nivel de cada uno."
+          bajada="Cabecera del área de usuario. modo=acudiente lista a los deportistas a cargo; modo=deportista pone la ficha del titular en la cabecera; sin deportistas, lo dice."
         >
           ResumenCuenta
         </SeccionTitulo>
@@ -762,6 +896,44 @@ const PASOS_EJEMPLO = [
     titulo: "Radica en la sede",
     contenido: <p className="text-texto-sec">Entrega la carpeta completa. La radicación es presencial.</p>,
   },
+];
+
+const PASOS_RUTA_EJEMPLO = [
+  {
+    id: "uno",
+    numero: "01",
+    etiqueta: "Descarga",
+    titulo: "Descarga los documentos",
+    texto: "Baja los formatos vigentes. Cada archivo indica versión y fecha.",
+    pie: "Impresión requerida",
+  },
+  {
+    id: "dos",
+    numero: "02",
+    etiqueta: "Médico",
+    titulo: "Certificado médico con un título largo que parte en dos líneas",
+    texto:
+      "Texto largo a propósito: expedición de aptitud física por un profesional habilitado y afiliación al sistema de salud vigente, para comprobar que las tarjetas mantienen el pie alineado.",
+    pie: "[Anexo del club]",
+  },
+  { id: "tres", numero: "03", etiqueta: "Presencial", titulo: "Radica en la sede", texto: "Entrega la carpeta completa. La radicación es presencial.", pie: "Solo en sede" },
+  { id: "cuatro", numero: "04", titulo: "Deportista activo", texto: "Sin etiqueta ni pie: el paso final." },
+];
+
+type FilaResultado = { id: string; puesto: string; placa: string; rider: string; club: string; tiempo: string };
+
+const COLUMNAS_RESULTADOS: ColumnaTabla<FilaResultado>[] = [
+  { clave: "puesto", titulo: "Posición", render: (f) => f.puesto, className: "w-20" },
+  { clave: "placa", titulo: "Placa", render: (f) => f.placa, className: "whitespace-nowrap" },
+  { clave: "rider", titulo: "Rider", principal: true, render: (f) => f.rider },
+  { clave: "club", titulo: "Club", render: (f) => f.club },
+  { clave: "tiempo", titulo: "Tiempo", render: (f) => f.tiempo, alinear: "derecha" },
+];
+
+const FILAS_RESULTADOS: FilaResultado[] = [
+  { id: "1", puesto: "1", placa: "[#000]", rider: "[Rider 1]", club: "[Club]", tiempo: "[00.000 s]" },
+  { id: "2", puesto: "2", placa: "[#000]", rider: "[Rider con nombre y dos apellidos largos]", club: "[Club con nombre largo]", tiempo: "[00.000 s]" },
+  { id: "3", puesto: "12", placa: "[#000]", rider: "[Rider 3]", club: "[Club]", tiempo: "[Pendiente]" },
 ];
 
 type FilaEjemplo = { id: string; fecha: string; competencia: string; rider: string; resultado: string };

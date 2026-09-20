@@ -36,4 +36,7 @@ export {
 } from "./SelectorDeporte";
 export { TarjetaMensualidad, type TarjetaMensualidadProps, type EstadoMensualidad } from "./TarjetaMensualidad";
 export { TarjetaJersey, type TarjetaJerseyProps, type EstadoJersey } from "./TarjetaJersey";
-export { ResumenCuenta, type ResumenCuentaProps } from "./TarjetaJersey";
+export { ResumenCuenta, type ResumenCuentaProps, type DeportistaResumen } from "./ResumenCuenta";
+export { PasosRuta, type PasosRutaProps, type PasoRuta } from "./PasosRuta";
+export { TarjetaDeporte, type TarjetaDeporteProps } from "./TarjetaDeporte";
+export { ContadorRegresivo, type ContadorRegresivoProps } from "./ContadorRegresivo";

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Aviso,
   Archivo,
   Boton,
   CampoMoneda,
+  ContadorRegresivo,
   EstadoError,
   Filtros,
   Modal,
@@ -219,18 +220,53 @@ export function DemoTarjetaJersey() {
   );
 }
 
-/** Cabecera de cuenta con dos deportistas y enlace al historial. */
+/**
+ * Cabecera de cuenta en sus tres casos: acudiente con dos deportistas,
+ * deportista adulto (su ficha va en la cabecera) y acudiente sin deportistas
+ * asociados todavía.
+ */
 export function DemoResumenCuenta() {
   return (
-    <ResumenCuenta
-      titular="[NOMBRE]"
-      deportistas={[
-        { nombre: "[DEPORTISTA 1]", deporte: "BMX", nivel: "[NIVEL 1]" },
-        { nombre: "[DEPORTISTA CON NOMBRE LARGO]", deporte: "[DEPORTE 2]", nivel: "[NIVEL 2]" },
-      ]}
-      enlaceHistorial={{ href: "/cuenta/mensualidades", etiqueta: "Ver mensualidades →" }}
-      className="max-w-2xl"
-    />
+    <div className="grid gap-4 lg:grid-cols-2">
+      <ResumenCuenta
+        titular="[NOMBRE ACUDIENTE]"
+        modo="acudiente"
+        deportistas={[
+          { nombre: "[DEPORTISTA 1]", deporte: "BMX", nivel: "[NIVEL 1]" },
+          { nombre: "[DEPORTISTA CON NOMBRE LARGO]", deporte: "[DEPORTE 2]", nivel: "[NIVEL 2]" },
+        ]}
+        enlaceHistorial={{ href: "/cuenta/mensualidades", etiqueta: "Ver mensualidades →" }}
+      />
+      <ResumenCuenta
+        titular="[NOMBRE DEPORTISTA]"
+        modo="deportista"
+        deportistas={[{ nombre: "[NOMBRE DEPORTISTA]", deporte: "BMX", nivel: "[NIVEL]" }]}
+        enlaceHistorial={{ href: "/cuenta/mensualidades", etiqueta: "Ver mensualidades →" }}
+      />
+      <ResumenCuenta titular="[NOMBRE ACUDIENTE]" modo="acudiente" deportistas={[]} />
+    </div>
+  );
+}
+
+/**
+ * Cuenta regresiva: hacia una fecha a siete días, hacia ninguna fecha
+ * (estado vacío) y sobre fondo oscuro. La fecha futura se calcula al montar
+ * para que la demo no caduque; en la página real viene de la competencia.
+ */
+export function DemoContadorRegresivo() {
+  const [objetivo, setObjetivo] = useState<string | null>(null);
+  useEffect(() => {
+    setObjetivo(new Date(Date.now() + 7 * 86_400_000 + 3 * 3_600_000).toISOString());
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <ContadorRegresivo hasta={objetivo} etiqueta="la competencia de ejemplo" className="max-w-xl" />
+      <ContadorRegresivo hasta={null} etiqueta="la siguiente competencia" />
+      <div className="rounded-lg bg-azul-profundo p-5">
+        <ContadorRegresivo hasta={objetivo} etiqueta="la competencia de ejemplo" oscuro className="max-w-xl" />
+      </div>
+    </div>
   );
 }
 

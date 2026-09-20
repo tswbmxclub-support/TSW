@@ -10,11 +10,14 @@ import { Boton } from "@/components/ui";
 import { SECCIONES_PANEL } from "@/config/panel";
 import { cerrarSesion } from "@/features/admin/acciones";
 import { CabeceraDeporte } from "@/components/admin/CabeceraDeporte";
-import { DEPORTES_MUESTRA } from "@/features/cuenta/datos-de-muestra";
+import { OPCIONES_SELECTOR_PANEL } from "@/features/cuenta/datos-de-muestra";
 import { cn } from "@/lib/utils";
 
-/** Lista que alimenta el selector mientras no existe la tabla deporte. */
-const DEPORTES_PANEL = DEPORTES_MUESTRA;
+/**
+ * Lista que alimenta el selector mientras no existe la tabla deporte. Incluye
+ * la opción "Marca TSW (todos)" para administrar el merchandising común.
+ */
+const DEPORTES_PANEL = OPCIONES_SELECTOR_PANEL;
 
 /**
  * Armazón del panel: barra lateral azul profundo con las secciones, correo
