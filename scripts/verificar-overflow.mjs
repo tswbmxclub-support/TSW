@@ -10,17 +10,27 @@ import process from "node:process";
 
 const PUERTO = process.env.PUERTO ?? "3311";
 const ANCHOS = [360, 1280];
+const PUERTO_DEVTOOLS = process.env.PUERTO_DEVTOOLS ?? "9223";
 
 // Rutas nuevas de la corporación multideporte. /admin/* exige sesión y el
 // proveedor Email de Supabase sigue apagado (bloqueante 2), así que el panel
 // no es alcanzable sin login; se verifica lo público del alcance nuevo.
-const RUTAS = [
+const RUTAS_POR_DEFECTO = [
+  "/",
+  "/semilleros",
+  "/semilleros?deporte=deporte-2",
+  "/competencias",
+  "/matriculas",
+  "/tienda",
   "/laboratorio",
   "/cuenta",
   "/cuenta/acceso",
   "/cuenta/mensualidades",
   "/cuenta/recuperar",
 ];
+
+// RUTAS="/,/tienda" node scripts/verificar-overflow.mjs acota la lista.
+const RUTAS = process.env.RUTAS ? process.env.RUTAS.split(",").map((r) => r.trim()).filter(Boolean) : RUTAS_POR_DEFECTO;
 
 const ejecutable =
   process.env.CHROME_PATH ??
@@ -43,7 +53,7 @@ async function encenderChrome() {
       "--disable-gpu",
       "--no-first-run",
       `--user-data-dir=${perfil}`,
-      "--remote-debugging-port=9223",
+      `--remote-debugging-port=${PUERTO_DEVTOOLS}`,
       "about:blank",
     ],
     { stdio: "ignore" },
@@ -51,7 +61,7 @@ async function encenderChrome() {
 
   for (let i = 0; i < 40; i++) {
     try {
-      const res = await fetch("http://127.0.0.1:9223/json/version");
+      const res = await fetch(`http://127.0.0.1:${PUERTO_DEVTOOLS}/json/version`);
       if (res.ok) return chrome;
     } catch {
       /* todavía no */
@@ -68,7 +78,7 @@ async function encenderChrome() {
  * entre versiones de Chrome.
  */
 async function abrirPestana() {
-  const lista = await (await fetch("http://127.0.0.1:9223/json/list")).json();
+  const lista = await (await fetch(`http://127.0.0.1:${PUERTO_DEVTOOLS}/json/list`)).json();
   const pagina = lista.find((t) => t.type === "page");
   if (!pagina) throw new Error("No hay pestañas en Chrome headless.");
 

@@ -5,7 +5,7 @@ import { Card, CardCuerpo, CuentaAscendente, Indicador, ItemDescarga, Seccion, S
 import { CIFRAS } from "@/config/sitio";
 import { BUCKET_DOCUMENTOS, type DocumentoConVersion } from "@/features/matriculas/types";
 import { urlPublicaStorage } from "@/lib/supabase/storage";
-import { formatearFecha } from "@/lib/utils";
+import { cn, formatearFecha } from "@/lib/utils";
 import { CITA_MUESTRA, DEPORTES_PUBLICO, PILARES_MUESTRA, SEDE_MUESTRA } from "@/features/publico/datos-de-muestra";
 
 /**
@@ -51,7 +51,7 @@ export function CifrasPortal() {
 /** Tres pilares institucionales con ícono, título, texto y remate. */
 export function PilaresPortal() {
   return (
-    <Seccion tituloId="titulo-pilares">
+    <Seccion tono="claro" tituloId="titulo-pilares">
       <Aparece>
         <SeccionTitulo id="titulo-pilares" bajada="[Bajada: cómo entiende la corporación la formación deportiva.]">
           Nuestros pilares
@@ -79,14 +79,17 @@ export function PilaresPortal() {
 
 /** Una tarjeta por deporte de la corporación. */
 export function DeportesPortal() {
+  // Con dos deportes, dos columnas: una cuadrícula de tres con un hueco se ve rota.
+  const columnas = DEPORTES_PUBLICO.length >= 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2";
+
   return (
-    <Seccion tono="claro" tituloId="titulo-deportes">
+    <Seccion tituloId="titulo-deportes">
       <Aparece>
         <SeccionTitulo id="titulo-deportes" bajada="[Bajada: los deportes que forma la corporación y cómo se organizan.]">
           Nuestros deportes
         </SeccionTitulo>
       </Aparece>
-      <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className={cn("mt-8 grid gap-5", columnas)}>
         {DEPORTES_PUBLICO.map((deporte, i) => (
           <Aparece key={deporte.id} indice={i + 1} como="li">
             <TarjetaDeporte
