@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { RUTA_PANEL, obtenerPerfil } from "@/lib/auth";
+import { Aviso } from "@/components/ui";
+import { RUTA_CUENTA, RUTA_PANEL, obtenerPerfil } from "@/lib/auth";
 import { iniciarSesionUsuario } from "@/features/cuenta/acciones";
 import { FormularioAcceso } from "@/features/admin/components/FormularioAcceso";
 
@@ -23,19 +25,22 @@ export default async function PaginaAccesoUsuario({
   const { redirigir, inactivo } = await searchParams;
 
   // Un administrador que llega a la puerta de usuario: al panel. Un usuario
-  // con sesión activa: a su cuenta. Sin sesión, se queda aquí.
+  // ACTIVO con sesión: a su cuenta. Un usuario inactivo con sesión (acaba de
+  // fijar su contraseña desde el enlace de invitación) se queda aquí con el
+  // aviso: mandarlo a /cuenta lo devolvería a esta puerta en bucle, porque
+  // exigirUsuarioPagina rechaza perfiles inactivos.
   const sesion = await obtenerPerfil();
-  if (sesion) {
-    redirect(sesion.tipo === "admin" ? RUTA_PANEL : "/cuenta");
-  }
+  if (sesion?.tipo === "admin") redirect(RUTA_PANEL);
+  if (sesion?.tipo === "usuario" && sesion.perfil.activo) redirect(RUTA_CUENTA);
+  const cuentaInactiva = Boolean(inactivo) || sesion?.tipo === "usuario";
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-lg border border-gris-borde bg-blanco p-6 sm:p-8">
-      {inactivo && (
-        <p className="mb-5 rounded-md border border-gris-borde bg-gris-frio p-3 text-sm text-texto-sec">
+    <>
+      {cuentaInactiva && (
+        <Aviso tono="info" className="mb-5">
           Tu cuenta está creada pero todavía no está activa. El club la activa cuando
           confirma tu matrícula; inténtalo de nuevo más tarde.
-        </p>
+        </Aviso>
       )}
       <FormularioAcceso
         redirigir={redirigir}
@@ -46,15 +51,15 @@ export default async function PaginaAccesoUsuario({
       />
       <p className="mt-6 border-t border-gris-borde pt-4 text-sm text-texto-sec">
         Al entrar aceptas la{" "}
-        <a
+        <Link
           href="/legal/datos"
           className="font-semibold text-azul-profundo underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
         >
           Política de tratamiento de datos
-        </a>
+        </Link>
         . Los datos de los menores a tu cargo se tratan con la autorización que firmaste al matricularlos.
         [Ajustar el texto con el asesor jurídico del club.]
       </p>
-    </div>
+    </>
   );
 }

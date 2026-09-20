@@ -18,13 +18,13 @@ export default async function PaginaRestablecerUsuario() {
   if (!usuario) redirect("/cuenta/recuperar?error=enlace");
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-lg border border-gris-borde bg-blanco p-6 sm:p-8">
+    <>
       <h1 className="text-2xl">Nueva contraseña</h1>
       <p className="mt-2 mb-6 text-sm text-texto-sec">Para la cuenta {usuario.email}.</p>
       <FormularioNuevaContrasena
         accion={restablecerContrasenaUsuario}
         destinoExito="/cuenta"
       />
-    </div>
+    </>
   );
 }

@@ -16,15 +16,11 @@ export default async function PaginaRecuperarUsuario({
     error === "enlace" ? "El enlace no es válido o ya venció. Pide uno nuevo." : undefined;
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-4">
-      <div className="rounded-lg border border-gris-borde bg-blanco p-6 sm:p-8">
-        <FormularioRecuperacion
-          avisoInicial={aviso}
-          accion={solicitarRecuperacionUsuario}
-          etiquetaCorreo="Correo de la cuenta"
-          enlaceVolver="/cuenta/acceso"
-        />
-      </div>
-    </div>
+    <FormularioRecuperacion
+      avisoInicial={aviso}
+      accion={solicitarRecuperacionUsuario}
+      etiquetaCorreo="Correo de la cuenta"
+      enlaceVolver="/cuenta/acceso"
+    />
   );
 }
