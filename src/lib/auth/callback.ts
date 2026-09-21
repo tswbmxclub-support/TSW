@@ -20,16 +20,10 @@ import { crearClienteServidor } from "@/lib/supabase/server";
  *
  *  · `?token_hash=…&type=recovery|invite`. Es el formato que Supabase
  *    recomienda para SSR: el hash se canjea con `verifyOtp` sin depender de
- *    cookies previas. Requiere que las plantillas de correo de Supabase
- *    (Authentication → Email Templates → "Reset password" e "Invite user")
- *    enlacen así:
- *
- *      {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery
- *      {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=invite
- *
- *    `.RedirectTo` ya trae `?siguiente=…`, por eso el separador es `&`. Las
- *    dos URL de callback deben estar en Authentication → URL Configuration →
- *    Redirect URLs.
+ *    cookies previas. Es el que usan TODOS los correos que manda la
+ *    aplicación (lib/auth/enlaces.ts genera el token con `generateLink` y
+ *    lib/correo lo envía), así que no dependemos de las plantillas ni de las
+ *    Redirect URLs del panel de Supabase.
  *
  * Solo se admiten los tipos que el sitio usa. El destino tras el canje se
  * restringe al área de la puerta (`prefijo`): nada de redirecciones abiertas.

@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { RUTA_LOGIN, destinoSeguro, obtenerUsuario } from "@/lib/auth";
+import { enviarRestablecerContrasena } from "@/lib/auth/enlaces";
 import { registrarAcierto, registrarFallo, segundosDeBloqueo } from "@/lib/auth/limite";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import {
@@ -100,7 +101,7 @@ export async function cerrarSesion(): Promise<void> {
 /**
  * Envía el enlace de recuperación. La respuesta es la misma exista o no el
  * correo, por la misma razón que en el acceso. El enlace vuelve por
- * /admin/auth/callback, que canjea el código por sesión y lleva a
+ * /admin/auth/callback, que canjea el token por sesión y lleva a
  * /admin/restablecer.
  */
 export async function solicitarRecuperacion(entrada: EntradaRecuperacion): Promise<ResultadoAccion> {
@@ -115,15 +116,13 @@ export async function solicitarRecuperacion(entrada: EntradaRecuperacion): Promi
   }
   registrarFallo(clave);
 
-  const sitio = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const supabase = await crearClienteServidor();
-  const { error } = await supabase.auth.resetPasswordForEmail(datos.data.correo, {
-    redirectTo: `${sitio}/admin/auth/callback?siguiente=/admin/restablecer`,
-  });
-
-  if (error) {
-    // Se registra para diagnóstico pero no se distingue de cara al usuario.
-    console.error("[recuperación de contraseña]", error.message);
+  // El enlace lo genera Supabase y el correo lo manda la aplicación
+  // (lib/auth/enlaces.ts). Si el correo no tiene cuenta, o el envío falla,
+  // se registra para diagnóstico pero no se distingue de cara al usuario.
+  try {
+    await enviarRestablecerContrasena(datos.data.correo, "admin");
+  } catch (error) {
+    console.error("[recuperación de contraseña]", error instanceof Error ? error.message : error);
   }
 
   return {

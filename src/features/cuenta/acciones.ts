@@ -3,13 +3,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import {
-  RUTA_ACCESO_USUARIO,
-  RUTA_RECUPERAR_USUARIO,
-  RUTA_RESTABLECER_USUARIO,
-} from "@/lib/auth/rutas";
-import { destinoSeguro } from "@/lib/auth/sesion";
-import { obtenerUsuario } from "@/lib/auth/sesion";
+import { RUTA_ACCESO_USUARIO } from "@/lib/auth/rutas";
+import { destinoSeguro, obtenerUsuario } from "@/lib/auth/sesion";
+import { enviarRestablecerContrasena } from "@/lib/auth/enlaces";
 import { registrarAcierto, registrarFallo, segundosDeBloqueo } from "@/lib/auth/limite";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import {
@@ -122,14 +118,12 @@ export async function solicitarRecuperacionUsuario(
   }
   registrarFallo(clave);
 
-  const sitio = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const supabase = await crearClienteServidor();
-  const { error } = await supabase.auth.resetPasswordForEmail(datos.data.correo, {
-    redirectTo: `${sitio}${RUTA_RECUPERAR_USUARIO.replace("/recuperar", "/auth/callback")}?siguiente=${encodeURIComponent(RUTA_RESTABLECER_USUARIO)}`,
-  });
-
-  if (error) {
-    console.error("[recuperación de cuenta de usuario]", error.message);
+  // Mismo mecanismo que el panel (lib/auth/enlaces.ts), con la puerta de
+  // usuario: el enlace vuelve por /cuenta/auth/callback.
+  try {
+    await enviarRestablecerContrasena(datos.data.correo, "usuario");
+  } catch (error) {
+    console.error("[recuperación de cuenta de usuario]", error instanceof Error ? error.message : error);
   }
 
   return {
