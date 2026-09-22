@@ -91,7 +91,7 @@ export function PedidosAdmin({
             render: (p) => (
               <Link
                 href={`/admin/pedidos/${p.id}`}
-                className="font-mono text-sm underline-offset-4 hover:text-rojo hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                className="inline-flex min-h-[44px] items-center font-mono text-sm underline-offset-4 hover:text-rojo hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
               >
                 {p.referencia}
               </Link>

@@ -76,12 +76,20 @@ export function NivelesAdmin({ niveles }: { niveles: Nivel[] }) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Boton tamano="sm" variante="fantasma" disabled={pendiente || indice === 0} onClick={() => mover(indice, -1)}>
+                {/* Solo un glifo: sin el ancho mínimo, el área táctil se queda en 39 px. */}
+                <Boton
+                  tamano="sm"
+                  variante="fantasma"
+                  className="min-w-[44px]"
+                  disabled={pendiente || indice === 0}
+                  onClick={() => mover(indice, -1)}
+                >
                   ↑ <span className="sr-only">Subir {n.nombre}</span>
                 </Boton>
                 <Boton
                   tamano="sm"
                   variante="fantasma"
+                  className="min-w-[44px]"
                   disabled={pendiente || indice === niveles.length - 1}
                   onClick={() => mover(indice, 1)}
                 >
