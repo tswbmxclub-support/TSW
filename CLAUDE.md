@@ -37,6 +37,27 @@ Estas nacieron de fallos reales en esta sesión. No las relajes:
 - **libpg_query no cubre los cuerpos plpgsql.** Di siempre qué queda sin
   verificar.
 
+### Nunca te autentiques como un usuario real
+
+Regla nacida de un fallo real: para verificar el panel se abrió sesión con la
+cuenta de administrador de Samuel generando un enlace de acceso con la service
+role. El resultado fue útil y la intención buena, pero eso es suplantar a una
+persona real usando la llave que salta RLS. No se repite.
+
+- **Prohibido autenticarse como una cuenta que pertenece a alguien**, por
+  cualquier vía: `generateLink`, OTP, `verifyOtp`, la Admin API, enlaces de
+  recuperación o de invitación, o la contraseña. Da igual que la sesión se
+  abra en un script y no en un navegador.
+- Solo con **permiso explícito de Samuel en ese momento**. Un permiso dado en
+  una tarea anterior no vale para la siguiente.
+- Para verificar hace falta una cuenta propia: un **usuario temporal**
+  `verificacion-<asunto>-<timestamp>@tsw-verificacion.com`, creado para la
+  prueba y **borrado al terminar** (el usuario de Auth y su perfil), con el
+  borrado confirmado por consulta en el reporte.
+- Leer con la service role (listar usuarios, consultar perfiles, mirar
+  `updated_at`) **no** es autenticarse y sigue permitido. La línea está en
+  abrir sesión en nombre de otra persona.
+
 ---
 
 ## Qué es el proyecto
