@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
 import { Aparece } from "@/lib/animaciones";
-import { BloqueCTA, Boton, Card, CardCuerpo, HeroPagina, Seccion, SeccionTitulo } from "@/components/ui";
-import { CONTACTO } from "@/config/sitio";
+import { BloqueCTA, BotonWhatsApp, Card, CardCuerpo, HeroPagina, Seccion, SeccionTitulo } from "@/components/ui";
 import { listarProductos } from "@/features/tienda/queries";
 import { CatalogoProductos } from "@/features/tienda/components/CatalogoProductos";
 import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
@@ -11,7 +10,7 @@ import { DEPORTES_PUBLICO, deporteDeParametros, type ParametrosBusqueda } from "
 
 const TITULO = "Tienda";
 const DESCRIPCION =
-  "Dotación oficial, protección y merchandising de la corporación deportiva TSW. Paga en línea con Wompi.";
+  "Dotación oficial, protección y merchandising de la corporación deportiva TSW. Elige talla y envía tu pedido por WhatsApp.";
 
 export const metadata: Metadata = {
   title: TITULO,
@@ -38,7 +37,7 @@ export default async function PaginaTienda({ searchParams }: Props) {
       <HeroPagina
         antetitulo="Dotación oficial"
         titulo={`Tienda · ${deporte.nombre}`}
-        bajada="Uniformes, protección y merchandising de la corporación. El pago se procesa con Wompi y el pedido queda reservado mientras se confirma."
+        bajada="Uniformes, protección y merchandising de la corporación. Elige producto y talla, y envía el pedido por WhatsApp: el club confirma disponibilidad y te indica cómo pagar."
         lateral={<SelectorDeportePublico deportes={DEPORTES_PUBLICO} valor={deporte.id} />}
       />
 
@@ -88,11 +87,11 @@ export default async function PaginaTienda({ searchParams }: Props) {
       <BloqueCTA
         tituloId="titulo-cta-tienda"
         titulo="¿Dudas con las tallas?"
-        texto="Escríbenos por WhatsApp antes de pagar: te ayudamos a elegir la talla correcta para evitar devoluciones."
+        texto="Escríbenos antes de pedir: te ayudamos a elegir la talla correcta para evitar cambios."
         acciones={
-          <Boton href={CONTACTO.whatsapp} externo fondo="acento" tamano="lg">
-            Escribir por WhatsApp
-          </Boton>
+          <BotonWhatsApp fondo="acento" variante="secundario" tamano="lg">
+            ¿Tienes dudas? Escríbenos
+          </BotonWhatsApp>
         }
       />
     </>

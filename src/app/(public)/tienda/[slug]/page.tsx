@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Aparece } from "@/lib/animaciones";
-import { Aviso, Badge, Seccion, SeccionTitulo } from "@/components/ui";
+import { Aviso, Badge, BotonWhatsApp, Seccion, SeccionTitulo } from "@/components/ui";
 import { ErrorNoEncontrado } from "@/lib/errors/errores";
 import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { formatearPrecio } from "@/lib/utils";
@@ -137,11 +137,14 @@ export default async function PaginaProducto({ params }: Props) {
                 <SelectorVariantes producto={producto} />
               </div>
 
-              <div className="mt-8">
-                <Aviso tono="info" titulo="Cómo funciona la compra">
-                  Al confirmar el pedido, las unidades quedan reservadas mientras se completa el
-                  pago con Wompi. Si el pago no se confirma, la reserva se libera sola.
+              <div className="mt-8 flex flex-col gap-4">
+                <Aviso tono="info" titulo="Cómo funciona el pedido">
+                  Elige talla y cantidad, agrégalo al carrito y envía el pedido por WhatsApp con
+                  el mensaje ya escrito. El club confirma la disponibilidad y te indica cómo pagar.
                 </Aviso>
+                <div>
+                  <BotonWhatsApp variante="secundario">¿Tienes dudas? Escríbenos</BotonWhatsApp>
+                </div>
               </div>
             </div>
           </Aparece>

@@ -5,7 +5,7 @@ import { ListaCarrito } from "@/features/pedidos/components/ListaCarrito";
 
 export const metadata: Metadata = {
   title: "Carrito",
-  description: "Los artículos que vas a comprar en la tienda del club TSW.",
+  description: "Los artículos que vas a pedir por WhatsApp en la tienda del club TSW.",
   robots: { index: false },
 };
 
@@ -20,7 +20,7 @@ export default function PaginaCarrito() {
         tono="oscuro"
         antetitulo="Tienda"
         titulo="Carrito"
-        bajada="Revisa tallas y cantidades antes de finalizar. El total definitivo lo calcula el servidor al confirmar el pedido."
+        bajada="Revisa tallas y cantidades y envía el pedido por WhatsApp. El club confirma disponibilidad y te indica cómo pagar."
       />
 
       <div className="contenedor py-12 sm:py-16 lg:py-20">

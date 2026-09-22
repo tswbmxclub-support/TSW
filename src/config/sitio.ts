@@ -23,7 +23,7 @@ export const CONTACTO = {
   direccion: "[Dirección de la sede]",
   ciudad: "[Ciudad]",
   horario: "[Horario de atención]",
-  whatsapp: "[https://wa.me/57XXXXXXXXXX]",
+  // El WhatsApp no va aquí: sale de NEXT_PUBLIC_WHATSAPP_NUMERO (src/lib/whatsapp.ts).
 } as const;
 
 export const REDES = [

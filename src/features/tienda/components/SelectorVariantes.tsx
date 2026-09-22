@@ -10,8 +10,9 @@ import { disponible, type ProductoConVariantes } from "../types";
 /**
  * Tallas y compra del detalle de producto. Isla de cliente: lo único que
  * cambia en el navegador es la talla elegida, la cantidad y el mensaje de
- * confirmación. El precio viaja con el item; el cobrado lo recalcula la base
- * al confirmar el checkout.
+ * confirmación. Al carrito solo se persiste id y cantidad; el detalle que se
+ * pasa aquí sirve para mostrar el artículo al instante, y el carrito lo
+ * revalida contra la base enseguida.
  */
 export function SelectorVariantes({ producto }: { producto: ProductoConVariantes }) {
   const { agregar } = useCarrito();
@@ -29,15 +30,17 @@ export function SelectorVariantes({ producto }: { producto: ProductoConVariantes
 
   function alAgregar() {
     if (!variante || unidades <= 0) return;
-    agregar({
-      varianteId: variante.id,
-      productoSlug: producto.slug,
-      nombreProducto: producto.nombre,
-      talla: variante.talla,
-      precioCentavos: variante.precio_centavos,
-      cantidad: Math.min(cantidad, unidades),
-      maximo: unidades,
-    });
+    agregar(
+      { varianteId: variante.id, cantidad: Math.min(cantidad, unidades) },
+      {
+        varianteId: variante.id,
+        productoSlug: producto.slug,
+        nombreProducto: producto.nombre,
+        talla: variante.talla,
+        precioCentavos: variante.precio_centavos,
+        disponible: unidades,
+      },
+    );
     setCantidad(1);
     setAgregado(true);
     // El mensaje se va solo: el carrito sigue siendo el canal principal.

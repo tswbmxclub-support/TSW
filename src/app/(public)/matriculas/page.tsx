@@ -6,6 +6,7 @@ import {
   Badge,
   BloqueCTA,
   Boton,
+  BotonWhatsApp,
   Card,
   CardCuerpo,
   HeroPagina,
@@ -167,9 +168,9 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
         titulo="¿Dudas con la matrícula?"
         texto="Escríbenos y te contamos qué documentos necesitas y cuándo puedes radicarlos."
         acciones={
-          <Boton href={CONTACTO.whatsapp} externo fondo="acento" tamano="lg">
+          <BotonWhatsApp fondo="acento" tamano="lg">
             Escribir por WhatsApp
-          </Boton>
+          </BotonWhatsApp>
         }
       />
     </>

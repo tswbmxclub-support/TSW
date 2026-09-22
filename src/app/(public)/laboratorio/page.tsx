@@ -7,6 +7,7 @@ import {
   Badge,
   BloqueCTA,
   Boton,
+  BotonWhatsApp,
   Campo,
   Card,
   CardCuerpo,
@@ -175,7 +176,7 @@ export default function PaginaLaboratorio() {
               Deshabilitado
             </Boton>
             <Boton href="/tienda">Enlace interno (Link)</Boton>
-            <Boton href="https://wompi.co" externo variante="secundario">
+            <Boton href="https://developer.mozilla.org" externo variante="secundario">
               Enlace externo
             </Boton>
           </Grupo>
@@ -192,6 +193,33 @@ export default function PaginaLaboratorio() {
             <p className="text-sm font-semibold text-texto-sec">Ancho completo · móvil</p>
             <div className="max-w-xs">
               <Boton completo>Agregar al carrito</Boton>
+            </div>
+          </div>
+        </div>
+      </Seccion>
+
+      <Seccion tono="claro" tituloId="titulo-boton-whatsapp">
+        <SeccionTitulo
+          id="titulo-boton-whatsapp"
+          bajada="Único punto de entrada a los enlaces wa.me: contacto genérico (sin texto) y envío de pedido (con texto). Sin NEXT_PUBLIC_WHATSAPP_NUMERO válido queda deshabilitado con aviso, nunca un enlace roto."
+        >
+          BotonWhatsApp
+        </SeccionTitulo>
+        <div className="mt-8 flex flex-col gap-8">
+          <Grupo titulo="Contacto genérico · secundario">
+            <BotonWhatsApp variante="secundario">¿Tienes dudas? Escríbenos</BotonWhatsApp>
+          </Grupo>
+          <Grupo titulo="Con texto del pedido · primario">
+            <BotonWhatsApp texto={"Hola, quiero hacer este pedido en TSW:\n\n• [Producto] — Talla [X] — Cantidad [N] — $ [precio]\n\nTotal: $ [total]"}>
+              Enviar pedido por WhatsApp
+            </BotonWhatsApp>
+          </Grupo>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-semibold text-texto-sec">Ancho completo · móvil</p>
+            <div className="max-w-xs">
+              <BotonWhatsApp tamano="lg" completo>
+                Enviar pedido por WhatsApp
+              </BotonWhatsApp>
             </div>
           </div>
         </div>
@@ -849,9 +877,9 @@ export default function PaginaLaboratorio() {
         texto="Escríbenos y te contamos qué documentos necesitas y cuándo puedes radicarlos."
         acciones={
           <>
-            <Boton href="/matriculas" fondo="acento" tamano="lg">
+            <BotonWhatsApp fondo="acento" tamano="lg">
               Escribir por WhatsApp
-            </Boton>
+            </BotonWhatsApp>
             <Boton href="/matriculas" fondo="acento" variante="secundario" tamano="lg">
               Ver documentos
             </Boton>
