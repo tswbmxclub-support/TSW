@@ -497,13 +497,29 @@ Implementado el 20-09-2026. Migración 13 aplicada en remoto; las 15 políticas
 
 **Cuentas nuevas — cómo se crean y por qué así:**
 
-- El trigger `crear_perfil_al_registrar` decide el tipo por
-  `raw_app_meta_data->>'tipo'` **en el INSERT** de `auth.users`.
-  `inviteUserByEmail` no acepta `app_metadata`, así que un **administrador**
-  se crea con `auth.admin.createUser({ app_metadata: { tipo: 'admin' } })` y
-  después recibe `resetPasswordForEmail`; un **usuario** va por
-  `inviteUserByEmail` (tipo por defecto). Está en
+- Un **administrador** se crea con
+  `auth.admin.createUser({ app_metadata: { tipo: 'admin' } })` y después
+  recibe `resetPasswordForEmail`; un **usuario** va por `inviteUserByEmail`,
+  que manda el correo en el mismo paso pero no acepta `app_metadata`. Está en
   `features/admin/acciones-perfiles.ts`.
+- **El perfil no se deja al trigger** (migración 15, 22-09-2026). GoTrue
+  inserta la fila de `auth.users` y escribe `app_metadata` en un UPDATE
+  posterior, así que en el INSERT el tipo todavía no está: la versión original
+  del hook mandaba a `perfil_usuario` a todo administrador creado desde el
+  panel, y esa cuenta recibía "Credenciales incorrectas." para siempre, sin un
+  error en ninguna capa. Hoy:
+  - `invitarAdministrador` pide el perfil explícitamente con
+    `crear_perfil_admin(p_actor_id, p_id, p_nombre)`, con actor en la bitácora.
+    Si esa llamada falla, deshace el alta de Auth: una cuenta sin perfil solo
+    ocupa el correo.
+  - El hook cubre además el **UPDATE de `raw_app_meta_data`**, como red.
+  - **Colisión de perfiles**: si el perfil contrario está inactivo, se migra;
+    si está **activo**, se rechaza. Migrar un perfil vivo borraría su fila y,
+    cuando existan `mensualidad` y `jersey` colgando de `perfil_usuario`,
+    arrastraría el historial de pagos por un `ON DELETE CASCADE`.
+  - Un rechazo dentro del hook **aborta la operación de Auth**, y la Admin API
+    lo devuelve como `500 Error updating user`: GoTrue no propaga el mensaje
+    de Postgres. Por eso el camino bueno es la RPC, cuyo mensaje sí llega.
 - Toda cuenta nace **inactiva**; activar es un paso deliberado desde el panel.
 - **Los enlaces de correo se canjean por `token_hash`** (`verifyOtp`) en
   `/admin/auth/callback` y `/cuenta/auth/callback` (`lib/auth/callback.ts`).

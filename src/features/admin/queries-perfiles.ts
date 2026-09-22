@@ -81,6 +81,46 @@ export async function listarUsuarios(): Promise<UsuarioPanel[]> {
   return (data ?? []).map((fila) => conCorreo(fila, cuentas));
 }
 
+/**
+ * Qué es ya, en el sistema, la persona de ese correo. Se usa para explicar un
+ * alta rechazada por correo repetido: la Admin API solo dice «ya está
+ * registrado», que es cierto pero no dice qué hacer.
+ *
+ * El correo vive en auth.users y no se puede filtrar por él desde PostgREST,
+ * así que se recorre el mapa de cuentas que ya arma usuariosDeAuth(). Los
+ * perfiles se leen con el cliente de la sesión: RLS sigue siendo la barrera.
+ */
+export type EstadoDeCuenta =
+  | { existe: false }
+  | { existe: true; tipo: "admin" | "usuario"; activo: boolean }
+  | { existe: true; tipo: "sin_perfil" };
+
+export async function estadoDeCuentaPorCorreo(correo: string): Promise<EstadoDeCuenta> {
+  await exigirAdmin();
+
+  const buscado = correo.trim().toLowerCase();
+  const cuentas = await usuariosDeAuth();
+  const cuenta = [...cuentas.values()].find((usuario) => usuario.email?.toLowerCase() === buscado);
+  if (!cuenta) return { existe: false };
+
+  const supabase = await crearClienteServidor();
+  const { data: admin } = await supabase
+    .from("perfil_admin")
+    .select("activo")
+    .eq("id", cuenta.id)
+    .maybeSingle();
+  if (admin) return { existe: true, tipo: "admin", activo: admin.activo };
+
+  const { data: usuario } = await supabase
+    .from("perfil_usuario")
+    .select("activo")
+    .eq("id", cuenta.id)
+    .maybeSingle();
+  if (usuario) return { existe: true, tipo: "usuario", activo: usuario.activo };
+
+  return { existe: true, tipo: "sin_perfil" };
+}
+
 /** Un titular por id, con su correo; null si no existe. */
 export async function obtenerUsuarioPanel(id: string): Promise<UsuarioPanel | null> {
   await exigirAdmin();

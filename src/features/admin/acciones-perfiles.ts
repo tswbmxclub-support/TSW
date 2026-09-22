@@ -6,6 +6,7 @@ import { exigirAdmin } from "@/lib/auth";
 import { ErrorApp } from "@/lib/errors";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { ejecutarRpc } from "./mutations";
+import { estadoDeCuentaPorCorreo } from "./queries-perfiles";
 import {
   esquemaEdicionAdmin,
   esquemaEdicionUsuario,
@@ -23,11 +24,16 @@ import {
  * Dos clases de operación, con dos mecanismos:
  *
  *  · Crear cuentas: SOLO la Admin API de Auth puede insertar en auth.users.
- *    El trigger `crear_perfil_al_registrar` decide el tipo de perfil por
- *    `app_metadata.tipo` en el INSERT, y `inviteUserByEmail` no acepta
- *    app_metadata: por eso un administrador se crea con `createUser` (que sí
- *    lo acepta) y recibe después el enlace para fijar su contraseña; un
- *    usuario se crea con `inviteUserByEmail`, que deja el tipo por defecto.
+ *    Un administrador se crea con `createUser` y recibe después el enlace
+ *    para fijar su contraseña; un usuario, con `inviteUserByEmail`, que manda
+ *    el correo en el mismo paso pero no acepta app_metadata.
+ *
+ *    El PERFIL no se deja al trigger (migración 15): GoTrue inserta la fila
+ *    de auth.users y escribe app_metadata en un UPDATE posterior, así que en
+ *    el INSERT el tipo todavía no está. El hook concilia en ese UPDATE, pero
+ *    el alta de un administrador la pide esta acción, explícitamente y con
+ *    actor, llamando a `crear_perfil_admin`.
+ *
  *    Toda cuenta nace INACTIVA; activarla es un paso aparte y deliberado.
  *
  *  · Editar, activar y desactivar perfiles: RPC de la migración 13 con
@@ -88,10 +94,60 @@ function revalidarPerfiles(tipo: "admin" | "usuario", id?: string) {
 // --- Administradores ---------------------------------------------------------
 
 /**
+ * El rechazo de conciliar_perfil_de_cuenta cuando la cuenta ya tiene un
+ * perfil de usuario ACTIVO (migración 15). Llega como check_violation sin
+ * nombre de constraint, así que traducirErrorPostgres lo devuelve tal cual:
+ * un texto correcto pero con el uuid dentro, que al administrador no le dice
+ * nada. Se reconoce por su texto —es un mensaje nuestro, no de Postgres— y se
+ * cambia por uno accionable.
+ */
+const PERFIL_USUARIO_ACTIVO = /perfil de usuario activo/i;
+const YA_ES_USUARIO_ACTIVO =
+  "Esa persona ya tiene una cuenta de usuario activa. Desactívala antes de darle acceso de administrador.";
+
+/**
+ * Por qué se rechazó un alta con correo repetido, en términos de lo que el
+ * administrador puede hacer al respecto.
+ *
+ * «Ya existe una cuenta con ese correo.» es cierto y no sirve de nada: no dice
+ * si esa persona ya es administradora, si está desactivada y basta con
+ * activarla, o si tiene una cuenta de usuario por medio. La cuenta ya existe y
+ * quien pregunta es un administrador con sesión, así que aquí no hay
+ * enumeración de correos que proteger: la hay en las puertas de acceso, no en
+ * el panel.
+ */
+async function motivoDeCorreoRepetido(correo: string): Promise<string> {
+  const estado = await estadoDeCuentaPorCorreo(correo);
+  if (!estado.existe) return YA_REGISTRADO;
+
+  if (estado.tipo === "admin") {
+    return estado.activo
+      ? "Esa persona ya es administradora."
+      : "Esa persona ya tiene cuenta de administrador, pero está inactiva. Actívala desde la lista.";
+  }
+
+  if (estado.tipo === "usuario") {
+    return estado.activo
+      ? YA_ES_USUARIO_ACTIVO
+      : "Esa persona ya tiene una cuenta de usuario, hoy inactiva. Convertirla en administradora todavía no se hace desde el panel.";
+  }
+
+  return YA_REGISTRADO;
+}
+
+/**
  * Crea la cuenta de un administrador y le manda el enlace para fijar su
  * contraseña. Nace inactivo: hay que activarlo desde la lista cuando haya
  * fijado su contraseña. El correo se confirma de oficio: lo escribió un
  * administrador, no un desconocido.
+ *
+ * El perfil se pide explícitamente con `crear_perfil_admin` (migración 15) en
+ * vez de confiar en el hook de Auth. La Admin API de GoTrue no escribe
+ * app_metadata en el INSERT de auth.users —inserta primero y actualiza
+ * después—, así que durante un instante la cuenta es de tipo usuario. El hook
+ * arreglado la concilia en ese UPDATE, pero el alta de un administrador no
+ * puede depender de en qué orden escriba sus columnas un proveedor externo:
+ * aquí se dice, con actor y constancia en la bitácora.
  */
 export async function invitarAdministrador(entrada: EntradaInvitacionAdmin): Promise<ResultadoPerfil> {
   const datos = esquemaInvitacionAdmin.safeParse(entrada);
@@ -101,14 +157,34 @@ export async function invitarAdministrador(entrada: EntradaInvitacionAdmin): Pro
     await exigirAdmin();
     const supabase = crearClienteAdmin();
 
-    const { error } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabase.auth.admin.createUser({
       email: datos.data.correo,
       email_confirm: true,
       app_metadata: { tipo: "admin" },
       user_metadata: { nombre: datos.data.nombre },
     });
-    if (esCorreoRepetido(error)) return { ok: false, error: YA_REGISTRADO };
+    if (esCorreoRepetido(error)) {
+      return { ok: false, error: await motivoDeCorreoRepetido(datos.data.correo) };
+    }
     if (error) throw error;
+
+    try {
+      await ejecutarRpc("crear_perfil_admin", {
+        p_id: data.user.id,
+        p_nombre: datos.data.nombre,
+      });
+    } catch (errorPerfil) {
+      // La cuenta de Auth ya existe y sin perfil de administrador no sirve
+      // para nada: si se deja, el correo queda ocupado y el siguiente intento
+      // choca con "Ya existe una cuenta con ese correo." Se deshace el alta
+      // para que reintentar sea posible. El borrado arrastra el perfil por la
+      // FK con ON DELETE CASCADE.
+      await supabase.auth.admin.deleteUser(data.user.id);
+      if (errorPerfil instanceof ErrorApp && PERFIL_USUARIO_ACTIVO.test(errorPerfil.message)) {
+        return { ok: false, error: YA_ES_USUARIO_ACTIVO };
+      }
+      throw errorPerfil;
+    }
 
     await enviarEnlaceContrasena(datos.data.correo, "admin");
     revalidarPerfiles("admin");
@@ -189,7 +265,9 @@ export async function invitarUsuario(entrada: EntradaInvitacionUsuario): Promise
       data: { nombre: datos.data.nombre },
       redirectTo: `${sitio()}/cuenta/auth/callback?siguiente=/cuenta/restablecer`,
     });
-    if (esCorreoRepetido(error)) return { ok: false, error: YA_REGISTRADO };
+    if (esCorreoRepetido(error)) {
+      return { ok: false, error: await motivoDeCorreoRepetido(datos.data.correo) };
+    }
     if (error) throw error;
 
     if (datos.data.telefono) {

@@ -698,9 +698,29 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      conciliar_perfil_de_cuenta: {
+        Args: { p_id: string; p_nombre: string; p_tipo: string }
+        Returns: undefined
+      }
       consumir_reserva: {
         Args: { p_cantidad: number; p_variante_id: string }
         Returns: number
+      }
+      crear_perfil_admin: {
+        Args: { p_actor_id: string; p_id: string; p_nombre: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "perfil_admin"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       desactivar_admin: {
         Args: { p_actor_id: string; p_id: string }
