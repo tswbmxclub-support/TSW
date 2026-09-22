@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { Badge, Boton } from "@/components/ui";
+import { DEPORTES, PORTADA } from "@/config/contenido";
 import { SITIO } from "@/config/sitio";
-import { DEPORTES_PUBLICO } from "@/features/publico/datos-de-muestra";
 
 /**
  * Portada de la corporación: texto y dos CTAs a la izquierda, tarjeta con los
@@ -17,13 +17,11 @@ export function HeroPortal() {
       <div className="contenedor grid gap-8 py-12 sm:py-16 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-12 lg:py-20">
         <div>
           <div className="flex flex-wrap gap-2">
-            <Badge tono="rojo">[Entidad deportiva]</Badge>
-            <Badge tono="claro">{DEPORTES_PUBLICO.map((d) => d.nombre).join(" · ")}</Badge>
+            <Badge tono="rojo">{PORTADA.etiquetaEntidad}</Badge>
+            <Badge tono="claro">{DEPORTES.map((d) => d.nombre).join(" · ")}</Badge>
           </div>
           <h1 className="titulo-hero mt-5">{SITIO.nombreLargo}</h1>
-          <p className="mt-4 max-w-xl text-lg text-blanco/85 sm:text-xl">
-            [Presentación de la corporación en dos frases: qué deportes forma, para quién y con qué enfoque.]
-          </p>
+          <p className="mt-4 max-w-xl text-lg text-blanco/85 sm:text-xl">{PORTADA.presentacion}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Boton href="/matriculas" tamano="lg">
               Ver matrículas
@@ -32,7 +30,7 @@ export function HeroPortal() {
               Conocer los semilleros
             </Boton>
           </div>
-          <p className="mt-6 text-sm text-blanco/60">[Aval, reconocimiento o afiliación de la corporación]</p>
+          <p className="mt-6 text-sm text-blanco/60">{PORTADA.aval}</p>
         </div>
 
         <section
@@ -43,7 +41,7 @@ export function HeroPortal() {
             Deportes de la corporación
           </h2>
           <ul className="mt-4 flex flex-col divide-y divide-blanco/10">
-            {DEPORTES_PUBLICO.map((deporte) => (
+            {DEPORTES.map((deporte) => (
               <li key={deporte.id}>
                 <Link
                   href={`/semilleros?deporte=${deporte.id}`}

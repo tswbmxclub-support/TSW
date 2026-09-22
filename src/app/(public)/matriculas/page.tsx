@@ -14,12 +14,12 @@ import {
   Seccion,
   SeccionTitulo,
 } from "@/components/ui";
+import { MATRICULAS } from "@/config/contenido";
 import { CONTACTO } from "@/config/sitio";
 import { ListaDocumentos } from "@/features/matriculas/components/ListaDocumentos";
 import { PasosMatricula } from "@/features/matriculas/components/PasosMatricula";
 import { listarDocumentosPublicados } from "@/features/matriculas/queries";
 import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
-import { CATEGORIAS_MATRICULA_MUESTRA, CUPOS_MUESTRA } from "@/features/publico/datos-de-muestra";
 import { DEPORTES_PUBLICO, deporteDeParametros, type ParametrosBusqueda } from "@/features/publico/deporte-publico";
 
 const TITULO = "Matrículas";
@@ -36,19 +36,19 @@ type Props = { searchParams: Promise<ParametrosBusqueda> };
 
 /**
  * Proceso y documentos de matrícula, por deporte. Server Component: los
- * documentos se leen en el servidor; cupos y categorías son datos de muestra
- * hasta que el esquema tenga deporte y periodo.
+ * documentos se leen en el servidor; cupos, cierre y categorías son contenido
+ * fijo (config/contenido.ts) hasta que el esquema tenga deporte y periodo.
  */
 export default async function PaginaMatriculas({ searchParams }: Props) {
   const [documentos, parametros] = await Promise.all([listarDocumentosPublicados(), searchParams]);
   const deporte = deporteDeParametros(parametros);
-  const cupos = CUPOS_MUESTRA[deporte.id] ?? { disponibles: "[CIFRA]", ocupacion: null };
+  const { cupos, cierre } = MATRICULAS;
 
   return (
     <>
       <HeroPagina
         tono="oscuro"
-        antetitulo="[Convocatoria abierta]"
+        antetitulo={MATRICULAS.antetitulo}
         titulo={`Matrículas · ${deporte.nombre}`}
         bajada="Descarga los formatos, diligéncialos y entrégalos en la sede. La radicación es presencial y los cupos son limitados por categoría."
         lateral={<SelectorDeportePublico deportes={DEPORTES_PUBLICO} valor={deporte.id} fondo="oscuro" />}
@@ -65,7 +65,7 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
               oscuro
               etiqueta="Cupos disponibles"
               valor={cupos.disponibles}
-              detalle="[Ocupación del periodo por categoría.]"
+              detalle={cupos.detalle}
               progreso={cupos.ocupacion}
               className="h-full"
             />
@@ -75,8 +75,8 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
               variante="cifra"
               oscuro
               etiqueta="Cierre ordinario"
-              valor="[FECHA]"
-              detalle="[Hasta cuándo se reciben carpetas sin recargo.]"
+              valor={cierre.fecha}
+              detalle={cierre.detalle}
               className="h-full"
             />
           </Aparece>
@@ -125,12 +125,12 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
 
       <Seccion tono="claro" tituloId="titulo-categorias">
         <Aparece>
-          <SeccionTitulo id="titulo-categorias" bajada={`[Cómo se organiza la vinculación en ${deporte.nombre}.]`}>
+          <SeccionTitulo id="titulo-categorias" bajada={MATRICULAS.categoriasBajada(deporte.nombre)}>
             Categorías de vinculación
           </SeccionTitulo>
         </Aparece>
         <ul className="mt-8 grid gap-5 lg:grid-cols-2">
-          {CATEGORIAS_MATRICULA_MUESTRA.map((categoria, i) => (
+          {MATRICULAS.categorias.map((categoria, i) => (
             <Aparece key={categoria.id} indice={i + 1} como="li">
               <Card className="h-full">
                 <CardCuerpo className="flex h-full flex-col">
@@ -151,10 +151,7 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
 
       <Seccion tituloId="titulo-documentos">
         <Aparece>
-          <SeccionTitulo
-            id="titulo-documentos"
-            bajada="Cada archivo indica su versión vigente y su fecha de publicación. [Los formatos por deporte llegarán con el esquema; hoy son comunes.]"
-          >
+          <SeccionTitulo id="titulo-documentos" bajada={MATRICULAS.documentosBajada}>
             Documentos para descargar
           </SeccionTitulo>
         </Aparece>

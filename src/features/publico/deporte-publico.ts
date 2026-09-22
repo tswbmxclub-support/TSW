@@ -1,4 +1,9 @@
-import { DEPORTES_PUBLICO, deportePublicoPorId, type DeportePublico } from "./datos-de-muestra";
+import { DEPORTES, type Deporte } from "@/config/contenido";
+
+/** Deporte por id, con el primero como respaldo. */
+export function deportePublicoPorId(id: string | undefined): Deporte {
+  return DEPORTES.find((d) => d.id === id) ?? DEPORTES[0]!;
+}
 
 /**
  * El selector de deporte del sitio público se oculta hasta que exista la
@@ -25,7 +30,7 @@ export type ParametrosBusqueda = Record<string, string | string[] | undefined>;
  *
  * Un id desconocido o ausente cae al primer deporte de la lista.
  */
-export function deporteDeParametros(parametros: ParametrosBusqueda | undefined): DeportePublico {
+export function deporteDeParametros(parametros: ParametrosBusqueda | undefined): Deporte {
   const crudo = parametros?.[PARAMETRO_DEPORTE];
   const id = Array.isArray(crudo) ? crudo[0] : crudo;
   return deportePublicoPorId(id);
@@ -36,4 +41,4 @@ export function enlaceConDeporte(ruta: string, deporteId: string): string {
   return `${ruta}?${PARAMETRO_DEPORTE}=${encodeURIComponent(deporteId)}`;
 }
 
-export { DEPORTES_PUBLICO };
+export { DEPORTES as DEPORTES_PUBLICO };

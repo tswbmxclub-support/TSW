@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 
 import { Aparece } from "@/lib/animaciones";
 import { Acordeon, BloqueCTA, Boton, HeroPagina, Indicador, Seccion, SeccionTitulo } from "@/components/ui";
-import { PREGUNTAS_SEMILLEROS } from "@/config/preguntas";
+import { SEMILLEROS } from "@/config/contenido";
 import { FichaNiveles } from "@/features/niveles/components/FichaNiveles";
 import { listarNiveles } from "@/features/niveles/queries";
 import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
-import { CIFRAS_SEMILLEROS_MUESTRA } from "@/features/publico/datos-de-muestra";
 import { DEPORTES_PUBLICO, deporteDeParametros, enlaceConDeporte, type ParametrosBusqueda } from "@/features/publico/deporte-publico";
 
 const TITULO = "Semilleros y niveles";
@@ -48,9 +47,9 @@ export default async function PaginaSemilleros({ searchParams }: Props) {
           La metodología en cifras
         </h2>
         <ul className="grid gap-4 md:grid-cols-3">
-          {CIFRAS_SEMILLEROS_MUESTRA.map((cifra, i) => (
+          {SEMILLEROS.cifras.map((cifra, i) => (
             <Aparece key={cifra.id} indice={i} como="li">
-              <Indicador variante="cifra" oscuro etiqueta={cifra.etiqueta} valor="[CIFRA]" detalle={cifra.detalle} className="h-full" />
+              <Indicador variante="cifra" oscuro etiqueta={cifra.etiqueta} valor={cifra.valor ?? "[CIFRA]"} detalle={cifra.detalle} className="h-full" />
             </Aparece>
           ))}
         </ul>
@@ -72,7 +71,7 @@ export default async function PaginaSemilleros({ searchParams }: Props) {
           <SeccionTitulo id="titulo-preguntas">Preguntas frecuentes</SeccionTitulo>
         </Aparece>
         <Aparece indice={1} className="mt-8 max-w-3xl">
-          <Acordeon items={PREGUNTAS_SEMILLEROS} />
+          <Acordeon items={[...SEMILLEROS.preguntas]} />
         </Aparece>
       </Seccion>
 

@@ -9,17 +9,18 @@
 // "[MONTO]" porque el precio es `integer` en centavos y su formato real
 // llegará con la columna; no se usa formatearPrecio con números inventados.
 
+import { DEPORTES } from "@/config/contenido";
+
 // --- Deportes ---------------------------------------------------------------
+// La lista de deportes es la del sitio público (config/contenido.ts): el
+// selector del panel y el público hablan el mismo idioma.
 
 export type DeporteMuestra = {
   id: string;
   nombre: string;
 };
 
-export const DEPORTES_MUESTRA: DeporteMuestra[] = [
-  { id: "bmx", nombre: "BMX" },
-  { id: "deporte-2", nombre: "[DEPORTE 2]" },
-];
+export const DEPORTES_MUESTRA: DeporteMuestra[] = DEPORTES.map(({ id, nombre }) => ({ id, nombre }));
 
 /** El deporte con el que arranca el selector antes de que el admin elija. */
 export const DEPORTE_POR_DEFECTO_ID = "bmx";

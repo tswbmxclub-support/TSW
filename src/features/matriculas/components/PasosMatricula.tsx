@@ -1,11 +1,12 @@
 import { PasosRuta, type PasoRuta } from "@/components/ui";
+import { MATRICULAS } from "@/config/contenido";
 import { CONTACTO } from "@/config/sitio";
 
 /**
  * Los cuatro pasos del proceso, en la hoja de ruta del rediseño. Lo que el
- * club todavía no ha confirmado va entre corchetes; el resto describe el
- * flujo tal como lo define el README: descarga, diligenciamiento y radicación
- * presencial.
+ * club todavía no ha confirmado sale de config/contenido.ts entre corchetes;
+ * el resto describe el flujo tal como lo define el README: descarga,
+ * diligenciamiento y radicación presencial.
  */
 const PASOS: PasoRuta[] = [
   {
@@ -32,7 +33,7 @@ const PASOS: PasoRuta[] = [
     texto: (
       <>
         <p>Completa cada formato con los datos del deportista y de la persona responsable, e imprímelos.</p>
-        <p className="mt-2">[Indicar si se firman a mano o se aceptan firmas digitales.]</p>
+        <p className="mt-2">{MATRICULAS.firmas}</p>
       </>
     ),
     pie: "Datos del deportista y del acudiente",
@@ -46,14 +47,13 @@ const PASOS: PasoRuta[] = [
       <>
         <p>Junto con los formatos diligenciados, prepara:</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>[Documento de identidad del deportista]</li>
-          <li>[Documento de identidad del acudiente]</li>
-          <li>[Certificado médico o afiliación a salud]</li>
-          <li>[Otros anexos que pida el club]</li>
+          {MATRICULAS.anexos.map((anexo) => (
+            <li key={anexo}>{anexo}</li>
+          ))}
         </ul>
       </>
     ),
-    pie: "[Lo que acompaña a los formatos]",
+    pie: MATRICULAS.anexosPie,
   },
   {
     id: "radicar",

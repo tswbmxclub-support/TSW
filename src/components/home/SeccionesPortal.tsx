@@ -2,16 +2,15 @@ import Image from "next/image";
 
 import { Aparece } from "@/lib/animaciones";
 import { Card, CardCuerpo, CuentaAscendente, Indicador, ItemDescarga, Seccion, SeccionTitulo, TarjetaDeporte } from "@/components/ui";
-import { CIFRAS } from "@/config/sitio";
+import { DEPORTES, PORTADA } from "@/config/contenido";
 import { BUCKET_DOCUMENTOS, type DocumentoConVersion } from "@/features/matriculas/types";
 import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { cn, formatearFecha } from "@/lib/utils";
-import { CITA_MUESTRA, DEPORTES_PUBLICO, PILARES_MUESTRA, SEDE_MUESTRA } from "@/features/publico/datos-de-muestra";
 
 /**
  * Secciones de la portada de la corporación, en el orden del rediseño. Todas
  * son Server Components; lo único con estado es la cuenta ascendente de las
- * cifras. Cada una lee de config/sitio o de los datos de muestra públicos.
+ * cifras. Todo el texto fijo sale de config/contenido.ts.
  */
 
 /** Fila de cuatro cifras sobre azul profundo, con cuenta ascendente cuando hay dato. */
@@ -22,7 +21,7 @@ export function CifrasPortal() {
         Cifras de la corporación
       </h2>
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {CIFRAS.map((cifra, i) => (
+        {PORTADA.cifras.map((cifra, i) => (
           <Aparece key={cifra.etiqueta} indice={i} como="li">
             <Indicador
               variante="cifra"
@@ -38,7 +37,7 @@ export function CifrasPortal() {
                   </>
                 )
               }
-              detalle={cifra.valor === null ? "[Pendiente de confirmar por el club.]" : "[Texto de apoyo de la cifra.]"}
+              detalle={cifra.valor === null ? PORTADA.cifraPendiente : cifra.detalle}
               className="h-full"
             />
           </Aparece>
@@ -53,12 +52,12 @@ export function PilaresPortal() {
   return (
     <Seccion tono="claro" tituloId="titulo-pilares">
       <Aparece>
-        <SeccionTitulo id="titulo-pilares" bajada="[Bajada: cómo entiende la corporación la formación deportiva.]">
+        <SeccionTitulo id="titulo-pilares" bajada={PORTADA.pilaresBajada}>
           Nuestros pilares
         </SeccionTitulo>
       </Aparece>
       <ul className="mt-8 grid gap-5 md:grid-cols-3">
-        {PILARES_MUESTRA.map((pilar, i) => (
+        {PORTADA.pilares.map((pilar, i) => (
           <Aparece key={pilar.id} indice={i + 1} como="li">
             <Card className="h-full">
               <CardCuerpo className="flex h-full flex-col">
@@ -80,17 +79,17 @@ export function PilaresPortal() {
 /** Una tarjeta por deporte de la corporación. */
 export function DeportesPortal() {
   // Con dos deportes, dos columnas: una cuadrícula de tres con un hueco se ve rota.
-  const columnas = DEPORTES_PUBLICO.length >= 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2";
+  const columnas = DEPORTES.length >= 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2";
 
   return (
     <Seccion tituloId="titulo-deportes">
       <Aparece>
-        <SeccionTitulo id="titulo-deportes" bajada="[Bajada: los deportes que forma la corporación y cómo se organizan.]">
+        <SeccionTitulo id="titulo-deportes" bajada={PORTADA.deportesBajada}>
           Nuestros deportes
         </SeccionTitulo>
       </Aparece>
       <ul className={cn("mt-8 grid gap-5", columnas)}>
-        {DEPORTES_PUBLICO.map((deporte, i) => (
+        {DEPORTES.map((deporte, i) => (
           <Aparece key={deporte.id} indice={i + 1} como="li">
             <TarjetaDeporte
               nombre={deporte.nombre}
@@ -120,11 +119,11 @@ export function CitaPortal() {
             “
           </span>
           <blockquote className="mt-3 flex-1 lg:mt-0">
-            <p className="text-lg italic text-blanco/90 sm:text-xl">{CITA_MUESTRA.texto}</p>
+            <p className="text-lg italic text-blanco/90 sm:text-xl">{PORTADA.cita.texto}</p>
           </blockquote>
           <figcaption className="mt-4 text-sm lg:mt-0 lg:shrink-0 lg:text-right">
-            <span className="block font-semibold text-blanco">{CITA_MUESTRA.autor}</span>
-            <span className="block text-blanco/70">{CITA_MUESTRA.cargo}</span>
+            <span className="block font-semibold text-blanco">{PORTADA.cita.autor}</span>
+            <span className="block text-blanco/70">{PORTADA.cita.cargo}</span>
           </figcaption>
         </figure>
       </Aparece>
@@ -180,7 +179,7 @@ export function SedePortal() {
   return (
     <Seccion tono="claro" tituloId="titulo-sede">
       <Aparece>
-        <SeccionTitulo id="titulo-sede" bajada="[Bajada: dónde entrena la corporación y cómo se atiende a las familias.]">
+        <SeccionTitulo id="titulo-sede" bajada={PORTADA.sedeBajada}>
           Sede y atención
         </SeccionTitulo>
       </Aparece>
@@ -189,16 +188,16 @@ export function SedePortal() {
           <Card className="h-full overflow-hidden">
             <div className="relative aspect-[16/9] bg-gris-frio">
               <Image
-                src={SEDE_MUESTRA.imagen}
-                alt="[Foto o mapa de la sede]"
+                src={PORTADA.sede.imagen}
+                alt={PORTADA.sede.imagenAlt}
                 fill
                 sizes="(min-width: 1024px) 60vw, 100vw"
                 className="object-cover"
               />
             </div>
             <CardCuerpo>
-              <h3 className="text-xl leading-tight">{SEDE_MUESTRA.nombre}</h3>
-              <p className="mt-2 text-texto-sec">{SEDE_MUESTRA.descripcion}</p>
+              <h3 className="text-xl leading-tight">{PORTADA.sede.nombre}</h3>
+              <p className="mt-2 text-texto-sec">{PORTADA.sede.descripcion}</p>
             </CardCuerpo>
           </Card>
         </Aparece>
@@ -207,7 +206,7 @@ export function SedePortal() {
             <CardCuerpo>
               <h3 className="text-xl leading-tight">Canales de atención</h3>
               <dl className="mt-4 flex flex-col divide-y divide-gris-borde">
-                {SEDE_MUESTRA.canales.map((canal) => (
+                {PORTADA.sede.canales.map((canal) => (
                   <div key={canal.id} className="py-3">
                     <dt className="text-xs font-bold uppercase tracking-wide text-texto-sec">{canal.titulo}</dt>
                     <dd className="mt-1 text-azul-profundo">{canal.texto}</dd>

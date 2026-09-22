@@ -1,9 +1,10 @@
 /**
- * Datos del club que todavía no tengo.
+ * Identidad, contacto y navegación del sitio.
  *
- * Todo lo que aparece entre corchetes es un placeholder: se reemplaza aquí, en
- * un solo sitio, cuando el club entregue la información. Ninguna página inventa
- * teléfonos, direcciones ni cifras.
+ * Todo lo que aparece entre corchetes es un placeholder: se reemplaza aquí
+ * cuando el club entregue la información. Ninguna página inventa teléfonos ni
+ * direcciones. El resto del contenido fijo (portada, matrículas, semilleros,
+ * tienda, deportes) vive en ./contenido.ts.
  */
 
 export const SITIO = {
@@ -31,26 +32,6 @@ export const REDES = [
   { nombre: "Facebook", url: "[https://facebook.com/...]" },
   { nombre: "YouTube", url: "[https://youtube.com/...]" },
 ] as const;
-
-/**
- * Cifras de la franja roja de la portada.
- *
- * `valor` en `null` significa que el dato todavía no existe: la tarjeta lo
- * muestra como pendiente en vez de inventar un número, y la cuenta ascendente
- * se activa sola en cuanto se escriba una cifra real.
- */
-export type Cifra = {
-  valor: number | null;
-  sufijo?: string;
-  etiqueta: string;
-};
-
-export const CIFRAS: Cifra[] = [
-  { valor: null, sufijo: "+", etiqueta: "[Deportistas formados]" },
-  { valor: null, sufijo: "", etiqueta: "[Años de trayectoria]" },
-  { valor: null, sufijo: "", etiqueta: "[Competencias al año]" },
-  { valor: null, sufijo: "", etiqueta: "[Niveles de formación]" },
-];
 
 /**
  * Navegación principal, plana como en el rediseño: cinco puertas, sin

@@ -4,8 +4,8 @@ import { Aparece } from "@/lib/animaciones";
 import { BloqueCTA, BotonWhatsApp, Card, CardCuerpo, HeroPagina, Seccion, SeccionTitulo } from "@/components/ui";
 import { listarProductos } from "@/features/tienda/queries";
 import { CatalogoProductos } from "@/features/tienda/components/CatalogoProductos";
+import { TIENDA } from "@/config/contenido";
 import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
-import { BENEFICIOS_TIENDA_MUESTRA } from "@/features/publico/datos-de-muestra";
 import { DEPORTES_PUBLICO, deporteDeParametros, type ParametrosBusqueda } from "@/features/publico/deporte-publico";
 
 const TITULO = "Tienda";
@@ -46,7 +46,7 @@ export default async function PaginaTienda({ searchParams }: Props) {
           Cómo funciona la tienda
         </h2>
         <ul className="grid gap-4 md:grid-cols-3">
-          {BENEFICIOS_TIENDA_MUESTRA.map((beneficio, i) => (
+          {TIENDA.beneficios.map((beneficio, i) => (
             <Aparece key={beneficio.id} indice={i} como="li">
               <Card className="h-full">
                 <CardCuerpo className="flex items-start gap-4 p-4">
