@@ -497,10 +497,9 @@ Implementado el 20-09-2026. Migración 13 aplicada en remoto; las 15 políticas
 
 **Cuentas nuevas — cómo se crean y por qué así:**
 
-- Un **administrador** se crea con
-  `auth.admin.createUser({ app_metadata: { tipo: 'admin' } })` y después
-  recibe `resetPasswordForEmail`; un **usuario** va por `inviteUserByEmail`,
-  que manda el correo en el mismo paso pero no acepta `app_metadata`. Está en
+- Toda cuenta se crea con `auth.admin.createUser`
+  (`app_metadata: { tipo: 'admin' }` para administradores; sin él, usuario),
+  con el correo confirmado de oficio. Está en
   `features/admin/acciones-perfiles.ts`.
 - **El perfil no se deja al trigger** (migración 15, 22-09-2026). GoTrue
   inserta la fila de `auth.users` y escribe `app_metadata` en un UPDATE
@@ -521,17 +520,23 @@ Implementado el 20-09-2026. Migración 13 aplicada en remoto; las 15 políticas
     lo devuelve como `500 Error updating user`: GoTrue no propaga el mensaje
     de Postgres. Por eso el camino bueno es la RPC, cuyo mensaje sí llega.
 - Toda cuenta nace **inactiva**; activar es un paso deliberado desde el panel.
-- **Los enlaces de correo se canjean por `token_hash`** (`verifyOtp`) en
-  `/admin/auth/callback` y `/cuenta/auth/callback` (`lib/auth/callback.ts`).
-  El formato `?code=` (PKCE) solo funciona en el navegador que pidió el
-  enlace; una invitación la pide el admin y la abre otra persona. **Requisito
-  de configuración en Supabase** (Authentication → Email Templates):
-  - "Reset password": enlace a `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery`
-  - "Invite user": enlace a `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=invite`
-  y en URL Configuration → Redirect URLs, los dos callbacks con el dominio
-  real. Sin esto, invitar crea la cuenta pero el enlace del correo falla.
-- El SMTP por defecto de Supabase limita los correos por hora: configurar
-  Resend como SMTP antes de invitar en serie.
+- **Los correos de acceso los manda la aplicación, no Supabase.** Supabase
+  solo genera el token (`auth.admin.generateLink`, en `lib/auth/enlaces.ts`);
+  el correo lo arma `lib/correo/plantillas.ts` y lo envía `lib/correo/
+  transporte.ts` con **nodemailer** (único archivo que lo importa). El enlace
+  vuelve por `/admin/auth/callback` o `/cuenta/auth/callback` con
+  `token_hash`, que `lib/auth/callback.ts` canjea con `verifyOtp`: funciona
+  desde cualquier dispositivo. **No se usan** `inviteUserByEmail` ni
+  `resetPasswordForEmail`, ni las plantillas ni las Redirect URLs del panel de
+  Supabase (que exigen SMTP propio para editarse y mandan en inglés).
+- Configuración: variables `CORREO_SMTP_HOST`, `CORREO_SMTP_PUERTO`,
+  `CORREO_SMTP_USUARIO`, `CORREO_SMTP_CLAVE`, `CORREO_REMITENTE` en
+  `.env.local` y en Vercel. Hoy apuntan a un Gmail con contraseña de
+  aplicación (límite ~500 correos/día); cuando haya dominio, a Resend por
+  SMTP (`smtp.resend.com`, usuario `resend`, clave = API key) sin tocar
+  código. La clave nunca va al repositorio.
+- El formulario público de "olvidé mi contraseña" responde igual exista o no
+  el correo y aunque el envío falle: el fallo solo va al log.
 
 Lo que sigue vigente de la propuesta original:
 

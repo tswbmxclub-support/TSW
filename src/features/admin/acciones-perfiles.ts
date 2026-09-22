@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { exigirAdmin } from "@/lib/auth";
 import { ErrorApp } from "@/lib/errors";
+import { enviarInvitacion } from "@/lib/auth/enlaces";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { ejecutarRpc } from "./mutations";
 import { estadoDeCuentaPorCorreo } from "./queries-perfiles";
@@ -24,9 +25,9 @@ import {
  * Dos clases de operación, con dos mecanismos:
  *
  *  · Crear cuentas: SOLO la Admin API de Auth puede insertar en auth.users.
- *    Un administrador se crea con `createUser` y recibe después el enlace
- *    para fijar su contraseña; un usuario, con `inviteUserByEmail`, que manda
- *    el correo en el mismo paso pero no acepta app_metadata.
+ *    Un administrador se crea con `createUser`; un usuario, también, aunque
+ *    antes fuera con `inviteUserByEmail`. El correo se confirma de oficio: lo
+ *    escribió un administrador, no un desconocido.
  *
  *    El PERFIL no se deja al trigger (migración 15): GoTrue inserta la fila
  *    de auth.users y escribe app_metadata en un UPDATE posterior, así que en
@@ -36,13 +37,13 @@ import {
  *
  *    Toda cuenta nace INACTIVA; activarla es un paso aparte y deliberado.
  *
+ *  · Enviar el enlace: lo hace la aplicación (lib/auth/enlaces.ts), no
+ *    Supabase. Por eso no se usa `inviteUserByEmail`: mandaría el correo con
+ *    la plantilla de Supabase, en inglés y con el formato PKCE que no
+ *    sobrevive a abrirse en otro dispositivo.
+ *
  *  · Editar, activar y desactivar perfiles: RPC de la migración 13 con
  *    p_actor_id, como toda escritura del panel. Nunca UPDATE directo.
- *
- * Los enlaces de invitación y recuperación llegan por correo con el
- * `token_hash` de Supabase y se canjean en /admin/auth/callback o
- * /cuenta/auth/callback (`verifyOtp`). Las plantillas de correo de Supabase
- * deben apuntar a esos callbacks: ver el comentario del callback.
  */
 
 export type ResultadoPerfil = { ok: true; mensaje?: string } | { ok: false; error: string };
@@ -61,26 +62,28 @@ function esCorreoRepetido(error: { code?: string; message?: string } | null): bo
   return error.code === "email_exists" || /already (been )?registered/i.test(error.message ?? "");
 }
 
-function sitio(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-}
-
-/** Manda el correo de "fija tu contraseña" a la puerta que corresponda. */
-async function enviarEnlaceContrasena(correo: string, tipo: "admin" | "usuario"): Promise<void> {
-  const callback =
-    tipo === "admin"
-      ? `${sitio()}/admin/auth/callback?siguiente=/admin/restablecer`
-      : `${sitio()}/cuenta/auth/callback?siguiente=/cuenta/restablecer`;
-
-  const { error } = await crearClienteAdmin().auth.resetPasswordForEmail(correo, { redirectTo: callback });
-  if (error) {
-    console.error("[enlace de contraseña]", error.message);
+/**
+ * Manda la invitación a una cuenta recién creada. Si el correo no sale, la
+ * cuenta ya existe: se avisa para que el admin use «Reenviar enlace» en vez
+ * de volver a invitar (que fallaría con "ya existe").
+ */
+async function enviarEnlaceInvitacion(correo: string, tipo: "admin" | "usuario", nombre: string): Promise<void> {
+  try {
+    await enviarInvitacion(correo, tipo, nombre);
+  } catch (error) {
+    console.error("[invitación]", error instanceof Error ? error.message : error);
     throw new ErrorApp(
       "La cuenta quedó creada pero el correo no salió. Usa «Reenviar enlace» en unos minutos.",
       "servicio_externo",
       502,
     );
   }
+}
+
+/** Nombre guardado al crear la cuenta, para el saludo del correo. */
+function nombreDe(usuario: { user_metadata?: Record<string, unknown> }): string | null {
+  const nombre = usuario.user_metadata?.nombre;
+  return typeof nombre === "string" && nombre.trim() ? nombre : null;
 }
 
 function revalidarPerfiles(tipo: "admin" | "usuario", id?: string) {
@@ -186,7 +189,7 @@ export async function invitarAdministrador(entrada: EntradaInvitacionAdmin): Pro
       throw errorPerfil;
     }
 
-    await enviarEnlaceContrasena(datos.data.correo, "admin");
+    await enviarEnlaceInvitacion(datos.data.correo, "admin", datos.data.nombre);
     revalidarPerfiles("admin");
     return {
       ok: true,
@@ -238,7 +241,7 @@ export async function reenviarEnlaceAdministrador(id: string): Promise<Resultado
     const { data, error } = await crearClienteAdmin().auth.admin.getUserById(id);
     if (error || !data.user?.email) return { ok: false, error: "Esa cuenta no existe en Auth." };
 
-    await enviarEnlaceContrasena(data.user.email, "admin");
+    await enviarInvitacion(data.user.email, "admin", nombreDe(data.user));
     return { ok: true, mensaje: "Enlace enviado." };
   } catch (error) {
     return { ok: false, error: mensajeDe(error) };
@@ -248,10 +251,8 @@ export async function reenviarEnlaceAdministrador(id: string): Promise<Resultado
 // --- Usuarios (titulares de cuenta) ------------------------------------------
 
 /**
- * Invita a un titular. `inviteUserByEmail` crea la cuenta y manda el correo
- * en un solo paso; el trigger crea perfil_usuario con el nombre que viaja en
- * `data`. El teléfono no cabe en la invitación, así que se guarda después
- * por la RPC, con el actor.
+ * Invita a un titular: crea la cuenta, guarda el teléfono por RPC (con el
+ * actor) y manda el correo con el enlace para fijar la contraseña.
  */
 export async function invitarUsuario(entrada: EntradaInvitacionUsuario): Promise<ResultadoPerfil> {
   const datos = esquemaInvitacionUsuario.safeParse(entrada);
@@ -261,9 +262,11 @@ export async function invitarUsuario(entrada: EntradaInvitacionUsuario): Promise
     await exigirAdmin();
     const supabase = crearClienteAdmin();
 
-    const { data, error } = await supabase.auth.admin.inviteUserByEmail(datos.data.correo, {
-      data: { nombre: datos.data.nombre },
-      redirectTo: `${sitio()}/cuenta/auth/callback?siguiente=/cuenta/restablecer`,
+    // Sin app_metadata.tipo: el trigger crea perfil_usuario.
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: datos.data.correo,
+      email_confirm: true,
+      user_metadata: { nombre: datos.data.nombre },
     });
     if (esCorreoRepetido(error)) {
       return { ok: false, error: await motivoDeCorreoRepetido(datos.data.correo) };
@@ -278,6 +281,7 @@ export async function invitarUsuario(entrada: EntradaInvitacionUsuario): Promise
       });
     }
 
+    await enviarEnlaceInvitacion(datos.data.correo, "usuario", datos.data.nombre);
     revalidarPerfiles("usuario");
     return {
       ok: true,
@@ -334,7 +338,7 @@ export async function reenviarEnlaceUsuario(id: string): Promise<ResultadoPerfil
     const { data, error } = await crearClienteAdmin().auth.admin.getUserById(id);
     if (error || !data.user?.email) return { ok: false, error: "Esa cuenta no existe en Auth." };
 
-    await enviarEnlaceContrasena(data.user.email, "usuario");
+    await enviarInvitacion(data.user.email, "usuario", nombreDe(data.user));
     return { ok: true, mensaje: "Enlace enviado." };
   } catch (error) {
     return { ok: false, error: mensajeDe(error) };
