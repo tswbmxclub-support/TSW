@@ -155,7 +155,9 @@ export async function guardarVariante(entrada: EntradaVariantePanel, productoId:
  */
 export async function alternarVariante(id: string, activo: boolean): Promise<ResultadoEscritura> {
   try {
-    await ejecutarRpc("guardar_variante", { p_id: id, p_activo: activo });
+    // Acción parcial: RPC mínima (migración 11). guardar_variante es
+    // reemplazo total y aquí pondría el SKU en NULL.
+    await ejecutarRpc("alternar_variante_activa", { p_id: id, p_activo: activo });
     revalidarPublico("producto");
     return { ok: true, mensaje: activo ? "Variante activada." : "Variante desactivada." };
   } catch (error) {

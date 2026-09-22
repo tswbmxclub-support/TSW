@@ -66,8 +66,9 @@ export async function guardarDocumento(entrada: EntradaDocumento): Promise<Resul
 
 export async function alternarDocumento(id: string, activo: boolean): Promise<ResultadoEscritura> {
   try {
-    // guardar_documento con p_id actualiza; p_titulo null deja el título como estaba.
-    await ejecutarRpc("guardar_documento", { p_id: id, p_activo: activo });
+    // Acción parcial: RPC mínima (migración 11). guardar_documento es
+    // reemplazo total y aquí borraría descripción y orden.
+    await ejecutarRpc("alternar_documento_activo", { p_id: id, p_activo: activo });
     revalidarPublico("documento");
     return { ok: true, mensaje: activo ? "Documento activado." : "Documento desactivado." };
   } catch (error) {
@@ -303,7 +304,9 @@ export async function reordenarNiveles(ids: string[]): Promise<ResultadoEscritur
 
 export async function alternarNivel(id: string, activo: boolean): Promise<ResultadoEscritura> {
   try {
-    await ejecutarRpc("guardar_nivel", { p_id: id, p_activo: activo });
+    // Acción parcial: RPC mínima (migración 11). guardar_nivel es reemplazo
+    // total y aquí vaciaría rango, horario, descripción y criterio.
+    await ejecutarRpc("alternar_nivel_activo", { p_id: id, p_activo: activo });
     revalidarPublico("nivel");
     return { ok: true, mensaje: activo ? "Nivel activado." : "Nivel desactivado." };
   } catch (error) {
