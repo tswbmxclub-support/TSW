@@ -262,16 +262,13 @@ function ModalPublicarVersion({
     }
 
     // 3. Insertar la fila por RPC: el trigger archiva la versión anterior.
-    const publicacion = await publicarVersionDocumento(
-      {
-        documentoId: documento.id,
-        version: preparacion.version,
-        storagePath: preparacion.storagePath,
-        nombreArchivo: archivo.name.slice(0, 255),
-        tamanoBytes: archivo.size,
-      },
-      archivo,
-    );
+    const publicacion = await publicarVersionDocumento({
+      documentoId: documento.id,
+      version: preparacion.version,
+      storagePath: preparacion.storagePath,
+      nombreArchivo: archivo.name.slice(0, 255),
+      tamanoBytes: archivo.size,
+    });
     setCargando(false);
 
     if (publicacion.ok) onListo(publicacion.mensaje ?? "Versión publicada.");

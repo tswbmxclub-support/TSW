@@ -77,44 +77,26 @@ export async function alternarDocumento(id: string, activo: boolean): Promise<Re
 
 /**
  * Publicar una versión nueva: la única forma de cambiar el archivo de un
- * documento. El PDF se valida DOS veces (cliente y aquí) y se sube ANTES de
- * insertar la fila: si la fila falla, queda un objeto huérfano sin referencia,
+ * documento. El PDF ya se validó (firma de bytes y tamaño) y se subió en
+ * `subirPdfDocumento`; aquí solo se inserta la fila por RPC. Se sube ANTES
+ * de insertar: si la fila falla, queda un objeto huérfano sin referencia,
  * pero si se insertara primero y la subida fallara, habría una fila vigente
  * apuntando al vacío. El orden de los daños importa.
+ *
+ * No recibe el archivo: mandarlo otra vez duplicaba el tráfico de cada
+ * publicación sin usarlo para nada.
  */
-export async function publicarVersionDocumento(
-  entrada: EntradaPublicarVersion,
-  archivo: File,
-): Promise<ResultadoEscritura> {
+export async function publicarVersionDocumento(entrada: EntradaPublicarVersion): Promise<ResultadoEscritura> {
   const datos = esquemaPublicarVersion.safeParse(entrada);
   if (!datos.success) {
     return { ok: false, error: Object.values(camposDeZod(datos.error))[0] ?? "Revisa los datos." };
   }
 
   try {
-    await exigirAdmin();
-
-    // Validación de contenido real: firma de bytes y tamaño.
-    const veredicto = await validarArchivo(archivo, { mimesPermitidos: MIMES_PDF, maximoBytes: MAXIMO_PDF_BYTES });
-    if (!veredicto.ok) {
-      return {
-        ok: false,
-        error:
-          veredicto.error === "grande"
-            ? "El PDF supera el tope de 10 MB."
-            : veredicto.error === "vacio"
-              ? "El archivo está vacío."
-              : "El archivo no es un PDF válido: la extensión dice una cosa y el contenido otra.",
-      };
-    }
-
-    const supabase = crearClienteAdmin();
     const d = datos.data;
 
-    // El archivo ya se subió desde el navegador con la sesión del admin; la
-    // fila se inserta por RPC con la service role. La ruta la valida el CHECK
-    // documento_version_ruta_versionada (migración 03).
-    const fila = await ejecutarRpc("publicar_documento_version", {
+    // La ruta la valida el CHECK documento_version_ruta_versionada (migración 03).
+    await ejecutarRpc("publicar_documento_version", {
       p_documento_id: d.documentoId,
       p_version: d.version,
       p_storage_path: d.storagePath,
@@ -122,8 +104,6 @@ export async function publicarVersionDocumento(
       p_tamano_bytes: d.tamanoBytes,
     });
 
-    void fila;
-    void supabase;
     revalidarPublico("documento");
     return { ok: true, mensaje: `Versión ${d.version} publicada. La anterior quedó archivada.` };
   } catch (error) {

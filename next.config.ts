@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  experimental: {
+    serverActions: {
+      // Los PDF de matrícula y las fotos entran por Server Actions como File.
+      // El tope por defecto es 1 MB: un PDF escaneado lo supera con facilidad.
+      // Mismo valor que MAXIMO_PDF_BYTES / MAXIMO_IMAGEN_BYTES (constantes.ts).
+      bodySizeLimit: "10mb",
+    },
+  },
   // Orígenes permitidos para los recursos de /_next/* en desarrollo. Hacen
   // falta cuando el sitio se abre desde otro dispositivo de la red local
   // —el móvil, por ejemplo— en vez de localhost.
