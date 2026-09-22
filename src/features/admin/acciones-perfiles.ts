@@ -130,6 +130,18 @@ async function motivoDeCorreoRepetido(correo: string): Promise<string> {
   }
 
   if (estado.tipo === "usuario") {
+    // PENDIENTE (aprobado, va después del acceso por código): acción propia
+    // «convertir en administradora» para este caso, con confirmación que diga
+    // en palabras que se ELIMINA su perfil de usuario —no un "¿estás seguro?"
+    // genérico—. La RPC ya sabe hacerlo: crear_perfil_admin migra un perfil
+    // contrario inactivo (migración 15).
+    //
+    // Cuando existan `mensualidad` y `jersey` colgando de perfil_usuario, esa
+    // acción tendrá que RECHAZAR si la persona tiene historial, aunque su
+    // perfil esté inactivo: hoy «inactivo» equivale a «nunca se usó», y en
+    // cuanto haya pagos registrados deja de equivaler. El ON DELETE CASCADE se
+    // llevaría ese historial sin avisar. Anotado ahora, mientras el caso
+    // todavía no puede ocurrir.
     return estado.activo
       ? YA_ES_USUARIO_ACTIVO
       : "Esa persona ya tiene una cuenta de usuario, hoy inactiva. Convertirla en administradora todavía no se hace desde el panel.";

@@ -14,7 +14,7 @@ import type { Database } from "../src/lib/supabase/database.types";
 export type Cliente = SupabaseClient<Database>;
 
 /** Lee .env.local sin depender de dotenv. */
-function cargarEnvLocal(): void {
+export function cargarEnvLocal(): void {
   const ruta = resolve(process.cwd(), ".env.local");
   if (!existsSync(ruta)) return;
 

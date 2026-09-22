@@ -93,6 +93,15 @@ export async function enviarCorreo(correo: Correo): Promise<void> {
   } catch (error) {
     // Solo el mensaje: nunca el cuerpo del correo ni el destinatario en el log.
     console.error("[correo] no se pudo enviar:", error instanceof Error ? error.message : error);
-    throw new ErrorServicioExterno("correo", "No se pudo enviar el correo. Inténtalo de nuevo en unos minutos.");
+    const fallo = new ErrorServicioExterno(
+      "correo",
+      "No se pudo enviar el correo. Inténtalo de nuevo en unos minutos.",
+    );
+    // El error original viaja en `cause`, no al log: los de un servidor SMTP
+    // traen código, comando y respuesta, y eso es justo lo que hace falta para
+    // diagnosticar (scripts/probar-correo.ts lo imprime). Adjuntarlo no lo
+    // registra en ninguna parte.
+    fallo.cause = error;
+    throw fallo;
   }
 }
