@@ -20,6 +20,7 @@ import {
   type EntradaResultado,
 } from "./schemas";
 import { validarArchivo } from "@/lib/utils/archivos";
+import type { Resultado } from "./types";
 
 /** Resultado de una acción de escritura cuando no redirige. */
 export type ResultadoEscritura = { ok: true; mensaje?: string } | { ok: false; error: string };
@@ -225,21 +226,24 @@ export async function subirImagenCompetencia(id: string, archivo: File): Promise
 
 // --- Resultados -----------------------------------------------------------------
 
-export async function guardarResultado(entrada: EntradaResultado): Promise<ResultadoEscritura> {
+export async function guardarResultado(
+  entrada: EntradaResultado,
+): Promise<{ ok: true; mensaje: string; resultado: Resultado } | { ok: false; error: string }> {
   const datos = esquemaResultado.safeParse(entrada);
   if (!datos.success) {
     return { ok: false, error: Object.values(camposDeZod(datos.error))[0] ?? "Revisa los datos." };
   }
 
   try {
-    await ejecutarRpc("guardar_resultado", {
+    const resultado = await ejecutarRpc("guardar_resultado", {
       p_competencia_id: datos.data.competenciaId,
       p_rider: datos.data.rider,
       p_categoria: datos.data.categoria,
       p_puesto: datos.data.puesto,
     });
     revalidarPublico("competencia");
-    return { ok: true, mensaje: "Resultado agregado." };
+    // La fila vuelve al formulario para pintarla sin esperar el refresco.
+    return { ok: true, mensaje: "Resultado agregado.", resultado };
   } catch (error) {
     return { ok: false, error: mensajeDe(error) };
   }

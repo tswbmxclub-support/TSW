@@ -8,12 +8,14 @@ import { formatearFecha } from "@/lib/utils";
 import {
   archivarCompetencia,
   destacarCompetencia,
+  eliminarResultado,
   guardarCompetencia,
+  guardarResultado,
   publicarCompetencia,
   subirImagenCompetencia,
 } from "../acciones-contenido";
 import { MAXIMO_IMAGEN_BYTES, MIMES_IMAGEN } from "../constantes";
-import type { CompetenciaConResultados } from "../types";
+import type { CompetenciaConResultados, Resultado } from "../types";
 
 type ResultadoAccion = { ok: boolean; error?: string; mensaje?: string };
 
@@ -345,6 +347,7 @@ function ModalCompetencia({
             {imagenPath && <p className="text-sm text-texto-sec">Imagen actual: {imagenPath}</p>}
           </div>
         )}
+        {existente && <SeccionResultados competenciaId={existente.id} iniciales={existente.resultados} />}
         {esNuevo && (
           <p className="text-sm text-texto-sec">
             Guarda el borrador para habilitar la subida de fotos y los resultados.
@@ -359,6 +362,116 @@ function ModalCompetencia({
         <Boton onClick={guardar}>{esNuevo ? "Guardar borrador" : "Guardar cambios"}</Boton>
       </div>
     </Modal>
+  );
+}
+
+/**
+ * Resultados de una competencia existente: lista con quitar (confirmado en
+ * línea: es destructivo) y formulario de alta. Cada operación va por su
+ * Server Action y su RPC (guardar_resultado / eliminar_resultado); la lista
+ * local se actualiza con la respuesta y la página se refresca al cerrar.
+ */
+function SeccionResultados({ competenciaId, iniciales }: { competenciaId: string; iniciales: Resultado[] }) {
+  const router = useRouter();
+  const [resultados, setResultados] = useState<Resultado[]>(iniciales);
+  const [rider, setRider] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [puesto, setPuesto] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [confirmarQuitar, setConfirmarQuitar] = useState<string | null>(null);
+  const [pendiente, iniciar] = useTransition();
+
+  function agregar() {
+    setError(null);
+    setMensaje(null);
+    const puestoNumero = Number(puesto);
+    if (rider.trim().length < 3) return setError("El nombre del rider es obligatorio.");
+    if (categoria.trim().length < 2) return setError("La categoría es obligatoria.");
+    if (!Number.isInteger(puestoNumero) || puestoNumero < 1) return setError("El puesto es un número entero desde 1.");
+
+    iniciar(async () => {
+      const respuesta = await guardarResultado({ competenciaId, rider: rider.trim(), categoria: categoria.trim(), puesto: puestoNumero });
+      if (!respuesta.ok) return setError(respuesta.error);
+      setResultados((previos) => [...previos, respuesta.resultado]);
+      router.refresh();
+      setRider("");
+      setCategoria("");
+      setPuesto("");
+      setMensaje(respuesta.mensaje ?? "Resultado agregado.");
+    });
+  }
+
+  function quitar(id: string) {
+    setError(null);
+    setMensaje(null);
+    iniciar(async () => {
+      const respuesta = await eliminarResultado(id);
+      setConfirmarQuitar(null);
+      if (!respuesta.ok) return setError(respuesta.error);
+      setResultados((previos) => previos.filter((r) => r.id !== id));
+      setMensaje(respuesta.mensaje ?? "Resultado eliminado.");
+      router.refresh();
+    });
+  }
+
+  const ordenados = [...resultados].sort((a, b) => a.puesto - b.puesto);
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-gris-borde pt-4">
+      <h3 className="text-base font-semibold text-azul-profundo">Resultados</h3>
+      {error && <Aviso tono="error">{error}</Aviso>}
+      {mensaje && <Aviso tono="exito">{mensaje}</Aviso>}
+
+      {ordenados.length === 0 ? (
+        <p className="text-sm text-texto-sec">Todavía no hay resultados registrados.</p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-gris-borde rounded-md border border-gris-borde">
+          {ordenados.map((r) => (
+            <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+              <span className="min-w-0">
+                <span className="font-semibold text-rojo">{r.puesto}.º</span> {r.rider}
+                <span className="text-texto-sec"> · {r.categoria}</span>
+              </span>
+              {confirmarQuitar === r.id ? (
+                <span className="flex items-center gap-2">
+                  <span className="text-xs text-texto-sec">¿Quitar?</span>
+                  <Boton tamano="sm" cargando={pendiente} onClick={() => quitar(r.id)}>
+                    Sí, quitar
+                  </Boton>
+                  <Boton tamano="sm" variante="fantasma" onClick={() => setConfirmarQuitar(null)}>
+                    No
+                  </Boton>
+                </span>
+              ) : (
+                <Boton tamano="sm" variante="fantasma" onClick={() => setConfirmarQuitar(r.id)}>
+                  Quitar
+                </Boton>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-[2fr_2fr_1fr]">
+        <Campo etiqueta="Rider" value={rider} onChange={(e) => setRider(e.target.value)} maxLength={120} autoComplete="off" />
+        <Campo etiqueta="Categoría" value={categoria} onChange={(e) => setCategoria(e.target.value)} maxLength={80} autoComplete="off" />
+        <Campo
+          etiqueta="Puesto"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          step={1}
+          value={puesto}
+          onChange={(e) => setPuesto(e.target.value)}
+        />
+      </div>
+      <div>
+        <Boton variante="secundario" cargando={pendiente} onClick={agregar}>
+          Agregar resultado
+        </Boton>
+      </div>
+    </div>
   );
 }
 
