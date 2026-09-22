@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import {
   RUTA_ACCESO_USUARIO,
   RUTA_LOGIN,
+  cuentasHabilitadas,
   esRutaAdminPublica,
   esRutaCuentaPublica,
 } from "@/lib/auth/rutas";
@@ -32,6 +33,16 @@ export async function middleware(request: NextRequest) {
   const esRutaAdmin = ruta.startsWith("/admin");
   const esRutaCuenta = ruta.startsWith("/cuenta");
   const hayCookieSesion = request.cookies.getAll().some((c) => c.name.startsWith("sb-"));
+
+  // Primera capa del apagado de /cuenta/*: se reescribe a una ruta inexistente
+  // para que Next sirva su página 404 con el código correcto. La segunda capa
+  // está en los layouts y el route handler de /cuenta.
+  if (esRutaCuenta && !cuentasHabilitadas()) {
+    const noExiste = request.nextUrl.clone();
+    noExiste.pathname = "/cuenta-no-disponible";
+    noExiste.search = "";
+    return NextResponse.rewrite(noExiste, { status: 404 });
+  }
 
   if (!esRutaAdmin && !esRutaCuenta && !hayCookieSesion) return respuesta;
 

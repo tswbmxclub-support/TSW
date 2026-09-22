@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+
+import { cuentasHabilitadas } from "@/lib/auth/rutas";
 
 export const metadata: Metadata = {
   title: { default: "Acceso a mi cuenta", template: "%s | Mi cuenta TSW" },
@@ -13,6 +16,9 @@ export const metadata: Metadata = {
  * sentido con sesión. Espejo de src/app/admin/(auth)/layout.tsx.
  */
 export default function LayoutAccesoCuenta({ children }: { children: ReactNode }) {
+  // Segunda capa del apagado de /cuenta/* (la primera es el middleware).
+  if (!cuentasHabilitadas()) notFound();
+
   return (
     <main className="flex min-h-svh flex-col items-center justify-center bg-gris-frio px-4 py-10">
       <Link

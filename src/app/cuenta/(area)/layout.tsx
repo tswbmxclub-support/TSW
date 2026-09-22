@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { Aviso, Boton } from "@/components/ui";
 import { Footer } from "@/components/layout/Footer";
 import { cerrarSesionUsuario } from "@/features/cuenta/acciones";
+import { cuentasHabilitadas } from "@/lib/auth/rutas";
 
 export const metadata: Metadata = {
   title: { default: "Mi cuenta", template: "%s | Mi cuenta TSW" },
@@ -21,6 +23,9 @@ export const metadata: Metadata = {
  * todavía se sirven de datos de muestra hasta la migración siguiente.
  */
 export default function LayoutCuenta({ children }: { children: ReactNode }) {
+  // Segunda capa del apagado de /cuenta/* (la primera es el middleware).
+  if (!cuentasHabilitadas()) notFound();
+
   return (
     <div className="flex min-h-svh flex-col bg-gris-frio">
       <header className="border-b border-blanco/10 bg-azul-profundo text-blanco">

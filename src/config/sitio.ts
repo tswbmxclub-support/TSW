@@ -83,7 +83,7 @@ export const PIE_SERVICIOS = [
   { etiqueta: "Competencias y resultados", href: "/competencias" },
   { etiqueta: "Matrículas", href: "/matriculas" },
   { etiqueta: "Dotación y tienda", href: "/tienda" },
-  { etiqueta: "Mi cuenta", href: "/cuenta/acceso" },
+  // "Mi cuenta" (/cuenta/acceso) vuelve cuando se habiliten las cuentas de usuario.
 ] as const;
 
 export const ENLACES_LEGALES = [

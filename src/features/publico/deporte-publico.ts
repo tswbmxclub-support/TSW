@@ -1,5 +1,13 @@
 import { DEPORTES_PUBLICO, deportePublicoPorId, type DeportePublico } from "./datos-de-muestra";
 
+/**
+ * El selector de deporte del sitio público se oculta hasta que exista la
+ * tabla `deporte` y las consultas filtren por ella. Hoy no filtra nada y su
+ * segunda opción es un marcador ("[DEPORTE 2]"). Se enciende aquí cuando
+ * llegue el esquema; el resto del recorrido por deporte no cambia.
+ */
+export const SELECTOR_DEPORTE_PUBLICO_VISIBLE = false;
+
 /** Nombre del parámetro de búsqueda con el deporte en el sitio público. */
 export const PARAMETRO_DEPORTE = "deporte";
 

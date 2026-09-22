@@ -34,6 +34,16 @@ export const RUTAS_CUENTA_PUBLICAS = [
   "/cuenta/auth/",
 ] as const;
 
+/**
+ * Las cuentas de usuario (deportistas y acudientes, /cuenta/*) no entran en
+ * la primera entrega. Mientras `CUENTAS_HABILITADAS` no sea exactamente
+ * "true", todo /cuenta/* responde 404 en dos capas: el middleware y los
+ * layouts/route handler de /cuenta. El código se queda: es la etapa siguiente.
+ */
+export function cuentasHabilitadas(): boolean {
+  return process.env.CUENTAS_HABILITADAS === "true";
+}
+
 export function esRutaAdminPublica(ruta: string): boolean {
   return RUTAS_ADMIN_PUBLICAS.some((publica) =>
     publica.endsWith("/") ? ruta.startsWith(publica) : ruta === publica,

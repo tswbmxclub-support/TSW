@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 import { SelectorDeporte, type OpcionDeporte } from "@/components/ui";
-import { enlaceConDeporte } from "../deporte-publico";
+import { SELECTOR_DEPORTE_PUBLICO_VISIBLE, enlaceConDeporte } from "../deporte-publico";
 
 export type SelectorDeportePublicoProps = {
   deportes: OpcionDeporte[];
@@ -23,6 +23,8 @@ export function SelectorDeportePublico({ deportes, valor, fondo = "claro" }: Sel
   const router = useRouter();
   const ruta = usePathname();
   const [pendiente, iniciar] = useTransition();
+
+  if (!SELECTOR_DEPORTE_PUBLICO_VISIBLE) return null;
 
   return (
     <div aria-busy={pendiente || undefined} className="flex flex-col gap-1.5">

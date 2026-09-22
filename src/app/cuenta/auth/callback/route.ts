@@ -1,6 +1,7 @@
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { canjearEnlaceDeCorreo } from "@/lib/auth/callback";
+import { cuentasHabilitadas } from "@/lib/auth/rutas";
 
 /**
  * Retorno del enlace de correo de la cuenta de usuario (invitación o
@@ -9,6 +10,10 @@ import { canjearEnlaceDeCorreo } from "@/lib/auth/callback";
  * de usuario jamás termina en el panel, aunque alguien manipule `siguiente`.
  */
 export async function GET(request: NextRequest) {
+  // Segunda capa del apagado de /cuenta/*: los route handlers no pasan por
+  // los layouts, así que la comprobación se repite aquí.
+  if (!cuentasHabilitadas()) return new NextResponse(null, { status: 404 });
+
   return canjearEnlaceDeCorreo(request, {
     prefijo: "/cuenta",
     destinoPorDefecto: "/cuenta/restablecer",
