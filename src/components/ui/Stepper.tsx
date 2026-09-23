@@ -19,7 +19,7 @@ export type StepperProps = {
 const BOTON =
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-md border-2 border-gris-borde " +
   "bg-blanco text-xl font-bold leading-none text-azul-profundo transition-colors " +
-  "hover:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo " +
+  "hover:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco " +
   "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-gris-borde";
 
 /**
@@ -87,7 +87,7 @@ export function Stepper({
           // 16 px mínimo (text-base): por debajo, Safari en iOS hace zoom al enfocar.
           className={cn(
             "h-11 w-16 rounded-md border-2 border-gris-borde bg-blanco text-center text-base font-semibold text-azul-profundo",
-            "focus:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+            "focus:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
             "disabled:cursor-not-allowed disabled:bg-gris-frio disabled:opacity-70",
           )}
         />

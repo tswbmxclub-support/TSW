@@ -53,7 +53,7 @@ export function ResumenCuenta({
           {enlaceHistorial && (
             <Link
               href={enlaceHistorial.href}
-              className="inline-flex min-h-[44px] items-center font-semibold text-rojo underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+              className="inline-flex min-h-[44px] items-center font-semibold text-acento-oscuro underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               {enlaceHistorial.etiqueta}
             </Link>

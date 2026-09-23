@@ -212,7 +212,7 @@ function ModalDocumento({
           ayuda="Menor aparece primero."
         />
         <label className="flex min-h-[44px] items-center gap-3 text-sm">
-          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-rojo" />
+          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-acento-oscuro" />
           Documento activo (visible en el sitio público)
         </label>
         <p className="text-sm text-texto-sec">

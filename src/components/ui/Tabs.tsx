@@ -81,8 +81,8 @@ export function Tabs({ opciones, valor, alCambiar, etiqueta, children, className
               onClick={() => alCambiar(opcion.valor)}
               className={cn(
                 "relative min-h-[44px] shrink-0 whitespace-nowrap px-4 py-2 text-base font-semibold transition-colors",
-                "focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-rojo",
-                activa ? "text-rojo" : "text-texto-sec hover:text-azul-profundo",
+                "focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-foco",
+                activa ? "text-acento-oscuro" : "text-texto-sec hover:text-azul-profundo",
               )}
             >
               {opcion.etiqueta}
@@ -98,7 +98,7 @@ export function Tabs({ opciones, valor, alCambiar, etiqueta, children, className
           id={`${base}-${valor}-panel`}
           aria-labelledby={`${base}-${valor}`}
           tabIndex={0}
-          className="pt-6 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="pt-6 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           {children}
         </div>
@@ -120,8 +120,8 @@ export function Filtros({
   className,
 }: Omit<TabsProps, "children"> & {
   /**
-   * Sobre azul profundo el texto va en blanco: el rojo como texto no alcanza
-   * contraste ahí (3.47:1) y se queda solo en el borde y el indicador.
+   * Sobre azul profundo el texto va en blanco y el borde en acento claro: el
+   * acento oscuro sobre marino se queda en 2.19:1 y desaparecería.
    */
   fondo?: "claro" | "oscuro";
 }) {
@@ -140,8 +140,8 @@ export function Filtros({
             onClick={() => alCambiar(opcion.valor)}
             className={cn(
               "relative min-h-[44px] overflow-hidden rounded-full border-2 px-4 py-2 text-sm font-semibold transition-colors",
-              "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
-              activo && (oscuro ? "border-rojo text-blanco" : "border-rojo text-rojo"),
+              "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
+              activo && (oscuro ? "border-acento text-blanco" : "border-acento-oscuro text-acento-oscuro"),
               !activo &&
                 (oscuro
                   ? "border-blanco/30 text-blanco/85 hover:border-blanco hover:text-blanco"
@@ -149,7 +149,7 @@ export function Filtros({
             )}
           >
             {opcion.etiqueta}
-            {activo && <IndicadorActivo id={`${base}-indicador`} />}
+            {activo && <IndicadorActivo id={`${base}-indicador`} className={oscuro ? "bg-acento" : ""} />}
           </button>
         );
       })}

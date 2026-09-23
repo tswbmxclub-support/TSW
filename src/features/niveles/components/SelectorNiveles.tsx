@@ -88,7 +88,7 @@ export function SelectorNiveles({ niveles }: { niveles: Nivel[] }) {
                 onClick={() => setActivo(i)}
                 className={cn(
                   "relative min-h-[44px] overflow-hidden rounded-lg border-2 p-4 text-left transition-colors",
-                  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+                  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                   seleccionado
                     ? "border-azul-profundo bg-azul-profundo text-blanco"
                     : "border-gris-borde bg-blanco hover:border-azul-medio",
@@ -98,7 +98,7 @@ export function SelectorNiveles({ niveles }: { niveles: Nivel[] }) {
                   <span
                     className={cn(
                       "font-display text-2xl leading-none",
-                      seleccionado ? "text-rojo" : "text-texto-sec",
+                      seleccionado ? "text-acento-oscuro" : "text-texto-sec",
                     )}
                   >
                     {String(item.orden).padStart(2, "0")}
@@ -126,7 +126,7 @@ export function SelectorNiveles({ niveles }: { niveles: Nivel[] }) {
           id={`${base}-panel`}
           aria-labelledby={`${base}-${activo}`}
           tabIndex={0}
-          className="focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           <motion.div
             key={nivel.id}

@@ -132,13 +132,13 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
         onKeyDown={alTeclearBoton}
         className={cn(
           "flex min-h-[44px] items-center gap-2 rounded-md border px-3 text-sm font-semibold",
-          "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+          "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
           fondo === "oscuro"
             ? "border-blanco/25 bg-azul-medio text-blanco hover:border-blanco/50"
             : "border-gris-borde bg-blanco text-azul-profundo hover:border-azul-medio",
         )}
       >
-        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-rojo" />
+        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-acento-oscuro" />
         <span className="max-w-40 truncate">{activo.nombre}</span>
         <span aria-hidden="true" className={cn("text-xs transition-transform duration-200", abierto && "rotate-180")}>
           ▾
@@ -236,8 +236,8 @@ export function SelectorDeporte({ deportes, valor, alCambiar, fondo = "oscuro", 
                         aria-current={esActivo ? "true" : undefined}
                         className={cn(
                           "flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border px-4 py-3 text-left font-semibold",
-                          "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
-                          esActivo ? "border-rojo bg-rojo/5 text-rojo-oscuro" : "border-gris-borde bg-blanco",
+                          "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
+                          esActivo ? "border-acento-oscuro bg-acento-oscuro/5 text-acento-oscuro" : "border-gris-borde bg-blanco",
                         )}
                       >
                         {deporte.nombre}

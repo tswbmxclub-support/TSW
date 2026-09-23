@@ -10,7 +10,7 @@ const TONOS: Record<TonoSeccion, string> = {
   claro: "bg-gris-frio text-azul-profundo",
   oscuro: "bg-azul-profundo text-blanco",
   // Rojo como fondo solo en franjas cortas de cierre, nunca en secciones largas.
-  acento: "bg-rojo text-blanco",
+  acento: "bg-acento-oscuro text-blanco",
 };
 
 export type SeccionProps = {

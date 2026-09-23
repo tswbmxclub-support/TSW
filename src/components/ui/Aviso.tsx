@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export type TonoAviso = "error" | "exito" | "aviso" | "info";
 
 const TONOS: Record<TonoAviso, string> = {
-  error: "border-rojo/40 bg-rojo/5 text-rojo-oscuro",
+  error: "border-error/40 bg-error-fondo text-error",
   exito: "border-exito/30 bg-exito-fondo text-exito",
   aviso: "border-aviso/30 bg-aviso-fondo text-aviso",
   info: "border-gris-borde bg-gris-frio text-azul-profundo",
@@ -13,7 +13,7 @@ const TONOS: Record<TonoAviso, string> = {
 
 /** Color del borde lateral de la variante destacada, por tono. */
 const BORDE_LATERAL: Record<TonoAviso, string> = {
-  error: "border-l-rojo",
+  error: "border-l-error",
   exito: "border-l-exito",
   aviso: "border-l-aviso",
   info: "border-l-azul-profundo",

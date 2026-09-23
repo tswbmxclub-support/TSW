@@ -51,7 +51,7 @@ export default async function PaginaTienda({ searchParams }: Props) {
               <Card className="h-full">
                 <CardCuerpo className="flex items-start gap-4 p-4">
                   <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-azul-profundo">
-                    <span className="h-2.5 w-2.5 rounded-full bg-rojo" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-acento-oscuro" />
                   </span>
                   <span>
                     <span className="block text-sm font-bold uppercase tracking-wide text-azul-profundo">{beneficio.titulo}</span>
@@ -89,7 +89,7 @@ export default async function PaginaTienda({ searchParams }: Props) {
         titulo="¿Dudas con las tallas?"
         texto="Escríbenos antes de pedir: te ayudamos a elegir la talla correcta para evitar cambios."
         acciones={
-          <BotonWhatsApp fondo="acento" variante="secundario" tamano="lg">
+          <BotonWhatsApp fondo="franja" variante="secundario" tamano="lg">
             ¿Tienes dudas? Escríbenos
           </BotonWhatsApp>
         }

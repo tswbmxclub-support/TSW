@@ -2,18 +2,20 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type TonoBadge = "neutro" | "acento" | "exito" | "aviso" | "oscuro" | "rojo" | "claro";
+export type TonoBadge = "neutro" | "acento" | "exito" | "aviso" | "oscuro" | "solido" | "claro";
 
 const TONOS: Record<TonoBadge, string> = {
   neutro: "bg-gris-frio text-texto-sec border-gris-borde",
-  // Rojo como acento: fondo tenue y texto oscuro para no perder contraste.
-  acento: "bg-rojo/10 text-rojo-oscuro border-rojo/30",
+  // Acento tenue: fondo al 10 % y texto en acento oscuro (6.61:1 sobre blanco).
+  acento: "bg-acento-oscuro/10 text-acento-oscuro border-acento-oscuro/30",
   // Colores funcionales de globals.css. Medidos: exito 4.69:1, aviso 5.41:1.
   exito: "bg-exito-fondo text-exito border-exito/30",
   aviso: "bg-aviso-fondo text-aviso border-aviso/30",
   oscuro: "bg-azul-profundo text-blanco border-azul-profundo",
-  // Rojo sólido: solo sobre azul profundo, como chip de antetítulo (blanco sobre rojo 4.96:1).
-  rojo: "bg-rojo text-blanco border-rojo",
+  // Acento sólido: solo sobre azul profundo, como chip de antetítulo. El texto
+  // va en azul profundo y no en blanco (5.12:1 contra 3.36:1), y así el chip
+  // también se separa del fondo marino, que es lo que el acento oscuro no hace.
+  solido: "bg-acento text-azul-profundo border-acento",
   // Translúcido sobre azul profundo, para etiquetas secundarias del hero.
   claro: "bg-blanco/10 text-blanco border-blanco/25",
 };

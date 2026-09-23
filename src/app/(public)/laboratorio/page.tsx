@@ -108,17 +108,54 @@ export default function PaginaLaboratorio() {
             </li>
           ))}
         </ul>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <p className="mt-8 text-sm text-texto-sec">
+          Ningún azul pasa AA sobre marino y sobre blanco a la vez, y por eso hay dos tokens de
+          acento en vez de uno. Cada tarjeta muestra el par y su ratio medido.
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="rounded-lg bg-azul-profundo p-5 text-blanco">
-            <p className="text-2xl font-display text-rojo">Rojo sobre azul profundo</p>
+            <p className="text-2xl font-display text-acento">Acento sobre azul profundo</p>
+            <p className="mt-2 text-sm text-blanco/85">5.12:1. AA para texto. Es el par del sitio oscuro.</p>
+          </div>
+          <div className="rounded-lg bg-acento-oscuro p-5 text-blanco">
+            <p className="text-2xl font-display">Blanco sobre acento oscuro</p>
+            <p className="mt-2 text-sm">6.61:1. Es el par de los botones primarios.</p>
+          </div>
+          <div className="rounded-lg bg-azul-profundo p-5">
+            <p className="text-2xl font-display text-cian">Cian sobre azul profundo</p>
             <p className="mt-2 text-sm text-blanco/85">
-              3.47:1. Solo texto grande (≥24px) o elementos de interfaz: barras, indicadores.
-              Nunca texto corrido.
+              7.83:1 aquí, pero 2.20:1 sobre blanco. Decorativo sobre oscuro y nada más: nunca
+              texto sobre claro, nunca borde de foco.
             </p>
           </div>
-          <div className="rounded-lg bg-rojo p-5 text-blanco">
-            <p className="text-2xl font-display">Blanco sobre rojo</p>
-            <p className="mt-2 text-sm">4.96:1. Es el par de los botones primarios.</p>
+          <div className="rounded-lg border border-gris-borde bg-blanco p-5">
+            <p className="text-2xl font-display text-acento-oscuro">Acento oscuro sobre blanco</p>
+            <p className="mt-2 text-sm text-texto-sec">
+              6.61:1. Sobre azul profundo cae a 2.61:1: ahí va el acento claro.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-lg border border-gris-borde bg-gris-frio p-5">
+            <p className="font-semibold text-azul-profundo">Anillo de foco</p>
+            <p className="mt-2 text-sm text-texto-sec">
+              Token propio porque es el único color que debe verse sobre los cuatro fondos:
+              blanco 4.07 · gris frío 3.70 · azul profundo 4.23 · azul medio 3.56. El rojo que se
+              retiró se quedaba en 2.92 sobre azul medio.
+            </p>
+            <button
+              type="button"
+              className="mt-3 min-h-[44px] rounded-md border-2 border-gris-borde px-4 font-semibold text-azul-profundo"
+            >
+              Enfócame con Tab
+            </button>
+          </div>
+          <div className="rounded-lg border border-error/40 bg-error-fondo p-5">
+            <p className="font-semibold text-error">El error tiene color propio</p>
+            <p className="mt-2 text-sm text-texto-sec">
+              #B3261E, de la familia de éxito y aviso. No es el rojo de marca: ese ahora
+              identifica a BMX Mastercross y no puede significar «algo salió mal».
+            </p>
           </div>
         </div>
       </Seccion>
@@ -246,19 +283,19 @@ export default function PaginaLaboratorio() {
       <Seccion tono="acento" tituloId="titulo-botones-acento" espaciado="compacto">
         <SeccionTitulo
           id="titulo-botones-acento"
-          bajada="fondo=&quot;acento&quot;: el primario se invierte a blanco con texto rojo. Solo en franjas de cierre (BloqueCTA)."
+          bajada="fondo=&quot;franja&quot;: el primario se invierte a blanco con texto en acento oscuro. Solo en franjas de cierre (BloqueCTA)."
         >
-          Botones sobre rojo
+          Botones sobre la franja de acento
         </SeccionTitulo>
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Boton fondo="acento">Primario</Boton>
-          <Boton fondo="acento" variante="secundario">
+          <Boton fondo="franja">Primario</Boton>
+          <Boton fondo="franja" variante="secundario">
             Secundario
           </Boton>
-          <Boton fondo="acento" variante="fantasma">
+          <Boton fondo="franja" variante="fantasma">
             Fantasma
           </Boton>
-          <Boton fondo="acento" disabled>
+          <Boton fondo="franja" disabled>
             Deshabilitado
           </Boton>
         </div>
@@ -298,7 +335,7 @@ export default function PaginaLaboratorio() {
             <CardCuerpo>
               <CardTitulo>Competencias</CardTitulo>
               <p className="mt-2 text-texto-sec">Calendario y resultados. Toda la tarjeta es el enlace.</p>
-              <span className="mt-4 inline-block font-semibold text-rojo">Ver resultados →</span>
+              <span className="mt-4 inline-block font-semibold text-acento-oscuro">Ver resultados →</span>
             </CardCuerpo>
           </CardEnlace>
 
@@ -866,7 +903,7 @@ export default function PaginaLaboratorio() {
       <Seccion tituloId="titulo-bloquecta" espaciado="compacto">
         <SeccionTitulo
           id="titulo-bloquecta"
-          bajada="Franja de cierre. Rojo por defecto (único fondo rojo del sitio), oscuro como alternativa. Los botones llevan fondo acorde."
+          bajada="Franja de cierre. De acento por defecto (único fondo de acento del sitio), oscuro como alternativa. Los botones llevan fondo acorde."
         >
           BloqueCTA
         </SeccionTitulo>
@@ -877,10 +914,10 @@ export default function PaginaLaboratorio() {
         texto="Escríbenos y te contamos qué documentos necesitas y cuándo puedes radicarlos."
         acciones={
           <>
-            <BotonWhatsApp fondo="acento" tamano="lg">
+            <BotonWhatsApp fondo="franja" tamano="lg">
               Escribir por WhatsApp
             </BotonWhatsApp>
-            <Boton href="/matriculas" fondo="acento" variante="secundario" tamano="lg">
+            <Boton href="/matriculas" fondo="franja" variante="secundario" tamano="lg">
               Ver documentos
             </Boton>
           </>
@@ -977,7 +1014,7 @@ const COLUMNAS_EJEMPLO: ColumnaTabla<FilaEjemplo>[] = [
   {
     clave: "resultado",
     titulo: "Resultado",
-    render: (f) => <span className="font-display text-lg text-rojo">{f.resultado}</span>,
+    render: (f) => <span className="font-display text-lg text-acento-oscuro">{f.resultado}</span>,
   },
 ];
 
@@ -1005,12 +1042,18 @@ function Grupo({ titulo, children }: { titulo: string; children: React.ReactNode
 const COLORES = [
   { nombre: "azul-profundo", hex: "#0B1B33", clase: "bg-azul-profundo", uso: "Fondo oscuro, header, footer" },
   { nombre: "azul-medio", hex: "#12294D", clase: "bg-azul-medio", uso: "Superficies sobre azul profundo" },
-  { nombre: "rojo", hex: "#D7263D", clase: "bg-rojo", uso: "Acento único: CTAs, activos" },
-  { nombre: "rojo-oscuro", hex: "#A31128", clase: "bg-rojo-oscuro", uso: "Hover del acento" },
+  { nombre: "acento", hex: "#008DFE", clase: "bg-acento", uso: "Sobre oscuro: activos, bordes, íconos" },
+  { nombre: "acento-oscuro", hex: "#0A5BB5", clase: "bg-acento-oscuro", uso: "Sobre claro: texto y botón primario" },
+  { nombre: "acento-hover", hex: "#094F9E", clase: "bg-acento-hover", uso: "Hover del botón primario" },
+  { nombre: "cian", hex: "#00BBFE", clase: "bg-cian", uso: "Decorativo sobre oscuro. Nunca texto" },
+  { nombre: "foco", hex: "#1A7FE0", clase: "bg-foco", uso: "Anillo de foco, el único que cruza los 4 fondos" },
   { nombre: "blanco", hex: "#FFFFFF", clase: "bg-blanco", uso: "Fondo base" },
   { nombre: "gris-frio", hex: "#F2F4F7", clase: "bg-gris-frio", uso: "Secciones claras" },
   { nombre: "gris-borde", hex: "#DCE3EC", clase: "bg-gris-borde", uso: "Bordes y separadores" },
   { nombre: "texto-sec", hex: "#46566F", clase: "bg-texto-sec", uso: "Texto secundario" },
+  { nombre: "error", hex: "#B3261E", clase: "bg-error", uso: "Estado de error. Funcional, no de marca" },
+  { nombre: "exito", hex: "#1F7A4D", clase: "bg-exito", uso: "Estado correcto" },
+  { nombre: "aviso", hex: "#8A5A00", clase: "bg-aviso", uso: "Estado de advertencia" },
 ];
 
 const PREGUNTAS = [

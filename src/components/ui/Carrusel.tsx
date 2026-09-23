@@ -149,7 +149,7 @@ export function Carrusel({
 
   const BOTON_CONTROL =
     "flex h-11 w-11 items-center justify-center rounded-full border-2 transition-colors " +
-    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo";
+    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
 
   return (
     <section
@@ -236,14 +236,14 @@ export function Carrusel({
                   aria-label={`Ir a la diapositiva ${i + 1}: ${diapositiva.nombre}`}
                   aria-current={activa ? "true" : undefined}
                   aria-controls={`${base}-${diapositiva.id}`}
-                  className="group flex h-11 w-11 items-center justify-center focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                  className="group flex h-11 w-11 items-center justify-center focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                 >
                   <span
                     aria-hidden="true"
                     className={cn(
                       "block h-1.5 rounded-full transition-[width,background-color] duration-300",
                       activa
-                        ? "w-8 bg-rojo"
+                        ? "w-8 bg-acento"
                         : sobreOscuro
                           ? "w-4 bg-blanco/50 group-hover:bg-blanco/80"
                           : "w-4 bg-azul-profundo/40 group-hover:bg-azul-profundo/70",

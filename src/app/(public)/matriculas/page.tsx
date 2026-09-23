@@ -165,7 +165,7 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
         titulo="¿Dudas con la matrícula?"
         texto="Escríbenos y te contamos qué documentos necesitas y cuándo puedes radicarlos."
         acciones={
-          <BotonWhatsApp fondo="acento" tamano="lg">
+          <BotonWhatsApp fondo="franja" tamano="lg">
             Escribir por WhatsApp
           </BotonWhatsApp>
         }

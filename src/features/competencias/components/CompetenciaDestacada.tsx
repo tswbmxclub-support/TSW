@@ -45,7 +45,7 @@ export function CompetenciaDestacada({ competencia }: { competencia: Competencia
               <ol className="mt-3 flex flex-col gap-2">
                 {podio.map((resultado) => (
                   <li key={resultado.id} className="flex items-baseline gap-3 border-b border-gris-borde pb-2">
-                    <span className="w-8 shrink-0 font-display text-2xl leading-none text-rojo">
+                    <span className="w-8 shrink-0 font-display text-2xl leading-none text-acento-oscuro">
                       {resultado.puesto}
                     </span>
                     <span className="font-semibold text-azul-profundo">{resultado.rider}</span>

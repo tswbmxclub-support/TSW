@@ -54,7 +54,7 @@ export function Indicador({
       <p
         className={cn(
           "text-xs font-bold uppercase tracking-[0.15em]",
-          oscuro ? "text-blanco/70" : esCifra ? "text-rojo-oscuro" : "text-texto-sec",
+          oscuro ? "text-blanco/70" : esCifra ? "text-acento-oscuro" : "text-texto-sec",
         )}
       >
         {etiqueta}
@@ -89,7 +89,7 @@ export function Indicador({
         href={href}
         className={cn(
           base,
-          "transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+          "transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
           oscuro ? "hover:border-blanco/40" : "hover:border-azul-medio",
           className,
         )}
@@ -119,7 +119,7 @@ function BarraProgreso({
   const pista = oscuro ? "bg-blanco/15" : "bg-gris-frio";
 
   if (progreso === undefined) {
-    return <div aria-hidden="true" className="mt-5 h-1 w-full rounded-full bg-rojo" />;
+    return <div aria-hidden="true" className="mt-5 h-1 w-full rounded-full bg-acento-oscuro" />;
   }
 
   const porcentaje = progreso === null || sinDato ? 0 : Math.min(100, Math.max(0, progreso));
@@ -133,7 +133,7 @@ function BarraProgreso({
       aria-valuetext={progreso === null ? "Sin dato" : `${porcentaje} %`}
       className={cn("mt-5 h-1.5 w-full overflow-hidden rounded-full", pista)}
     >
-      <div className="h-full rounded-full bg-rojo transition-[width] duration-300" style={{ width: `${porcentaje}%` }} />
+      <div className="h-full rounded-full bg-acento-oscuro transition-[width] duration-300" style={{ width: `${porcentaje}%` }} />
     </div>
   );
 }

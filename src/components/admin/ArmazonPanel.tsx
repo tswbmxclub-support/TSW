@@ -69,7 +69,7 @@ export function ArmazonPanel({
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-blanco/10 bg-azul-profundo px-4 text-blanco lg:hidden">
         <Link
           href="/admin"
-          className="flex min-h-[44px] items-center font-display text-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="flex min-h-[44px] items-center font-display text-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           TSW
           <span className="ml-2 text-xs font-normal uppercase tracking-[0.2em] text-blanco/60">Panel</span>
@@ -79,7 +79,7 @@ export function ArmazonPanel({
           onClick={() => setAbierto(true)}
           aria-expanded={abierto}
           aria-controls="menu-panel"
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           <span aria-hidden="true" className="text-2xl leading-none">
             ☰
@@ -147,7 +147,7 @@ function Navegacion({
       <div className="flex h-16 items-center justify-between gap-2 px-5">
         <Link
           href="/admin"
-          className="flex min-h-[44px] items-center font-display text-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="flex min-h-[44px] items-center font-display text-xl focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           TSW
           <span className="ml-2 text-xs font-normal uppercase tracking-[0.2em] text-blanco/60">Panel</span>
@@ -156,7 +156,7 @@ function Navegacion({
           <button
             type="button"
             onClick={alCerrar}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             <span aria-hidden="true" className="text-2xl leading-none">
               ×
@@ -185,12 +185,12 @@ function Navegacion({
                   aria-current={actual ? "page" : undefined}
                   className={cn(
                     "relative flex min-h-[44px] items-center rounded-md px-3 font-semibold transition-colors",
-                    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+                    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                     actual ? "bg-blanco/10 text-blanco" : "text-blanco/75 hover:bg-blanco/5 hover:text-blanco",
                   )}
                 >
                   {actual && (
-                    <span aria-hidden="true" className="absolute inset-y-2 left-0 w-[3px] rounded-r bg-rojo" />
+                    <span aria-hidden="true" className="absolute inset-y-2 left-0 w-[3px] rounded-r bg-acento" />
                   )}
                   {seccion.etiqueta}
                 </Link>
@@ -211,7 +211,7 @@ function Navegacion({
         </form>
         <Link
           href="/"
-          className="mt-3 inline-flex min-h-[44px] items-center text-sm text-blanco/70 underline-offset-4 hover:text-blanco hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="mt-3 inline-flex min-h-[44px] items-center text-sm text-blanco/70 underline-offset-4 hover:text-blanco hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           Ver el sitio público
         </Link>

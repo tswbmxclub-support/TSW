@@ -93,7 +93,7 @@ export default async function PaginaCompetencias({ searchParams }: Props) {
         titulo="¿Quieres competir con la corporación?"
         texto="Conoce los semilleros y niveles: la ruta que lleva de la iniciación a la competencia."
         acciones={
-          <Boton href={enlaceConDeporte("/semilleros", deporte.id)} fondo="acento" tamano="lg">
+          <Boton href={enlaceConDeporte("/semilleros", deporte.id)} fondo="franja" tamano="lg">
             Conocer los semilleros
           </Boton>
         }

@@ -51,10 +51,10 @@ export default async function PaginaInicio() {
         texto="Descarga los documentos de matrícula, diligéncialos y radícalos en la sede. Te contamos el proceso paso a paso."
         acciones={
           <>
-            <Boton href="/matriculas" fondo="acento" tamano="lg">
+            <Boton href="/matriculas" fondo="franja" tamano="lg">
               Ver matrículas
             </Boton>
-            <Boton href="/tienda" fondo="acento" variante="secundario" tamano="lg">
+            <Boton href="/tienda" fondo="franja" variante="secundario" tamano="lg">
               Dotación oficial
             </Boton>
           </>

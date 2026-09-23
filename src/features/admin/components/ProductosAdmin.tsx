@@ -352,7 +352,7 @@ function ModalProducto({
           ayuda="Se muestra en la ficha pública del producto. Texto plano."
         />
         <label className="flex min-h-[44px] items-center gap-3 text-sm">
-          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-rojo" />
+          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-acento-oscuro" />
           Producto activo (visible en la tienda)
         </label>
 
@@ -470,7 +470,7 @@ function ModalProducto({
                           type="checkbox"
                           checked={borrador.activo}
                           onChange={(e) => editarVariante(indice, { activo: e.target.checked })}
-                          className="h-5 w-5 accent-rojo"
+                          className="h-5 w-5 accent-acento-oscuro"
                         />
                         Activa
                       </label>

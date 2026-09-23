@@ -54,7 +54,7 @@ export function CardEnlace({
       className={cn(
         "group block rounded-lg border transition-transform duration-200",
         "hover:scale-[1.02] hover:shadow-lg",
-        "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+        "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
         oscura ? "border-blanco/15 bg-azul-medio text-blanco" : "border-gris-borde bg-blanco",
         className,
       )}

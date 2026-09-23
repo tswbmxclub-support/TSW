@@ -54,13 +54,13 @@ export function Acordeon({ items, exclusivo = true, abiertosInicial = [], classN
                 aria-expanded={abierto}
                 aria-controls={idPanel}
                 onClick={() => alternar(item.id)}
-                className="flex min-h-[44px] w-full items-center justify-between gap-4 py-4 text-left text-base font-semibold text-azul-profundo transition-colors hover:text-rojo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                className="flex min-h-[44px] w-full items-center justify-between gap-4 py-4 text-left text-base font-semibold text-azul-profundo transition-colors hover:text-acento-oscuro focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <span>{item.titulo}</span>
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "shrink-0 text-2xl leading-none text-rojo transition-transform duration-200",
+                    "shrink-0 text-2xl leading-none text-acento-oscuro transition-transform duration-200",
                     abierto && "rotate-45",
                   )}
                 >

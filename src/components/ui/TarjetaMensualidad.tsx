@@ -31,7 +31,7 @@ const ETIQUETA_ESTADO: Record<EstadoMensualidad, "pagada" | "pendiente" | "venci
 /**
  * Una mensualidad: mes, estado con ChipEstado, monto y fecha de pago o de
  * vencimiento. Compacta para el historial; destacada para el mes actual, con
- * borde rojo y superficie azul medio para que se distinga de un vistazo.
+ * borde de acento y superficie azul medio para que se distinga de un vistazo.
  *
  * El monto null muestra "[MONTO]": la regla del proyecto prohíbe inventar
  * cifras mientras la base no tenga la columna.
@@ -53,7 +53,7 @@ export function TarjetaMensualidad({
   return (
     <Card
       oscura={destacada}
-      className={cn("overflow-hidden", destacada && "border-rojo/60 shadow-md", className)}
+      className={cn("overflow-hidden", destacada && "border-acento/60 shadow-md", className)}
     >
       <div className={cn("flex flex-col gap-3", destacada ? "p-5 sm:p-6" : "p-4")}>
         <div className="flex items-start justify-between gap-3">

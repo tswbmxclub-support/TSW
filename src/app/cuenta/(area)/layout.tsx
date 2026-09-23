@@ -32,7 +32,7 @@ export default function LayoutCuenta({ children }: { children: ReactNode }) {
         <div className="contenedor flex h-16 items-center justify-between">
           <Link
             href="/cuenta"
-            className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+            className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             TSW
             <span className="ml-2 text-xs font-normal uppercase tracking-[0.2em] text-blanco/60">Mi cuenta</span>

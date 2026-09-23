@@ -80,7 +80,7 @@ export default async function PaginaSemilleros({ searchParams }: Props) {
         titulo="¿Listo para empezar?"
         texto="Descarga los documentos de matrícula y radícalos en la sede."
         acciones={
-          <Boton href={enlaceConDeporte("/matriculas", deporte.id)} fondo="acento" tamano="lg">
+          <Boton href={enlaceConDeporte("/matriculas", deporte.id)} fondo="franja" tamano="lg">
             Ver documentos de matrícula
           </Boton>
         }

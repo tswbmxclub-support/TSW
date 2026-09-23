@@ -65,7 +65,7 @@ export function TarjetaDeporte({
           <ul className="mt-4 flex flex-col gap-1.5 text-sm font-semibold text-azul-profundo">
             {puntos.map((punto) => (
               <li key={punto} className="flex items-start gap-2">
-                <span aria-hidden="true" className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rojo" />
+                <span aria-hidden="true" className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-acento-oscuro" />
                 <span>{punto}</span>
               </li>
             ))}
@@ -79,7 +79,7 @@ export function TarjetaDeporte({
           {href && (
             <Link
               href={href}
-              className="inline-flex min-h-[44px] items-center font-semibold text-rojo-oscuro underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+              className="inline-flex min-h-[44px] items-center font-semibold text-acento-oscuro underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               {etiquetaEnlace}
               <span className="sr-only">: {nombre}</span>

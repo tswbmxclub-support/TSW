@@ -81,7 +81,7 @@ export function Modal({ abierto, alCerrar, titulo, children, pie, className }: M
               <button
                 type="button"
                 onClick={alCerrar}
-                className="min-h-[44px] min-w-[44px] rounded-md px-2 text-2xl leading-none text-texto-sec hover:bg-gris-frio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                className="min-h-[44px] min-w-[44px] rounded-md px-2 text-2xl leading-none text-texto-sec hover:bg-gris-frio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <span aria-hidden="true">×</span>
                 <span className="sr-only">Cerrar</span>

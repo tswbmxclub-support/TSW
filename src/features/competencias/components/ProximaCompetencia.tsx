@@ -19,7 +19,7 @@ export function ProximaCompetencia({ competencia }: { competencia: CompetenciaCo
       <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-center lg:gap-10">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tono="rojo">Próxima competencia</Badge>
+            <Badge tono="solido">Próxima competencia</Badge>
             {competencia && <Badge tono="claro">{formatearFecha(competencia.fecha)}</Badge>}
           </div>
           <h2 id="titulo-proxima" className="mt-4 text-2xl sm:text-3xl lg:text-4xl">

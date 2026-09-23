@@ -53,7 +53,7 @@ export default async function PaginaAccesoUsuario({
         Al entrar aceptas la{" "}
         <Link
           href="/legal/datos"
-          className="font-semibold text-azul-profundo underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="font-semibold text-azul-profundo underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           Política de tratamiento de datos
         </Link>

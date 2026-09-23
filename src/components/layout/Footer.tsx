@@ -5,7 +5,7 @@ import { CONTACTO, ENLACES_LEGALES, PIE_INSTITUCIONAL, PIE_SERVICIOS, REDES, SIT
 
 const ENLACE =
   "inline-flex min-h-[44px] items-center text-blanco/85 underline-offset-4 hover:text-blanco hover:underline " +
-  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo";
+  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
 
 /**
  * Pie de cuatro columnas, como en el rediseño: corporación, institucional,

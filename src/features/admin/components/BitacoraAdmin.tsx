@@ -109,7 +109,7 @@ export function BitacoraAdmin({
           type="button"
           aria-expanded={expandido === e.id}
           onClick={() => setExpandido(expandido === e.id ? null : e.id)}
-          className="min-h-[44px] rounded-md px-3 text-sm font-semibold text-azul-profundo underline-offset-4 hover:text-rojo hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="min-h-[44px] rounded-md px-3 text-sm font-semibold text-azul-profundo underline-offset-4 hover:text-acento-oscuro hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           {expandido === e.id ? "Ocultar" : "Ver"}
         </button>
@@ -152,7 +152,7 @@ export function BitacoraAdmin({
         <div className="flex items-end">
           <button
             type="submit"
-            className="min-h-[44px] w-full rounded-md border-2 border-azul-profundo px-4 font-semibold text-azul-profundo transition-colors hover:bg-azul-profundo hover:text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+            className="min-h-[44px] w-full rounded-md border-2 border-azul-profundo px-4 font-semibold text-azul-profundo transition-colors hover:bg-azul-profundo hover:text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             Aplicar filtros
           </button>
@@ -241,7 +241,7 @@ function DetalleEvento({
         <button
           type="button"
           onClick={alCerrar}
-          className="min-h-[44px] min-w-[44px] rounded-md px-2 text-2xl leading-none text-texto-sec hover:bg-gris-frio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="min-h-[44px] min-w-[44px] rounded-md px-2 text-2xl leading-none text-texto-sec hover:bg-gris-frio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           <span aria-hidden="true">×</span>
           <span className="sr-only">Cerrar detalle</span>

@@ -19,7 +19,7 @@ export type BotonWhatsAppProps = {
 const AVISO_POR_FONDO: Record<FondoBoton, string> = {
   claro: "text-texto-sec",
   oscuro: "text-blanco/80",
-  acento: "text-blanco/90",
+  franja: "text-blanco/90",
 };
 
 /**

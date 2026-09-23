@@ -19,15 +19,15 @@ const BASE =
   "inline-flex items-center justify-center gap-2 rounded-md font-semibold " +
   // Área táctil mínima de 44 px y foco visible: requisitos, no adornos.
   "min-h-[44px] transition-[background-color,color,border-color,transform] duration-150 " +
-  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo " +
+  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco " +
   "disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99]";
 
 /**
- * Variantes sobre fondo claro. El primario es el único que usa el rojo como
- * fondo: blanco sobre #D7263D da 4.96:1.
+ * Variantes sobre fondo claro. El primario es el único que usa el acento como
+ * fondo: blanco sobre #0A5BB5 da 6.61:1.
  */
 const VARIANTES: Record<VarianteBoton, string> = {
-  primario: "bg-rojo text-blanco hover:bg-rojo-oscuro",
+  primario: "bg-acento-oscuro text-blanco hover:bg-acento-hover",
   secundario:
     "bg-transparent text-azul-profundo border-2 border-azul-profundo hover:bg-azul-profundo hover:text-blanco",
   fantasma: "bg-transparent text-azul-profundo hover:bg-gris-frio",
@@ -45,22 +45,23 @@ const VARIANTES_OSCURO: Record<VarianteBoton, string> = {
 };
 
 /**
- * Sobre la franja roja. Rojo sobre rojo no existe: el primario se invierte a
- * blanco con texto rojo (4.96:1) y los demás van en blanco.
+ * Sobre la franja de acento. Acento sobre acento no existe: el primario se
+ * invierte a blanco con texto en acento oscuro (6.61:1) y los demás van en
+ * blanco.
  */
-const VARIANTES_ACENTO: Record<VarianteBoton, string> = {
-  primario: "bg-blanco text-rojo hover:bg-gris-frio",
-  secundario: "bg-transparent text-blanco border-2 border-blanco hover:bg-blanco hover:text-rojo",
+const VARIANTES_FRANJA: Record<VarianteBoton, string> = {
+  primario: "bg-blanco text-acento-oscuro hover:bg-gris-frio",
+  secundario: "bg-transparent text-blanco border-2 border-blanco hover:bg-blanco hover:text-acento-oscuro",
   fantasma: "bg-transparent text-blanco hover:bg-blanco/15",
 };
 
 /** Fondo sobre el que se apoya el botón. Cambia la paleta, no la forma. */
-export type FondoBoton = "claro" | "oscuro" | "acento";
+export type FondoBoton = "claro" | "oscuro" | "franja";
 
 const PALETAS: Record<FondoBoton, Record<VarianteBoton, string>> = {
   claro: VARIANTES,
   oscuro: VARIANTES_OSCURO,
-  acento: VARIANTES_ACENTO,
+  franja: VARIANTES_FRANJA,
 };
 
 const TAMANOS: Record<TamanoBoton, string> = {
@@ -72,7 +73,8 @@ const TAMANOS: Record<TamanoBoton, string> = {
 type PropsComunes = {
   variante?: VarianteBoton;
   tamano?: TamanoBoton;
-  /** Fondo sobre el que va: `claro` (por defecto), `oscuro` o `acento` (rojo). */
+  /** Fondo sobre el que va: `claro` (por defecto), `oscuro` o `franja` (la
+   *  franja de cierre, que es de acento oscuro). */
   fondo?: FondoBoton;
   /** Ocupa todo el ancho disponible. Útil en móvil. */
   completo?: boolean;

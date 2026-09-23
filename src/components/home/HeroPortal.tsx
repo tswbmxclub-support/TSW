@@ -17,7 +17,7 @@ export function HeroPortal() {
       <div className="contenedor grid gap-8 py-12 sm:py-16 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-12 lg:py-20">
         <div>
           <div className="flex flex-wrap gap-2">
-            <Badge tono="rojo">{PORTADA.etiquetaEntidad}</Badge>
+            <Badge tono="solido">{PORTADA.etiquetaEntidad}</Badge>
             <Badge tono="claro">{DEPORTES.map((d) => d.nombre).join(" · ")}</Badge>
           </div>
           <h1 className="titulo-hero mt-5">{SITIO.nombreLargo}</h1>
@@ -45,7 +45,7 @@ export function HeroPortal() {
               <li key={deporte.id}>
                 <Link
                   href={`/semilleros?deporte=${deporte.id}`}
-                  className="group flex min-h-[44px] items-center justify-between gap-4 py-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                  className="group flex min-h-[44px] items-center justify-between gap-4 py-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                 >
                   <span className="min-w-0">
                     <span className="block font-display text-lg uppercase leading-tight">{deporte.nombre}</span>

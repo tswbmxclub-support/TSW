@@ -58,7 +58,7 @@ export function Header() {
       <div className="contenedor flex h-16 items-center justify-between gap-4 lg:h-20">
         <Link
           href="/"
-          className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           TSW
           <span className="ml-2 hidden text-xs font-normal uppercase tracking-[0.2em] text-blanco/60 sm:inline">
@@ -78,13 +78,13 @@ export function Header() {
                       aria-current={activa(enlace.href) ? "page" : undefined}
                       className={cn(
                         "relative flex min-h-[44px] items-center px-4 font-semibold transition-colors hover:text-blanco",
-                        "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+                        "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                         activa(enlace.href) ? "text-blanco" : "text-blanco/75",
                       )}
                     >
                       {enlace.etiqueta}
                       {activa(enlace.href) && (
-                        <span className="absolute inset-x-3 bottom-3 h-[3px] bg-rojo" aria-hidden="true" />
+                        <span className="absolute inset-x-3 bottom-3 h-[3px] bg-acento" aria-hidden="true" />
                       )}
                     </Link>
                   </li>
@@ -101,7 +101,7 @@ export function Header() {
                     onClick={() => setSubmenuAbierto(abierto ? null : enlace.etiqueta)}
                     className={cn(
                       "flex min-h-[44px] items-center gap-2 px-4 font-semibold transition-colors",
-                      "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+                      "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                       abierto || activa(enlace.href) ? "text-blanco" : "text-blanco/75 hover:text-blanco",
                     )}
                   >
@@ -129,7 +129,7 @@ export function Header() {
                             <li key={sub.href}>
                               <Link
                                 href={sub.href}
-                                className="block rounded-md p-3 transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                                className="block rounded-md p-3 transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                               >
                                 <span className="block font-semibold">{sub.etiqueta}</span>
                                 <span className="mt-0.5 block text-sm text-blanco/70">
@@ -157,7 +157,7 @@ export function Header() {
             onClick={() => setMenuMovil(true)}
             aria-expanded={menuMovil}
             aria-controls="menu-movil"
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-blanco transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo lg:hidden"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-blanco transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:hidden"
           >
             <span aria-hidden="true" className="text-2xl leading-none">
               ☰
@@ -179,7 +179,7 @@ function EnlaceCarrito() {
   return (
     <Link
       href="/carrito"
-      className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md px-3 font-semibold text-blanco transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+      className="relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md px-3 font-semibold text-blanco transition-colors hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
     >
       <span aria-hidden="true" className="text-xl leading-none">
         🛒
@@ -190,7 +190,7 @@ function EnlaceCarrito() {
       {cargado && unidades > 0 && (
         <span
           aria-hidden="true"
-          className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-rojo px-1 text-xs font-bold text-blanco"
+          className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-acento px-1 text-xs font-bold text-azul-profundo"
         >
           {unidades}
         </span>
@@ -237,7 +237,7 @@ function MenuMovil({
             <button
               type="button"
               onClick={alCerrar}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-blanco hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-blanco hover:bg-blanco/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               <span aria-hidden="true" className="text-3xl leading-none">
                 ×
@@ -253,7 +253,7 @@ function MenuMovil({
                   <Link
                     href={enlace.href}
                     aria-current={rutaActiva === enlace.href ? "page" : undefined}
-                    className="flex min-h-[56px] items-center border-b border-blanco/10 font-display text-2xl text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                    className="flex min-h-[56px] items-center border-b border-blanco/10 font-display text-2xl text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                   >
                     {enlace.etiqueta}
                   </Link>
@@ -264,7 +264,7 @@ function MenuMovil({
                         <li key={sub.href}>
                           <Link
                             href={sub.href}
-                            className="flex min-h-[48px] items-center pl-4 text-blanco/75 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                            className="flex min-h-[48px] items-center pl-4 text-blanco/75 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                           >
                             {sub.etiqueta}
                           </Link>
@@ -277,7 +277,7 @@ function MenuMovil({
               <li>
                 <Link
                   href="/carrito"
-                  className="flex min-h-[56px] items-center border-b border-blanco/10 font-display text-2xl text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                  className="flex min-h-[56px] items-center border-b border-blanco/10 font-display text-2xl text-blanco focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                 >
                   Carrito
                 </Link>

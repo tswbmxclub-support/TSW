@@ -56,7 +56,7 @@ function bloqueEnlace(enlaceCrudo: string, textoBoton: string): string {
   // El enlace lleva `&` entre parámetros: en HTML va como &amp;, también en href.
   const enlace = escaparHtml(enlaceCrudo);
   return `<p style="margin:24px 0;">
-          <a href="${enlace}" style="display:inline-block;padding:14px 22px;background:#D7263D;color:#FFFFFF;text-decoration:none;font-weight:bold;border-radius:6px;font-size:16px;">${textoBoton}</a>
+          <a href="${enlace}" style="display:inline-block;padding:14px 22px;background:#0A5BB5;color:#FFFFFF;text-decoration:none;font-weight:bold;border-radius:6px;font-size:16px;">${textoBoton}</a>
         </p>
         <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#46566F;">Si el botón no funciona, copia y pega este enlace en el navegador:<br><span style="word-break:break-all;">${enlace}</span></p>`;
 }

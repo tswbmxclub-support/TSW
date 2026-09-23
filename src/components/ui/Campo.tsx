@@ -16,11 +16,11 @@ type Compartidas = {
 const CONTROL =
   "w-full min-h-[44px] rounded-md border-2 bg-blanco px-3 py-2 text-base text-azul-profundo " +
   "placeholder:text-texto-sec/70 transition-colors " +
-  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo " +
+  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco " +
   "disabled:cursor-not-allowed disabled:bg-gris-frio disabled:opacity-70";
 
 function bordes(hayError: boolean) {
-  return hayError ? "border-rojo" : "border-gris-borde focus:border-azul-medio";
+  return hayError ? "border-error" : "border-gris-borde focus:border-azul-medio";
 }
 
 /** Etiqueta, ayuda y error, cableados por id. Lo usan Campo, AreaTexto y Select. */
@@ -38,7 +38,7 @@ function Envoltura({
       <label htmlFor={id} className="text-sm font-semibold text-azul-profundo">
         {etiqueta}
         {requerido && (
-          <span className="ml-1 text-rojo" aria-hidden="true">
+          <span className="ml-1 text-error" aria-hidden="true">
             *
           </span>
         )}
@@ -53,7 +53,7 @@ function Envoltura({
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-rojo">
+        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-error">
           {error}
         </p>
       )}

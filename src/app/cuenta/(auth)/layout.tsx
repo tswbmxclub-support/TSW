@@ -23,7 +23,7 @@ export default function LayoutAccesoCuenta({ children }: { children: ReactNode }
     <main className="flex min-h-svh flex-col items-center justify-center bg-gris-frio px-4 py-10">
       <Link
         href="/"
-        className="mb-6 font-display text-3xl tracking-tight text-azul-profundo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+        className="mb-6 font-display text-3xl tracking-tight text-azul-profundo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
       >
         TSW
         <span className="ml-2 text-xs font-normal uppercase tracking-[0.2em] text-texto-sec">Mi cuenta</span>

@@ -59,7 +59,7 @@ export function NivelesAdmin({ niveles }: { niveles: Nivel[] }) {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-display text-lg text-rojo" aria-hidden="true">
+                  <span className="font-display text-lg text-acento-oscuro" aria-hidden="true">
                     {indice + 1}
                   </span>
                   <ChipEstado tipo="activo" valor={n.activo} />
@@ -196,7 +196,7 @@ function ModalNivel({
           ayuda="Qué debe lograr el deportista para pasar al siguiente nivel."
         />
         <label className="flex min-h-[44px] items-center gap-3 text-sm">
-          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-rojo" />
+          <input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} className="h-5 w-5 accent-acento-oscuro" />
           Nivel activo (visible en el sitio público)
         </label>
       </div>

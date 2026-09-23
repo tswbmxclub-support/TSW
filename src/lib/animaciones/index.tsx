@@ -143,12 +143,13 @@ export function usePropsTarjeta() {
 
 /**
  * Indicador deslizante de pestañas y filtros. El `layoutId` hace que la barra
- * roja viaje entre opciones. Siempre es un `motion.span`: lo que cambia es si
+ * de acento viaje entre opciones. Por defecto va en acento oscuro, que es el
+ * que contrasta sobre claro; sobre azul profundo el llamador pasa `bg-acento`. Siempre es un `motion.span`: lo que cambia es si
  * lleva `layoutId`, no la etiqueta que se pinta.
  */
 export function IndicadorActivo({ id, className = "" }: { id: string; className?: string }) {
   const reducido = useMovimientoReducido();
-  const clases = `absolute inset-x-0 bottom-0 h-[3px] bg-rojo ${className}`;
+  const clases = `absolute inset-x-0 bottom-0 h-[3px] bg-acento-oscuro ${className}`;
 
   return (
     <motion.span

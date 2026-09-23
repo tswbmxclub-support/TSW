@@ -71,7 +71,7 @@ export function CampoMoneda({
       <label htmlFor={id} className="text-sm font-semibold text-azul-profundo">
         {etiqueta}
         {required && (
-          <span className="ml-1 text-rojo" aria-hidden="true">
+          <span className="ml-1 text-error" aria-hidden="true">
             *
           </span>
         )}
@@ -107,7 +107,7 @@ export function CampoMoneda({
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-rojo">
+        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-error">
           {error}
         </p>
       )}

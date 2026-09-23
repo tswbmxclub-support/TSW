@@ -98,7 +98,7 @@ function Diapositiva({ diapositiva, primera }: { diapositiva: Diapositiva; prime
       {/* pb deja sitio a los indicadores, que viven en el borde inferior. */}
       <div className="contenedor relative pb-20 pt-24 sm:pb-24 lg:pb-28">
         <div className="max-w-2xl">
-          <p className="mb-3 inline-block bg-rojo px-3 py-1 text-xs font-bold uppercase tracking-[0.2em]">
+          <p className="mb-3 inline-block bg-acento px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-azul-profundo">
             {diapositiva.nombre}
           </p>
           <Titulo className="titulo-hero">{diapositiva.titulo}</Titulo>

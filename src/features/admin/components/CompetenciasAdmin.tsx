@@ -109,7 +109,7 @@ export function CompetenciasAdmin({ competencias }: { competencias: CompetenciaC
               <ul className="mt-4 flex flex-wrap gap-2 text-sm">
                 {c.resultados.map((r) => (
                   <li key={r.id} className="rounded-md bg-gris-frio px-3 py-1.5">
-                    <span className="font-semibold text-rojo">{r.puesto}.º</span> {r.rider} ·{" "}
+                    <span className="font-semibold text-acento-oscuro">{r.puesto}.º</span> {r.rider} ·{" "}
                     <span className="text-texto-sec">{r.categoria}</span>
                   </li>
                 ))}
@@ -313,7 +313,7 @@ function ModalCompetencia({
             type="checkbox"
             checked={autorizada}
             onChange={(e) => setAutorizada(e.target.checked)}
-            className="mt-0.5 h-5 w-5 accent-rojo"
+            className="mt-0.5 h-5 w-5 accent-acento-oscuro"
           />
           <span>
             <strong className="text-azul-profundo">Autorización de uso de imagen firmada</strong>
@@ -430,7 +430,7 @@ function SeccionResultados({ competenciaId, iniciales }: { competenciaId: string
           {ordenados.map((r) => (
             <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
               <span className="min-w-0">
-                <span className="font-semibold text-rojo">{r.puesto}.º</span> {r.rider}
+                <span className="font-semibold text-acento-oscuro">{r.puesto}.º</span> {r.rider}
                 <span className="text-texto-sec"> · {r.categoria}</span>
               </span>
               {confirmarQuitar === r.id ? (

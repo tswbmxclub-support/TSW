@@ -62,11 +62,11 @@ export function PilaresPortal() {
             <Card className="h-full">
               <CardCuerpo className="flex h-full flex-col">
                 <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-md bg-azul-profundo text-blanco">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rojo" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-acento-oscuro" />
                 </span>
                 <h3 className="mt-5 text-xl leading-tight">{pilar.titulo}</h3>
                 <p className="mt-2 flex-1 text-texto-sec">{pilar.texto}</p>
-                <p className="mt-5 text-xs font-bold uppercase tracking-wide text-rojo-oscuro">{pilar.pie}</p>
+                <p className="mt-5 text-xs font-bold uppercase tracking-wide text-acento-oscuro">{pilar.pie}</p>
               </CardCuerpo>
             </Card>
           </Aparece>
@@ -115,7 +115,7 @@ export function CitaPortal() {
     <Seccion tono="oscuro" espaciado="compacto">
       <Aparece>
         <figure className="rounded-lg border border-blanco/15 bg-azul-medio p-6 sm:p-8 lg:flex lg:items-center lg:gap-8">
-          <span aria-hidden="true" className="font-display text-5xl leading-none text-rojo">
+          <span aria-hidden="true" className="font-display text-5xl leading-none text-acento-oscuro">
             “
           </span>
           <blockquote className="mt-3 flex-1 lg:mt-0">

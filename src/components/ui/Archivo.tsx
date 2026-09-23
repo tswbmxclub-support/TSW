@@ -74,7 +74,7 @@ export function Archivo({
     <div className={cn("flex flex-col gap-1.5", className)}>
       <span id={`${id}-etiqueta`} className="text-sm font-semibold text-azul-profundo">
         {etiqueta}
-        <span className="ml-1 text-rojo" aria-hidden="true">
+        <span className="ml-1 text-error" aria-hidden="true">
           *
         </span>
         <span className="sr-only"> (obligatorio)</span>
@@ -83,7 +83,7 @@ export function Archivo({
       <div
         className={cn(
           "rounded-md border-2 border-dashed p-4 transition-colors",
-          descripcion ? "border-rojo bg-rojo/5" : "border-gris-borde bg-gris-frio",
+          descripcion ? "border-acento-oscuro bg-acento-oscuro/5" : "border-gris-borde bg-gris-frio",
         )}
       >
         <input
@@ -101,7 +101,7 @@ export function Archivo({
             "file:mr-3 file:min-h-[44px] file:cursor-pointer file:rounded-md file:border-0",
             "file:bg-azul-profundo file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blanco",
             "file:hover:bg-azul-medio file:disabled:cursor-not-allowed file:disabled:opacity-50",
-            "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+            "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
             "disabled:cursor-not-allowed disabled:opacity-70",
           )}
         />
@@ -127,7 +127,7 @@ export function Archivo({
         </p>
       )}
       {descripcion && (
-        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-rojo">
+        <p id={`${id}-error`} role="alert" className="text-sm font-medium text-error">
           {descripcion}
         </p>
       )}

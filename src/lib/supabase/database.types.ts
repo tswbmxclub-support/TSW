@@ -39,6 +39,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      club: {
+        Row: {
+          activo: boolean
+          actualizado_en: string
+          color_identidad: string | null
+          creado_en: string
+          deporte: string
+          descripcion: string | null
+          etiqueta: string | null
+          id: string
+          instagram_url: string | null
+          logo_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+          tipo: string
+        }
+        Insert: {
+          activo?: boolean
+          actualizado_en?: string
+          color_identidad?: string | null
+          creado_en?: string
+          deporte: string
+          descripcion?: string | null
+          etiqueta?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_path?: string | null
+          nombre: string
+          orden?: number
+          slug: string
+          tipo?: string
+        }
+        Update: {
+          activo?: boolean
+          actualizado_en?: string
+          color_identidad?: string | null
+          creado_en?: string
+          deporte?: string
+          descripcion?: string | null
+          etiqueta?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_path?: string | null
+          nombre?: string
+          orden?: number
+          slug?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
       competencia: {
         Row: {
           actualizado_en: string
@@ -213,8 +264,10 @@ export type Database = {
         Row: {
           activo: boolean
           actualizado_en: string
+          club_id: string
           creado_en: string
           criterio_promocion: string | null
+          cupo_maximo: number | null
           descripcion: string | null
           horario: string | null
           id: string
@@ -225,8 +278,10 @@ export type Database = {
         Insert: {
           activo?: boolean
           actualizado_en?: string
+          club_id: string
           creado_en?: string
           criterio_promocion?: string | null
+          cupo_maximo?: number | null
           descripcion?: string | null
           horario?: string | null
           id?: string
@@ -237,8 +292,10 @@ export type Database = {
         Update: {
           activo?: boolean
           actualizado_en?: string
+          club_id?: string
           creado_en?: string
           criterio_promocion?: string | null
+          cupo_maximo?: number | null
           descripcion?: string | null
           horario?: string | null
           id?: string
@@ -246,7 +303,15 @@ export type Database = {
           orden?: number
           rango_edad?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "nivel_club_fk"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "club"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pedido: {
         Row: {
@@ -396,7 +461,8 @@ export type Database = {
         Row: {
           activo: boolean
           actualizado_en: string
-          categoria: Database["public"]["Enums"]["categoria_producto"]
+          categoria: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id: string | null
           creado_en: string
           descripcion: string | null
           id: string
@@ -408,7 +474,8 @@ export type Database = {
         Insert: {
           activo?: boolean
           actualizado_en?: string
-          categoria: Database["public"]["Enums"]["categoria_producto"]
+          categoria?: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id?: string | null
           creado_en?: string
           descripcion?: string | null
           id?: string
@@ -420,7 +487,8 @@ export type Database = {
         Update: {
           activo?: boolean
           actualizado_en?: string
-          categoria?: Database["public"]["Enums"]["categoria_producto"]
+          categoria?: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id?: string | null
           creado_en?: string
           descripcion?: string | null
           id?: string
@@ -429,7 +497,15 @@ export type Database = {
           orden?: number
           slug?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "producto_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "club"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       resultado: {
         Row: {
@@ -595,6 +671,31 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      alternar_club_activo: {
+        Args: { p_activo: boolean; p_actor_id: string; p_id: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          color_identidad: string | null
+          creado_en: string
+          deporte: string
+          descripcion: string | null
+          etiqueta: string | null
+          id: string
+          instagram_url: string | null
+          logo_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+          tipo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "club"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       alternar_documento_activo: {
         Args: { p_activo: boolean; p_actor_id: string; p_id: string }
         Returns: {
@@ -618,8 +719,10 @@ export type Database = {
         Returns: {
           activo: boolean
           actualizado_en: string
+          club_id: string
           creado_en: string
           criterio_promocion: string | null
+          cupo_maximo: number | null
           descripcion: string | null
           horario: string | null
           id: string
@@ -639,7 +742,8 @@ export type Database = {
         Returns: {
           activo: boolean
           actualizado_en: string
-          categoria: Database["public"]["Enums"]["categoria_producto"]
+          categoria: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id: string | null
           creado_en: string
           descripcion: string | null
           id: string
@@ -811,7 +915,8 @@ export type Database = {
         Returns: {
           activo: boolean
           actualizado_en: string
-          categoria: Database["public"]["Enums"]["categoria_producto"]
+          categoria: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id: string | null
           creado_en: string
           descripcion: string | null
           id: string
@@ -827,7 +932,69 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      establecer_logo_club: {
+        Args: { p_actor_id: string; p_id: string; p_logo_path: string }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          color_identidad: string | null
+          creado_en: string
+          deporte: string
+          descripcion: string | null
+          etiqueta: string | null
+          id: string
+          instagram_url: string | null
+          logo_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+          tipo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "club"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       generar_referencia_pedido: { Args: never; Returns: string }
+      guardar_club: {
+        Args: {
+          p_actor_id: string
+          p_color_identidad?: string
+          p_deporte?: string
+          p_descripcion?: string
+          p_etiqueta?: string
+          p_id?: string
+          p_instagram_url?: string
+          p_nombre?: string
+          p_orden?: number
+          p_slug?: string
+          p_tipo?: string
+        }
+        Returns: {
+          activo: boolean
+          actualizado_en: string
+          color_identidad: string | null
+          creado_en: string
+          deporte: string
+          descripcion: string | null
+          etiqueta: string | null
+          id: string
+          instagram_url: string | null
+          logo_path: string | null
+          nombre: string
+          orden: number
+          slug: string
+          tipo: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "club"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       guardar_competencia: {
         Args: {
           p_actor_id: string
@@ -887,7 +1054,9 @@ export type Database = {
         Args: {
           p_activo?: boolean
           p_actor_id: string
+          p_club_id?: string
           p_criterio_promocion?: string
+          p_cupo_maximo?: number
           p_descripcion?: string
           p_horario?: string
           p_id?: string
@@ -898,8 +1067,10 @@ export type Database = {
         Returns: {
           activo: boolean
           actualizado_en: string
+          club_id: string
           creado_en: string
           criterio_promocion: string | null
+          cupo_maximo: number | null
           descripcion: string | null
           horario: string | null
           id: string
@@ -957,6 +1128,7 @@ export type Database = {
           p_activo?: boolean
           p_actor_id: string
           p_categoria?: Database["public"]["Enums"]["categoria_producto"]
+          p_club_id?: string
           p_descripcion?: string
           p_id?: string
           p_nombre?: string
@@ -966,7 +1138,8 @@ export type Database = {
         Returns: {
           activo: boolean
           actualizado_en: string
-          categoria: Database["public"]["Enums"]["categoria_producto"]
+          categoria: Database["public"]["Enums"]["categoria_producto"] | null
+          club_id: string | null
           creado_en: string
           descripcion: string | null
           id: string
@@ -1091,7 +1264,7 @@ export type Database = {
         }
       }
       reordenar_niveles: {
-        Args: { p_actor_id: string; p_ids: string[] }
+        Args: { p_actor_id: string; p_club_id: string; p_ids: string[] }
         Returns: undefined
       }
       reservar_stock: {
@@ -1138,7 +1311,7 @@ export type Database = {
         | "publicar"
         | "archivar"
         | "cambiar_estado"
-      categoria_producto: "uniformes" | "proteccion" | "merchandising"
+      categoria_producto: "buso" | "guantes" | "camiseta" | "gorra"
       estado_pedido:
         | "pendiente"
         | "pagado"
@@ -1286,7 +1459,7 @@ export const Constants = {
         "archivar",
         "cambiar_estado",
       ],
-      categoria_producto: ["uniformes", "proteccion", "merchandising"],
+      categoria_producto: ["buso", "guantes", "camiseta", "gorra"],
       estado_pedido: [
         "pendiente",
         "pagado",

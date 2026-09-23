@@ -4,27 +4,55 @@
    Colorimetría TSW.
 
    Tailwind 4: `@theme` es el equivalente de `theme.extend` de la v3. Cada
-   variable de aquí se vuelve utilidad (bg-rojo, text-texto-sec, border-gris-
+   variable de aquí se vuelve utilidad (bg-acento, text-texto-sec, border-gris-
    borde...) y a la vez existe como variable CSS. No hay tailwind.config.
 
-   El rojo es acento (CTAs, estados activos, énfasis), nunca fondo dominante.
-   Contraste mínimo AA (4.5:1) en todo texto. Ratios medidos:
+   El acento sale del logo de la corporación. NO hay rojo en el sistema: el
+   rojo es el color de identidad de BMX Mastercross y vive en su fila de
+   `club` (club.color_identidad), no aquí. Ningún componente genérico lo usa.
 
-     blanco  sobre rojo            4.96:1  ok texto
-     rojo    sobre blanco          4.96:1  ok texto
-     rojo    sobre gris-frio       4.50:1  ok texto, justo en el límite
-     rojo    sobre azul-profundo   3.47:1  SOLO texto grande (≥24px) o elementos
-                                           de interfaz: barras, indicadores
-     rojo    sobre azul-medio      2.92:1  NUNCA, ni como texto ni como UI
-     texto-sec sobre blanco        7.44:1  ok
-     texto-sec sobre gris-frio     6.76:1  ok
-     blanco/60 sobre azul-profundo 6.85:1  ok (texto atenuado del footer)
+   Dos tokens de acento y no uno, porque ningún azul pasa AA sobre marino y
+   sobre blanco a la vez: el cian brilla sobre oscuro y desaparece sobre
+   claro, y el azul profundo hace lo contrario.
+
+   Ratios medidos (AA ≥ 4.5 texto · UI ≥ 3.0 componentes):
+
+     acento        sobre azul-profundo  5.12  AA  texto, bordes, íconos
+     acento        sobre azul-medio     4.30  UI
+     acento        sobre blanco         3.36  UI  nunca texto
+     acento-oscuro sobre blanco         6.61  AA  y blanco encima, 6.61
+     acento-oscuro sobre gris-frio      6.00  AA
+     acento-oscuro sobre azul-profundo  2.61  ✗   NUNCA sobre oscuro
+     cian          sobre azul-profundo  7.83  AA  solo decorativo
+     cian          sobre blanco         2.20  ✗   NUNCA texto, nunca borde
+     azul-profundo sobre acento        5.12  AA  el chip sobre oscuro
+     blanco        sobre azul-profundo 17.23  AA
+     texto-sec     sobre blanco         7.44  AA
+     texto-sec     sobre gris-frio      6.76  AA
+
+   El anillo de foco tiene token propio porque es el único color que debe
+   verse sobre los CUATRO fondos. Ninguno de los tres anteriores lo logra con
+   margen: `acento` se queda en 3.05 sobre gris-frío, a un 1,7 % del mínimo.
+   `--foco` da 3.56 en su peor caso.
+
+     foco sobre blanco 4.07 · gris-frio 3.70 · azul-profundo 4.23 · azul-medio 3.56
+
+   El rojo que se retiró fallaba sobre azul-medio (2.92): el anillo de foco
+   estaba por debajo del mínimo en las superficies de azul medio.
    --------------------------------------------------------------------------- */
 @theme {
   --color-azul-profundo: #0b1b33;
   --color-azul-medio: #12294d;
-  --color-rojo: #d7263d;
-  --color-rojo-oscuro: #a31128;
+
+  /* Acento de la corporación, del logo. */
+  --color-acento: #008dfe;
+  --color-acento-oscuro: #0a5bb5;
+  --color-acento-hover: #094f9e;
+  /* Del logo TSW. Decorativo sobre oscuro y nada más. */
+  --color-cian: #00bbfe;
+  /* Anillo de foco, el único que cruza los cuatro fondos. */
+  --color-foco: #1a7fe0;
+
   --color-blanco: #ffffff;
   --color-gris-frio: #f2f4f7;
   --color-gris-borde: #dce3ec;
@@ -36,6 +64,12 @@
   --color-exito-fondo: #e6f4ec;
   --color-aviso: #8a5a00;
   --color-aviso-fondo: #fff4d6;
+  /* Error. Es funcional, de la familia de exito y aviso, NO el rojo de
+     marca: #d7263d ahora identifica a Mastercross y no puede significar
+     "algo salió mal". blanco 6.54 - gris-frio 5.93, el mismo rango que
+     los otros dos estados. */
+  --color-error: #b3261e;
+  --color-error-fondo: #fdecea;
 
   --font-display: var(--fuente-display), system-ui, sans-serif;
   --font-sans: var(--fuente-cuerpo), system-ui, sans-serif;
@@ -71,7 +105,7 @@
 
   /* Foco siempre visible: es requisito de accesibilidad, no decoración. */
   :focus-visible {
-    outline: 3px solid var(--color-rojo);
+    outline: 3px solid var(--color-foco);
     outline-offset: 2px;
   }
 
@@ -151,7 +185,7 @@
     top: -100%;
     z-index: 100;
     border-radius: 0.375rem;
-    background-color: var(--color-rojo);
+    background-color: var(--color-acento-oscuro);
     padding: 0.75rem 1.25rem;
     font-weight: 600;
     color: var(--color-blanco);

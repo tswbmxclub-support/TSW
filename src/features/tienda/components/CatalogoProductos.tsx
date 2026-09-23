@@ -56,7 +56,7 @@ export function CatalogoProductos({ productos }: { productos: ProductoConVariant
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar uniforme, talla…"
-            className="h-11 w-full rounded-md border-2 border-gris-borde bg-blanco px-4 text-base text-azul-profundo placeholder:text-texto-sec/70 focus:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo sm:w-64"
+            className="h-11 w-full rounded-md border-2 border-gris-borde bg-blanco px-4 text-base text-azul-profundo placeholder:text-texto-sec/70 focus:border-azul-medio focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-64"
           />
         </div>
       </div>

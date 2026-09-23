@@ -45,7 +45,7 @@ export function ListaCarrito() {
           titulo="Tu carrito está vacío"
           texto="Los uniformes, la protección y el merchandising del club están en la tienda."
           accion={
-            <Boton href="/tienda" fondo="acento" tamano="lg">
+            <Boton href="/tienda" fondo="franja" tamano="lg">
               Ir a la tienda
             </Boton>
           }
@@ -78,7 +78,7 @@ export function ListaCarrito() {
                 <div className="min-w-0">
                   <Link
                     href={`/tienda/${item.productoSlug}`}
-                    className="text-lg font-semibold text-azul-profundo hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+                    className="text-lg font-semibold text-azul-profundo hover:underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
                   >
                     {item.nombreProducto}
                   </Link>

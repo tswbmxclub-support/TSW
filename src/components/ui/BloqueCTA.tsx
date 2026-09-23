@@ -12,9 +12,9 @@ export type BloqueCTAProps = {
 };
 
 /**
- * Franja de cierre con una llamada a la acción. Rojo por defecto: es el único
- * lugar donde el rojo hace de fondo, y por eso es corta y va al final.
- * Los botones dentro deben llevar `fondo="acento"` (o `"oscuro"`).
+ * Franja de cierre con una llamada a la acción. De acento por defecto: es el
+ * único lugar donde el acento hace de fondo, y por eso es corta y va al final.
+ * Los botones dentro deben llevar `fondo="franja"` (o `"oscuro"`).
  */
 export function BloqueCTA({ titulo, texto, acciones, tono = "acento", tituloId }: BloqueCTAProps) {
   return (

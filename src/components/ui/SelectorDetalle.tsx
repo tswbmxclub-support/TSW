@@ -97,7 +97,7 @@ export function SelectorDetalle({ items, etiqueta, inicial, className }: Selecto
                 onClick={() => setActivoId(item.id)}
                 className={cn(
                   "relative min-h-[44px] overflow-hidden rounded-lg border-2 p-4 text-left transition-colors",
-                  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+                  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                   seleccionado
                     ? "border-azul-profundo bg-azul-profundo text-blanco"
                     : "border-gris-borde bg-blanco hover:border-azul-medio",
@@ -108,7 +108,7 @@ export function SelectorDetalle({ items, etiqueta, inicial, className }: Selecto
                     <span
                       className={cn(
                         "font-display text-2xl leading-none",
-                        seleccionado ? "text-rojo" : "text-texto-sec",
+                        seleccionado ? "text-acento-oscuro" : "text-texto-sec",
                       )}
                     >
                       {item.numero}
@@ -137,7 +137,7 @@ export function SelectorDetalle({ items, etiqueta, inicial, className }: Selecto
           id={`${base}-panel`}
           aria-labelledby={`${base}-tab-${activo.id}`}
           tabIndex={0}
-          className="focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+          className="focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
           <motion.div
             key={activo.id}

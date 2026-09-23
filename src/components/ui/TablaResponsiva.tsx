@@ -88,7 +88,7 @@ export function TablaResponsiva<T>({
                     "py-4 pr-4 align-top",
                     columna.alinear === "derecha" && "text-right",
                     columna === principal && "font-semibold text-azul-profundo",
-                    columna === enfatizada && "font-display text-2xl leading-none text-rojo-oscuro",
+                    columna === enfatizada && "font-display text-2xl leading-none text-acento-oscuro",
                     columna.className,
                   )}
                 >
@@ -105,7 +105,7 @@ export function TablaResponsiva<T>({
           <li key={claveFila(fila)} className="rounded-lg border border-gris-borde bg-blanco p-4">
             <div className="flex items-start gap-3">
               {enfatizada && (
-                <p className="shrink-0 font-display text-3xl leading-none text-rojo-oscuro">
+                <p className="shrink-0 font-display text-3xl leading-none text-acento-oscuro">
                   <span className="sr-only">{enfatizada.titulo}: </span>
                   {enfatizada.render(fila)}
                 </p>

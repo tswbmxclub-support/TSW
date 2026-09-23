@@ -99,7 +99,7 @@ export function FormularioAcceso({
         <p className="text-center text-sm">
           <Link
             href={enlaceRecuperar}
-            className="inline-flex min-h-[44px] items-center text-azul-profundo underline underline-offset-4 hover:text-rojo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo"
+            className="inline-flex min-h-[44px] items-center text-azul-profundo underline underline-offset-4 hover:text-acento-oscuro focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             ¿Olvidaste la contraseña?
           </Link>

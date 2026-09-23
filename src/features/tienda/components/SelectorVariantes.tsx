@@ -133,11 +133,11 @@ export function SelectorVariantes({ producto }: { producto: ProductoConVariantes
 function cnBotonTalla(activa: boolean, sinStock: boolean): string {
   return [
     "min-h-[44px] min-w-[56px] rounded-md border-2 px-4 py-2 text-base font-semibold transition-colors",
-    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-rojo",
+    "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
     sinStock
       ? "cursor-not-allowed border-gris-borde bg-gris-frio text-texto-sec/60 line-through"
       : activa
-        ? "border-rojo bg-rojo text-blanco"
+        ? "border-acento-oscuro bg-acento-oscuro text-blanco"
         : "border-gris-borde bg-blanco text-azul-profundo hover:border-azul-medio",
   ].join(" ");
 }

@@ -94,15 +94,16 @@ export function ContadorRegresivo({
               "flex flex-col items-center rounded-lg border px-2 py-3 sm:py-4",
               oscuro ? "border-blanco/15 bg-azul-medio text-blanco" : "border-gris-borde bg-blanco text-azul-profundo",
               // El último bloque lleva el acento, como en el rediseño: es el que
-              // se mueve. Sobre azul medio el rojo no alcanza contraste como
-              // texto (2.92:1), así que allí va como borde inferior.
-              indice === casillas.length - 1 && oscuro && "border-b-4 border-b-rojo",
+              // se mueve. Sobre azul medio el acento oscuro no alcanza
+              // contraste (2.19:1), así que allí va el acento claro como
+              // borde inferior.
+              indice === casillas.length - 1 && oscuro && "border-b-4 border-b-acento",
             )}
           >
             <span
               className={cn(
                 "font-display text-3xl leading-none tabular-nums sm:text-4xl lg:text-5xl",
-                indice === casillas.length - 1 && !oscuro && "text-rojo-oscuro",
+                indice === casillas.length - 1 && !oscuro && "text-acento-oscuro",
               )}
             >
               {montado ? dosCifras(restante[casilla.clave]) : "--"}

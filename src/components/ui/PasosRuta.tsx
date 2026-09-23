@@ -51,7 +51,13 @@ export function PasosRuta({ pasos, etiqueta, oscuro = false, className }: PasosR
           )}
         >
           <div className="flex items-start justify-between gap-3">
-            <span aria-hidden="true" className="font-display text-4xl leading-none text-rojo sm:text-5xl">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "font-display text-4xl leading-none sm:text-5xl",
+                oscuro ? "text-acento" : "text-acento-oscuro",
+              )}
+            >
               {paso.numero}
             </span>
             {paso.etiqueta && (
@@ -71,7 +77,7 @@ export function PasosRuta({ pasos, etiqueta, oscuro = false, className }: PasosR
           </h3>
           <div className={cn("mt-2 flex-1 text-sm", oscuro ? "text-blanco/80" : "text-texto-sec")}>{paso.texto}</div>
           {paso.pie && (
-            <p className={cn("mt-4 text-xs font-bold uppercase tracking-wide", oscuro ? "text-blanco/85" : "text-rojo-oscuro")}>
+            <p className={cn("mt-4 text-xs font-bold uppercase tracking-wide", oscuro ? "text-blanco/85" : "text-acento-oscuro")}>
               {paso.pie}
             </p>
           )}

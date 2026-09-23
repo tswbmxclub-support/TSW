@@ -48,8 +48,9 @@ export function HeroPagina({
                 className={cn(
                   "mb-3 text-xs font-bold uppercase tracking-[0.2em]",
                   // Rojo sobre azul profundo no alcanza AA en texto pequeño:
-                  // sobre oscuro va como chip blanco sobre rojo, igual que en el hero.
-                  oscuro ? "inline-block bg-rojo px-3 py-1 text-blanco" : "text-rojo-oscuro",
+                  // sobre oscuro va como chip de acento con texto azul profundo (5.12:1):
+  // el acento oscuro sobre marino se queda en 2.61 y no se separaría.
+                  oscuro ? "inline-block bg-acento px-3 py-1 text-azul-profundo" : "text-acento-oscuro",
                 )}
               >
                 {antetitulo}

@@ -103,7 +103,7 @@ export function UltimosResultados({
                             <tbody>
                               {competencia.resultados.slice(0, 5).map((resultado) => (
                                 <tr key={resultado.id} className="border-b border-gris-borde/60">
-                                  <td className="py-2 pr-3 font-display text-lg text-rojo">
+                                  <td className="py-2 pr-3 font-display text-lg text-acento-oscuro">
                                     {resultado.puesto}
                                   </td>
                                   <td className="py-2 pr-3">{resultado.rider}</td>
