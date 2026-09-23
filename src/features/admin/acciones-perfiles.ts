@@ -7,7 +7,7 @@ import { ErrorApp } from "@/lib/errors";
 import { enviarInvitacion } from "@/lib/auth/enlaces";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { ejecutarRpc } from "./mutations";
-import { estadoDeCuentaPorCorreo } from "./queries-perfiles";
+import { estadoDeCuentaPorCorreo, obtenerUsuarioPanel } from "./queries-perfiles";
 import {
   esquemaEdicionAdmin,
   esquemaEdicionUsuario,
@@ -130,21 +130,9 @@ async function motivoDeCorreoRepetido(correo: string): Promise<string> {
   }
 
   if (estado.tipo === "usuario") {
-    // PENDIENTE (aprobado, va después del acceso por código): acción propia
-    // «convertir en administradora» para este caso, con confirmación que diga
-    // en palabras que se ELIMINA su perfil de usuario —no un "¿estás seguro?"
-    // genérico—. La RPC ya sabe hacerlo: crear_perfil_admin migra un perfil
-    // contrario inactivo (migración 15).
-    //
-    // Cuando existan `mensualidad` y `jersey` colgando de perfil_usuario, esa
-    // acción tendrá que RECHAZAR si la persona tiene historial, aunque su
-    // perfil esté inactivo: hoy «inactivo» equivale a «nunca se usó», y en
-    // cuanto haya pagos registrados deja de equivaler. El ON DELETE CASCADE se
-    // llevaría ese historial sin avisar. Anotado ahora, mientras el caso
-    // todavía no puede ocurrir.
     return estado.activo
       ? YA_ES_USUARIO_ACTIVO
-      : "Esa persona ya tiene una cuenta de usuario, hoy inactiva. Convertirla en administradora todavía no se hace desde el panel.";
+      : "Esa persona ya tiene una cuenta de usuario, hoy inactiva. Ábrela en Usuarios y usa «Convertir en administrador»: no hace falta otra cuenta.";
   }
 
   return YA_REGISTRADO;
@@ -339,6 +327,46 @@ export async function desactivarUsuario(id: string): Promise<ResultadoPerfil> {
     revalidarPerfiles("usuario", id);
     return { ok: true, mensaje: "Cuenta desactivada. Sus datos se conservan." };
   } catch (error) {
+    return { ok: false, error: mensajeDe(error) };
+  }
+}
+
+/**
+ * Convierte la cuenta de un titular en cuenta de administrador.
+ *
+ * **Es destructiva**: `crear_perfil_admin` migra el perfil, y migrar es borrar
+ * la fila de `perfil_usuario` y crear la de `perfil_admin` (migración 15). Por
+ * eso la pantalla lo dice con esas palabras antes de ejecutarla, y por eso la
+ * base solo lo permite sobre un perfil INACTIVO: uno activo es alguien que
+ * está usando el sistema.
+ *
+ * PENDIENTE, y hay que acordarse: cuando existan `mensualidad` y `jersey`
+ * colgando de `perfil_usuario`, esta acción tendrá que **rechazar si la
+ * persona tiene historial**, aunque su perfil esté inactivo. Hoy «inactivo»
+ * equivale a «nunca se usó», y en cuanto haya pagos registrados deja de
+ * equivaler: el `ON DELETE CASCADE` se llevaría ese historial sin avisar. La
+ * comprobación va en la RPC, no aquí, por la misma razón que la invariante de
+ * fotos de menores vive en la tabla: si aparece un tercer camino, la base lo
+ * para sola.
+ */
+export async function convertirEnAdministrador(id: string): Promise<ResultadoPerfil> {
+  try {
+    const titular = await obtenerUsuarioPanel(id);
+    if (!titular) return { ok: false, error: "Ese titular ya no existe." };
+    if (titular.activo) return { ok: false, error: YA_ES_USUARIO_ACTIVO };
+
+    await ejecutarRpc("crear_perfil_admin", { p_id: id, p_nombre: titular.nombre });
+
+    revalidarPerfiles("usuario", id);
+    revalidarPerfiles("admin");
+    return {
+      ok: true,
+      mensaje: `${titular.nombre} pasó a la lista de administradores, todavía inactivo. Actívalo cuando quieras darle acceso al panel.`,
+    };
+  } catch (error) {
+    if (error instanceof ErrorApp && PERFIL_USUARIO_ACTIVO.test(error.message)) {
+      return { ok: false, error: YA_ES_USUARIO_ACTIVO };
+    }
     return { ok: false, error: mensajeDe(error) };
   }
 }

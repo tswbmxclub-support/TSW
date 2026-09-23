@@ -27,6 +27,7 @@ import {
 import type { UsuarioPanel } from "../queries-perfiles";
 import {
   activarUsuario,
+  convertirEnAdministrador,
   desactivarUsuario,
   editarUsuario,
   invitarUsuario,
@@ -259,7 +260,8 @@ function ModalInvitarUsuario({
  */
 export function DetalleUsuarioAdmin({ usuario }: { usuario: UsuarioPanel }) {
   const { pendiente, aviso, ejecutar } = useAccionPerfil();
-  const [modal, setModal] = useState<null | "editar" | "desactivar" | "pago" | "jersey">(null);
+  const [modal, setModal] = useState<null | "editar" | "desactivar" | "convertir" | "pago" | "jersey">(null);
+  const router = useRouter();
 
   return (
     <div className="flex flex-col gap-6">
@@ -294,6 +296,11 @@ export function DetalleUsuarioAdmin({ usuario }: { usuario: UsuarioPanel }) {
             ) : (
               <Boton tamano="sm" variante="fantasma" disabled={pendiente} onClick={() => ejecutar(() => activarUsuario(usuario.id))}>
                 Activar
+              </Boton>
+            )}
+            {!usuario.activo && (
+              <Boton tamano="sm" variante="fantasma" disabled={pendiente} onClick={() => setModal("convertir")}>
+                Convertir en administrador
               </Boton>
             )}
             {!usuario.ultimoAcceso && usuario.correo && (
@@ -401,6 +408,40 @@ export function DetalleUsuarioAdmin({ usuario }: { usuario: UsuarioPanel }) {
         <p className="text-sm text-texto-sec">
           {usuario.nombre} dejará de poder entrar a su cuenta. Sus datos y los de sus deportistas se conservan;
           puedes volver a activarla cuando quieras.
+        </p>
+      </Modal>
+
+      <Modal
+        abierto={modal === "convertir"}
+        alCerrar={() => setModal(null)}
+        titulo="Convertir en administrador"
+        pie={
+          <PieModal
+            alCerrar={() => setModal(null)}
+            cargando={pendiente}
+            etiquetaGuardar="Convertir y eliminar su perfil"
+            onGuardar={() =>
+              ejecutar(
+                () => convertirEnAdministrador(usuario.id),
+                () => {
+                  setModal(null);
+                  // Esta ficha deja de existir en cuanto la conversión pasa:
+                  // quedarse aquí mostraría un 404 al refrescar.
+                  router.push("/admin/administradores");
+                },
+              )
+            }
+          />
+        }
+      >
+        <Aviso tono="aviso" titulo="Esto elimina su perfil de titular">
+          Se <strong>borra la ficha de {usuario.nombre} como titular</strong> —nombre, teléfono y todo lo que
+          cuelgue de ella— y en su lugar queda una cuenta de administrador con el mismo correo. No es un cambio
+          de etiqueta: la fila de titular desaparece y no se puede deshacer desde el panel.
+        </Aviso>
+        <p className="mt-4 text-sm text-texto-sec">
+          Entra a la lista de administradores <strong>inactivo</strong>. Tendrás que activarlo aparte para que
+          pueda usar el panel.
         </p>
       </Modal>
 
