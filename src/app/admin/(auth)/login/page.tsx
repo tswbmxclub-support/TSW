@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { RUTA_CUENTA, RUTA_PANEL, obtenerPerfil } from "@/lib/auth";
-import { FormularioAcceso } from "@/features/admin/components/FormularioAcceso";
+import { AccesoAdmin } from "@/features/admin/components/AccesoAdmin";
 
 export const metadata: Metadata = { title: "Acceso" };
 
@@ -22,11 +22,5 @@ export default async function PaginaAcceso({
   const sesion = await obtenerPerfil();
   if (sesion) redirect(sesion.tipo === "usuario" ? RUTA_CUENTA : RUTA_PANEL);
 
-  return (
-    <FormularioAcceso
-      redirigir={redirigir}
-      titulo="Acceso al panel"
-      textoAyuda="Solo para la administración del club."
-    />
-  );
+  return <AccesoAdmin redirigir={redirigir} />;
 }

@@ -3,6 +3,7 @@ import "server-only";
 import type { User } from "@supabase/supabase-js";
 
 import { exigirAdmin } from "@/lib/auth";
+import { buscarCuentaPorCorreo, cuentasDeAuth } from "@/lib/auth/cuentas";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -24,26 +25,6 @@ export type PerfilUsuario = Tables<"perfil_usuario">;
 export type AdminPanel = PerfilAdmin & { correo: string | null; ultimoAcceso: string | null };
 export type UsuarioPanel = PerfilUsuario & { correo: string | null; ultimoAcceso: string | null };
 
-/**
- * Mapa id → usuario de Auth de todas las cuentas. La Admin API pagina de a
- * 1000; el bucle recorre las páginas que haga falta. Con las decenas o cientos
- * de cuentas que tendrá la corporación, es una o dos llamadas.
- */
-async function usuariosDeAuth(): Promise<Map<string, User>> {
-  const supabase = crearClienteAdmin();
-  const mapa = new Map<string, User>();
-  const porPagina = 1000;
-
-  for (let pagina = 1; pagina <= 20; pagina += 1) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page: pagina, perPage: porPagina });
-    if (error) throw error;
-    for (const usuario of data.users) mapa.set(usuario.id, usuario);
-    if (data.users.length < porPagina) break;
-  }
-
-  return mapa;
-}
-
 function conCorreo<T extends { id: string }>(fila: T, cuentas: Map<string, User>) {
   const cuenta = cuentas.get(fila.id);
   return {
@@ -60,7 +41,7 @@ export async function listarAdministradores(): Promise<AdminPanel[]> {
 
   const [{ data, error }, cuentas] = await Promise.all([
     supabase.from("perfil_admin").select("*").order("activo", { ascending: false }).order("nombre"),
-    usuariosDeAuth(),
+    cuentasDeAuth(),
   ]);
   if (error) throw error;
 
@@ -74,7 +55,7 @@ export async function listarUsuarios(): Promise<UsuarioPanel[]> {
 
   const [{ data, error }, cuentas] = await Promise.all([
     supabase.from("perfil_usuario").select("*").order("activo", { ascending: false }).order("nombre"),
-    usuariosDeAuth(),
+    cuentasDeAuth(),
   ]);
   if (error) throw error;
 
@@ -87,7 +68,7 @@ export async function listarUsuarios(): Promise<UsuarioPanel[]> {
  * registrado», que es cierto pero no dice qué hacer.
  *
  * El correo vive en auth.users y no se puede filtrar por él desde PostgREST,
- * así que se recorre el mapa de cuentas que ya arma usuariosDeAuth(). Los
+ * así que se recorre el mapa de cuentas que ya arma cuentasDeAuth(). Los
  * perfiles se leen con el cliente de la sesión: RLS sigue siendo la barrera.
  */
 export type EstadoDeCuenta =
@@ -98,9 +79,7 @@ export type EstadoDeCuenta =
 export async function estadoDeCuentaPorCorreo(correo: string): Promise<EstadoDeCuenta> {
   await exigirAdmin();
 
-  const buscado = correo.trim().toLowerCase();
-  const cuentas = await usuariosDeAuth();
-  const cuenta = [...cuentas.values()].find((usuario) => usuario.email?.toLowerCase() === buscado);
+  const cuenta = await buscarCuentaPorCorreo(correo);
   if (!cuenta) return { existe: false };
 
   const supabase = await crearClienteServidor();
