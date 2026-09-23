@@ -37,11 +37,11 @@ export const RUTAS_PUBLICAS = {
 export const LARGO_CODIGO_ACCESO = 8;
 
 /**
- * Plazo de vigencia, tal como se le dice a la persona. Placeholder a
- * propósito: el valor real está en el dashboard y no se inventa aquí.
- * Encaja en «El código vence …».
+ * Plazo de vigencia, tal como se le dice a la persona. Encaja en «El código
+ * vence …». El valor sale del dashboard («Email OTP Expiration», fijado en
+ * 10 minutos el 2026-09-23): si se cambia allá, se cambia aquí.
  */
-export const VIGENCIA_CODIGO_ACCESO = "[en X minutos]";
+export const VIGENCIA_CODIGO_ACCESO = "en 10 minutos";
 
 /** Espera antes de poder pedir otro código, en segundos. */
 export const SEGUNDOS_REENVIO_CODIGO = 60;

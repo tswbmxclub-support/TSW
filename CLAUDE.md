@@ -296,6 +296,33 @@ un CHECK de pedido, Postgres pone en `details` un `Failing row contains (…)` c
 nombre, correo y teléfono del comprador — exactamente lo que la decisión de
 auditoría y la Ley 1581 evitan guardar.
 
+### La bitácora es inmutable, con una sola excepción (migración 16)
+
+`evento_auditoria.actor_id` es `on delete set null`, así que borrar una cuenta
+de `auth.users` obliga a un **UPDATE** de la bitácora. El trigger de solo
+inserción lo rechazaba, la transacción entera se abortaba y GoTrue lo devolvía
+como `Database error deleting user`, sin decir por qué: **ninguna cuenta que
+hubiera hecho algo en el panel se podía borrar.**
+
+Desde la 16, `evento_auditoria_solo_insercion()` deja pasar **un** caso: el
+UPDATE que lleva `actor_id` de un valor a NULL **sin que difiera ninguna otra
+columna**. Se comprueba con dos redes, porque cada una falla donde la otra
+aguanta:
+
+- columna por columna con `is distinct from`, en los tipos reales;
+- la fila entera, `(to_jsonb(new) - 'actor_id')::text`, que cubre **cualquier
+  columna que se añada después** y no deja pasar ni un cambio de forma (`'1'`
+  y `'1.0'` son el mismo jsonb y distinto texto).
+
+No se condiciona por rol, sesión ni origen del UPDATE: desde un trigger eso no
+se distingue con fiabilidad, y una condición que se puede fingir no es una
+condición. **El DELETE no tiene excepción.**
+
+Verificado contra remoto el 23-09-2026: la cuenta se borra, sus 5 eventos
+siguen ahí con todo idéntico salvo el actor, y los cinco intentos que no deben
+pasar —actor de NULL a un valor, de un valor a otro, otra columna colada en el
+mismo UPDATE, solo otra columna, y un DELETE— dan `23001`.
+
 ---
 
 ## `/laboratorio` es el estándar de diseño
