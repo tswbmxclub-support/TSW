@@ -31,6 +31,7 @@ export {
 export { Aviso, type AvisoProps, type TonoAviso } from "./Aviso";
 export { BotonWhatsApp, type BotonWhatsAppProps } from "./BotonWhatsApp";
 export { Archivo, type ArchivoProps } from "./Archivo";
+export { LogoClub, type LogoClubProps, type TamanoLogoClub } from "./LogoClub";
 export {
   SelectorDeporte,
   type SelectorDeporteProps,

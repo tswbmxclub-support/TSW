@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import {
+  LogoClub,
   Acordeon,
   AreaTexto,
   Aviso,
@@ -766,6 +767,50 @@ export default function PaginaLaboratorio() {
             <TarjetaDeporte nombre="[DEPORTE 3]" descripcion="[Sin puntos, sin pie ni enlace: solo informativa.]" className="h-full" />
           </li>
         </ul>
+      </Seccion>
+
+      {/* --- LogoClub ------------------------------------------------------ */}
+      <Seccion tono="claro" tituloId="titulo-logo-club">
+        <SeccionTitulo
+          id="titulo-logo-club"
+          bajada="El espacio del logo de un club. Existe aunque no haya archivo: reserva el hueco con las mismas medidas para que la página no se recoloque el día que se suban. Mientras tanto, iniciales sobre el color de identidad que ya está en la base."
+        >
+          LogoClub
+        </SeccionTitulo>
+        <div className="mt-8 flex flex-wrap items-end gap-6">
+          <div className="flex flex-col items-center gap-2">
+            <LogoClub nombre="BMX Club TSW" color="#008DFE" tamano="sm" />
+            <span className="text-xs text-texto-sec">sm · 40px</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <LogoClub nombre="BMX Mastercross" color="#0A5BB5" tamano="md" />
+            <span className="text-xs text-texto-sec">md · 64px</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <LogoClub nombre="Habilidades Motrices" tamano="lg" />
+            <span className="text-xs text-texto-sec">lg · sin color</span>
+          </div>
+        </div>
+        <div className="mt-6 rounded-lg bg-azul-profundo p-5">
+          <div className="flex flex-wrap items-center gap-6">
+            <LogoClub nombre="BMX Club TSW" color="#008DFE" tamano="md" oscuro />
+            <LogoClub nombre="BMX Mastercross" color="#0A5BB5" tamano="md" oscuro />
+            <p className="text-sm text-blanco/80">
+              Sobre azul profundo el hueco cambia de borde y de texto: el gris del borde claro
+              desaparecería.
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-texto-sec">
+          Los colores de estas muestras son tokens del sistema, no los de los clubes: el color de
+          identidad real sale de <code>club.color_identidad</code>, y reproducirlo aquí volvería a
+          meter el rojo de Mastercross dentro del código.
+        </p>
+        <p className="mt-2 text-sm text-texto-sec">
+          El archivo sale de <code>club.logo_path</code>, que el administrador sube desde el panel.
+          Un logo en <code>public/</code> volvería a meter el contenido del cliente dentro del
+          código.
+        </p>
       </Seccion>
 
       {/* --- ContadorRegresivo -------------------------------------------- */}

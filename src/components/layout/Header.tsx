@@ -2,21 +2,54 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 import { useTrampaFoco } from "@/lib/accesibilidad/trampaFoco";
+import type { ClubMenu } from "@/features/clubes/types";
 import { AnimatePresence, motion, useMovimientoReducido } from "@/lib/animaciones";
-import { NAVEGACION, SITIO } from "@/config/sitio";
+import { NAVEGACION, SITIO, type EnlaceNav } from "@/config/sitio";
 import { useCarrito } from "@/features/pedidos/carrito";
 import { cn } from "@/lib/utils";
 
+/**
+ * Dónde se inserta «Clubes» en la barra: después de «Corporación» y antes de
+ * «Semilleros», porque los niveles cuelgan de un club y se lee en ese orden.
+ */
+const POSICION_CLUBES = 1;
+
+/**
+ * La entrada «Clubes» se arma con lo que hay en la base, no con una lista
+ * escrita aquí: el administrador da de alta clubes desde el panel y el menú
+ * tiene que seguirlo sin un despliegue. Sin clubes activos la entrada no
+ * aparece, en vez de quedar un desplegable vacío.
+ */
+function navegacionConClubes(clubes: ClubMenu[]): EnlaceNav[] {
+  if (clubes.length === 0) return NAVEGACION;
+
+  const entrada: EnlaceNav = {
+    etiqueta: "Clubes",
+    href: "/semilleros",
+    submenu: clubes.map((club) => ({
+      etiqueta: club.nombre,
+      href: `/semilleros?club=${club.slug}`,
+      descripcion: club.etiqueta ?? (club.tipo === "programa" ? "Programa" : "Club"),
+    })),
+  };
+
+  return [...NAVEGACION.slice(0, POSICION_CLUBES), entrada, ...NAVEGACION.slice(POSICION_CLUBES)];
+}
+
 /** Cabecera azul profundo, pegada arriba, con submenú y menú móvil a pantalla completa. */
-export function Header() {
+export function Header({ clubes }: { clubes: ClubMenu[] }) {
   const ruta = usePathname();
+  const navegacion = useMemo(() => navegacionConClubes(clubes), [clubes]);
   const [menuMovil, setMenuMovil] = useState(false);
   const [submenuAbierto, setSubmenuAbierto] = useState<string | null>(null);
   const reducido = useMovimientoReducido();
   const zonaSubmenu = useRef<HTMLUListElement>(null);
+  // Al cerrar con Escape el foco tiene que volver al disparador, no perderse
+  // al principio de la página.
+  const disparadores = useRef(new Map<string, HTMLButtonElement | null>());
 
   // Cambiar de página cierra todo lo que estuviera desplegado.
   useEffect(() => {
@@ -53,23 +86,90 @@ export function Header() {
 
   const activa = (href: string) => ruta === href || ruta.startsWith(`${href}/`);
 
+  /**
+   * Teclado del desplegable, patrón de divulgación con navegación por
+   * flechas: abajo y arriba recorren en ciclo, Inicio y Fin saltan a los
+   * extremos, Escape cierra devolviendo el foco al disparador y el tabulador
+   * lo cierra al salir. Sin esto el desplegable solo se recorre con Tab, que
+   * funciona pero no es lo que espera quien navega con teclado.
+   */
+  function alTeclearSubmenu(evento: ReactKeyboardEvent<HTMLElement>, etiqueta: string) {
+    const contenedor = evento.currentTarget.closest("li");
+    const opciones = [...(contenedor?.querySelectorAll<HTMLAnchorElement>('[data-submenu] a') ?? [])];
+    const indice = opciones.indexOf(document.activeElement as HTMLAnchorElement);
+
+    switch (evento.key) {
+      case "ArrowDown":
+        evento.preventDefault();
+        if (submenuAbierto !== etiqueta) {
+          setSubmenuAbierto(etiqueta);
+          // El panel aún no está en el DOM: el foco espera al siguiente marco.
+          requestAnimationFrame(() => {
+            contenedor?.querySelector<HTMLAnchorElement>('[data-submenu] a')?.focus();
+          });
+          return;
+        }
+        opciones[(indice + 1) % opciones.length]?.focus();
+        return;
+      case "ArrowUp":
+        evento.preventDefault();
+        if (submenuAbierto !== etiqueta) return;
+        opciones[(indice - 1 + opciones.length) % opciones.length]?.focus();
+        return;
+      case "Home":
+        if (submenuAbierto !== etiqueta) return;
+        evento.preventDefault();
+        opciones[0]?.focus();
+        return;
+      case "End":
+        if (submenuAbierto !== etiqueta) return;
+        evento.preventDefault();
+        opciones[opciones.length - 1]?.focus();
+        return;
+      case "Escape":
+        if (submenuAbierto !== etiqueta) return;
+        evento.preventDefault();
+        setSubmenuAbierto(null);
+        disparadores.current.get(etiqueta)?.focus();
+        return;
+      case "Tab":
+        // Salir con el tabulador cierra: dejarlo abierto taparía lo que hay
+        // debajo mientras el foco ya está en otra parte.
+        if (indice === opciones.length - 1 && !evento.shiftKey) setSubmenuAbierto(null);
+        return;
+      default:
+    }
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-blanco/10 bg-azul-profundo text-blanco">
       <div className="contenedor flex h-16 items-center justify-between gap-4 lg:h-20">
         <Link
           href="/"
-          className="flex min-h-[44px] items-center font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+          className="flex min-h-[44px] items-center gap-3 font-display text-2xl tracking-tight focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         >
-          TSW
-          <span className="ml-2 hidden text-xs font-normal uppercase tracking-[0.2em] text-blanco/60 sm:inline">
-            {SITIO.subtitulo}
+          {/* Hueco del logo de la corporación. Reserva sus medidas desde ya para
+              que la cabecera no se recoloque cuando exista el archivo; el logo
+              de la corporación es del sitio, no de un club, así que no sale de
+              la tabla `club`. Llega con el bucket de logos. */}
+          <span
+            aria-hidden="true"
+            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-blanco/25 text-[10px] font-normal tracking-normal text-blanco/60 sm:flex"
+          >
+            logo
+          </span>
+          <span className="flex items-center">
+            TSW
+            <span className="ml-2 hidden text-xs font-normal uppercase tracking-[0.2em] text-blanco/60 sm:inline">
+              {SITIO.subtitulo}
+            </span>
           </span>
         </Link>
 
         {/* --- Navegación de escritorio ------------------------------------ */}
         <nav aria-label="Principal" className="hidden lg:block">
           <ul className="flex items-center gap-1" ref={zonaSubmenu}>
-            {NAVEGACION.map((enlace) => {
+            {navegacion.map((enlace) => {
               if (!enlace.submenu) {
                 return (
                   <li key={enlace.href}>
@@ -93,9 +193,12 @@ export function Header() {
 
               const abierto = submenuAbierto === enlace.etiqueta;
               return (
-                <li key={enlace.etiqueta} className="relative">
+                <li key={enlace.etiqueta} className="relative" onKeyDown={(e) => alTeclearSubmenu(e, enlace.etiqueta)}>
                   <button
                     type="button"
+                    ref={(n) => {
+                      disparadores.current.set(enlace.etiqueta, n);
+                    }}
                     aria-expanded={abierto}
                     aria-controls={`submenu-${enlace.etiqueta}`}
                     onClick={() => setSubmenuAbierto(abierto ? null : enlace.etiqueta)}
@@ -122,6 +225,7 @@ export function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={reducido ? undefined : { opacity: 0, y: -8 }}
                         transition={{ duration: 0.18 }}
+                        data-submenu
                         className="absolute left-0 top-full w-80 rounded-b-lg border border-blanco/10 bg-azul-medio p-2 shadow-xl"
                       >
                         <ul>
@@ -167,7 +271,12 @@ export function Header() {
         </div>
       </div>
 
-      <MenuMovil abierto={menuMovil} alCerrar={() => setMenuMovil(false)} rutaActiva={ruta} />
+      <MenuMovil
+        abierto={menuMovil}
+        alCerrar={() => setMenuMovil(false)}
+        rutaActiva={ruta}
+        navegacion={navegacion}
+      />
     </header>
   );
 }
@@ -208,10 +317,12 @@ function MenuMovil({
   abierto,
   alCerrar,
   rutaActiva,
+  navegacion,
 }: {
   abierto: boolean;
   alCerrar: () => void;
   rutaActiva: string;
+  navegacion: EnlaceNav[];
 }) {
   const reducido = useMovimientoReducido();
   const panel = useRef<HTMLDivElement>(null);
@@ -248,7 +359,7 @@ function MenuMovil({
 
           <nav aria-label="Principal (móvil)" className="contenedor flex-1 overflow-y-auto py-6">
             <ul className="flex flex-col gap-1">
-              {NAVEGACION.map((enlace) => (
+              {navegacion.map((enlace) => (
                 <li key={enlace.etiqueta}>
                   <Link
                     href={enlace.href}
