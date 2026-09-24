@@ -5,8 +5,9 @@ import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { formatearPrecio } from "@/lib/utils";
 import {
   BUCKET_PRODUCTOS,
-  ETIQUETA_CATEGORIA,
   disponible,
+  esDeLaMarca,
+  etiquetaCategoria,
   precioDesde,
   type ProductoConVariantes,
 } from "../types";
@@ -35,7 +36,8 @@ export function TarjetaProducto({
   const unidades = activas.reduce((total, v) => total + disponible(v), 0);
   const agotado = unidades <= 0;
   const tallas = activas.filter((v) => disponible(v) > 0).map((v) => v.talla);
-  const esMarca = producto.categoria === "merchandising";
+  const esMarca = esDeLaMarca(producto);
+  const prenda = etiquetaCategoria(producto.categoria);
   const foto = producto.imagen_path
     ? urlPublicaStorage(BUCKET_PRODUCTOS, producto.imagen_path)
     : "/imagenes/producto.jpg";
@@ -58,9 +60,11 @@ export function TarjetaProducto({
       </div>
 
       <CardCuerpo className="flex flex-1 flex-col">
-        <span className="text-xs font-bold uppercase tracking-[0.15em] text-texto-sec">
-          {ETIQUETA_CATEGORIA[producto.categoria]}
-        </span>
+        {prenda && (
+          <span className="text-xs font-bold uppercase tracking-[0.15em] text-texto-sec">
+            {prenda}
+          </span>
+        )}
         <div className="mt-2 flex items-start justify-between gap-3">
           <h3 className="text-lg leading-snug">{producto.nombre}</h3>
           <p className="shrink-0 text-right font-display text-xl text-azul-profundo">

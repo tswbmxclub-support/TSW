@@ -174,8 +174,16 @@ export type EntradaResultado = z.infer<typeof esquemaResultado>;
 
 export const esquemaNivel = z.object({
   id: UUID.optional(),
+  /** Obligatorio desde la migración 17: un nivel sin club no se lista ni se ordena. */
+  clubId: UUID,
   nombre: z.string().trim().min(3, "El nombre es obligatorio.").max(120, "Máximo 120 caracteres."),
   orden: z.number().int().min(0).default(0),
+  cupoMaximo: z
+    .number()
+    .int("El cupo debe ser un entero.")
+    .positive("El cupo debe ser mayor que cero.")
+    .nullable()
+    .optional(),
   rangoEdad: z.string().trim().max(80, "Máximo 80 caracteres.").optional(),
   horario: z.string().trim().max(200, "Máximo 200 caracteres.").optional(),
   descripcion: z.string().trim().max(1000, "Máximo 1000 caracteres.").optional(),
@@ -187,6 +195,8 @@ export type EntradaNivel = z.infer<typeof esquemaNivel>;
 
 /** Reordenar: la lista completa de ids en el orden nuevo. */
 export const esquemaReordenarNiveles = z.object({
+  /** El reordenamiento es DENTRO de un club: la RPC rechaza listas que mezclen. */
+  clubId: UUID,
   ids: z.array(UUID).min(1, "No hay niveles para reordenar."),
 });
 
@@ -202,9 +212,14 @@ export const esquemaProducto = z.object({
     .min(3, "El slug debe tener al menos 3 caracteres.")
     .max(160)
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Solo minúsculas, números y guiones."),
-  categoria: z.enum(["uniformes", "proteccion", "merchandising"], {
-    message: "Elige una categoría.",
-  }),
+  /**
+   * Tipo de prenda. Nulable: la migración 17 dejó sin clasificar los productos
+   * de la semilla, y obligar aquí impediría editarles cualquier otra cosa
+   * hasta elegirles prenda.
+   */
+  categoria: z.enum(["buso", "guantes", "camiseta", "gorra"]).nullable().optional(),
+  /** Club dueño. Nulo = merchandising de la marca TSW, común a todos. */
+  clubId: UUID.nullable().optional(),
   descripcion: z
     .string()
     .trim()

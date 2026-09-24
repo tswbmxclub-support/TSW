@@ -22,6 +22,7 @@ import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { aSlug } from "@/lib/utils";
 import { MAXIMO_IMAGEN_BYTES, MIMES_IMAGEN } from "../constantes";
 import { disponible, type ProductoConVariantes } from "@/features/tienda/types";
+import type { Club } from "@/features/clubes/types";
 import {
   alternarProducto,
   alternarVariante,
@@ -40,14 +41,23 @@ type VariantesBorrador = {
   activo: boolean;
 };
 
+/**
+ * Tipo de prenda (migración 17). El valor vacío es "sin clasificar", que es un
+ * estado real: los productos de la semilla llegaron así porque sus categorías
+ * viejas no traducían a ninguna prenda.
+ */
 const CATEGORIAS = [
-  { valor: "uniformes", etiqueta: "Uniformes" },
-  { valor: "proteccion", etiqueta: "Protección" },
-  { valor: "merchandising", etiqueta: "Merchandising" },
+  { valor: "", etiqueta: "Sin clasificar" },
+  { valor: "buso", etiqueta: "Buso" },
+  { valor: "guantes", etiqueta: "Guantes" },
+  { valor: "camiseta", etiqueta: "Camiseta" },
+  { valor: "gorra", etiqueta: "Gorra" },
 ] as const;
 
-function etiquetaCategoria(categoria: string): string {
-  return CATEGORIAS.find((c) => c.valor === categoria)?.etiqueta ?? categoria;
+type ValorCategoria = (typeof CATEGORIAS)[number]["valor"];
+
+function etiquetaCategoria(categoria: string | null): string {
+  return CATEGORIAS.find((c) => c.valor === (categoria ?? ""))?.etiqueta ?? "Sin clasificar";
 }
 
 /**
@@ -61,7 +71,13 @@ function etiquetaCategoria(categoria: string): string {
  *    RESTRICT). Se desactiva, y si la base rechazara algo, el mensaje que
  *    llega ya está traducido a lenguaje del cliente.
  */
-export function ProductosAdmin({ productos }: { productos: ProductoConVariantes[] }) {
+export function ProductosAdmin({
+  productos,
+  clubes,
+}: {
+  productos: ProductoConVariantes[];
+  clubes: Club[];
+}) {
   const router = useRouter();
   const [aviso, setAviso] = useState<ResultadoAccion | null>(null);
   const [editando, setEditando] = useState<ProductoConVariantes | "nuevo" | null>(null);
@@ -147,6 +163,7 @@ export function ProductosAdmin({ productos }: { productos: ProductoConVariantes[
       )}
 
       <ModalProducto
+        clubes={clubes}
         producto={editando}
         alCerrar={() => setEditando(null)}
         onGuardado={(resultado) => {
@@ -191,10 +208,12 @@ export function ProductosAdmin({ productos }: { productos: ProductoConVariantes[
 // --- Editor -----------------------------------------------------------------
 
 function ModalProducto({
+  clubes,
   producto,
   alCerrar,
   onGuardado,
 }: {
+  clubes: Club[];
   producto: ProductoConVariantes | "nuevo" | null;
   alCerrar: () => void;
   onGuardado: (resultado: ResultadoAccion) => void;
@@ -205,7 +224,10 @@ function ModalProducto({
   const [nombre, setNombre] = useState(existente?.nombre ?? "");
   const [slug, setSlug] = useState(existente?.slug ?? "");
   const [slugEditado, setSlugEditado] = useState(Boolean(existente));
-  const [categoria, setCategoria] = useState(existente?.categoria ?? "uniformes");
+  const [categoria, setCategoria] = useState<ValorCategoria>(existente?.categoria ?? "");
+  // Cadena vacía = marca TSW. El <select> no distingue null de "", así que la
+  // conversión a null se hace al guardar, en un solo sitio.
+  const [clubId, setClubId] = useState(existente?.club_id ?? "");
   const [descripcion, setDescripcion] = useState(existente?.descripcion ?? "");
   const [activo, setActivo] = useState(existente?.activo ?? true);
   const [error, setError] = useState<string | null>(null);
@@ -254,7 +276,8 @@ function ModalProducto({
       id: existente?.id,
       nombre: nombre.trim(),
       slug,
-      categoria,
+      categoria: categoria === "" ? null : categoria,
+      clubId: clubId === "" ? null : clubId,
       descripcion: descripcion.trim() || undefined,
       activo,
       orden: existente?.orden ?? 0,
@@ -338,12 +361,24 @@ function ModalProducto({
           ayuda="Identificador en la URL pública. Se autogenera del nombre; puedes editarlo."
           error={slug && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug) ? "Solo minúsculas, números y guiones." : undefined}
         />
-        <Select
-          etiqueta="Categoría"
-          value={categoria}
-          onChange={(e) => setCategoria(e.target.value as typeof categoria)}
-          opciones={CATEGORIAS.map((c) => ({ valor: c.valor, etiqueta: c.etiqueta }))}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Select
+            etiqueta="Tipo de prenda"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value as ValorCategoria)}
+            opciones={CATEGORIAS.map((c) => ({ valor: c.valor, etiqueta: c.etiqueta }))}
+          />
+          <Select
+            etiqueta="Club"
+            value={clubId}
+            onChange={(e) => setClubId(e.target.value)}
+            ayuda="Sin club = merchandising de la marca TSW, común a todos."
+            opciones={[
+              { valor: "", etiqueta: "Marca TSW" },
+              ...clubes.map((c) => ({ valor: c.id, etiqueta: c.nombre })),
+            ]}
+          />
+        </div>
         <AreaTexto
           etiqueta="Descripción"
           value={descripcion}

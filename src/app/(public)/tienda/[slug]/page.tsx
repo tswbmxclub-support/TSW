@@ -14,6 +14,7 @@ import {
   ETIQUETA_CATEGORIA,
   disponible,
   precioDesde,
+  etiquetaCategoria,
 } from "@/features/tienda/types";
 import { TarjetaProducto } from "@/features/tienda/components/TarjetaProducto";
 import { SelectorVariantes } from "@/features/tienda/components/SelectorVariantes";
@@ -33,7 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: producto.nombre,
       description:
-        producto.descripcion ?? `${ETIQUETA_CATEGORIA[producto.categoria]} oficial del club TSW.`,
+        producto.descripcion ??
+        `${etiquetaCategoria(producto.categoria) ?? "Dotación"} oficial de la corporación TSW.`,
       openGraph: {
         title: `${producto.nombre} | TSW`,
         description: producto.descripcion ?? undefined,
@@ -105,9 +107,11 @@ export default async function PaginaProducto({ params }: Props) {
 
           <Aparece indice={1}>
             <div>
-              <span className="text-xs font-bold uppercase tracking-[0.15em] text-texto-sec">
-                {ETIQUETA_CATEGORIA[producto.categoria]}
-              </span>
+              {etiquetaCategoria(producto.categoria) && (
+                <span className="text-xs font-bold uppercase tracking-[0.15em] text-texto-sec">
+                  {etiquetaCategoria(producto.categoria)}
+                </span>
+              )}
               <h1 id="titulo-producto" className="mt-2 text-3xl sm:text-4xl">
                 {producto.nombre}
               </h1>

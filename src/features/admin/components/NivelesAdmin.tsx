@@ -1,24 +1,51 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 
-import { Aviso, AreaTexto, Boton, Campo, ChipEstado, Modal } from "@/components/ui";
+import { Aviso, AreaTexto, Boton, Campo, ChipEstado, Modal, Select } from "@/components/ui";
+import type { Club } from "@/features/clubes/types";
 import { alternarNivel, guardarNivel, reordenarNiveles } from "../acciones-contenido";
 import type { Nivel } from "../types";
 
 type ResultadoAccion = { ok: boolean; error?: string; mensaje?: string };
 
 /**
- * Módulo de niveles: semilleros y rutas formativas. Reordenar actualiza el
- * campo `orden` con la RPC reordenar_niveles, que escribe la secuencia
- * completa en una transacción (el UNIQUE de `orden` lo exige así).
+ * Módulo de niveles.
+ *
+ * Desde la migración 17 un nivel pertenece a un club y el UNIQUE es
+ * (club_id, orden): Minirider e Intermedio existen en los dos clubes, con la
+ * misma descripción y horarios distintos. Por eso la pantalla se agrupa por
+ * club y el reordenamiento ocurre DENTRO de cada grupo: `reordenar_niveles`
+ * recibe el club y rechaza listas que mezclen, con mensaje propio.
  */
-export function NivelesAdmin({ niveles }: { niveles: Nivel[] }) {
+export function NivelesAdmin({ niveles, clubes }: { niveles: Nivel[]; clubes: Club[] }) {
   const router = useRouter();
   const [pendiente, iniciar] = useTransition();
   const [aviso, setAviso] = useState<ResultadoAccion | null>(null);
   const [editando, setEditando] = useState<Nivel | "nuevo" | null>(null);
+
+  /**
+   * Los niveles ya llegan ordenados por `orden`; aquí solo se reparten por
+   * club conservando ese orden. Un nivel cuyo club se desactivó queda en el
+   * grupo "Sin club visible" en vez de desaparecer de la pantalla: el
+   * administrador tiene que poder verlo para moverlo.
+   */
+  const grupos = useMemo(() => {
+    const porClub = new Map<string, Nivel[]>();
+    for (const nivel of niveles) {
+      const lista = porClub.get(nivel.club_id) ?? [];
+      lista.push(nivel);
+      porClub.set(nivel.club_id, lista);
+    }
+
+    const conocidos = clubes.map((club) => ({ club, niveles: porClub.get(club.id) ?? [] }));
+    const huerfanos = [...porClub.entries()]
+      .filter(([id]) => !clubes.some((c) => c.id === id))
+      .map(([id, lista]) => ({ club: { id, nombre: "Club no visible" } as Club, niveles: lista }));
+
+    return [...conocidos, ...huerfanos];
+  }, [niveles, clubes]);
 
   function ejecutar(accion: () => Promise<ResultadoAccion>) {
     setAviso(null);
@@ -29,91 +56,120 @@ export function NivelesAdmin({ niveles }: { niveles: Nivel[] }) {
     });
   }
 
-  /** Mueve un nivel y manda el orden completo resultante. */
-  function mover(indice: number, direccion: -1 | 1) {
-    const ids = niveles.map((n) => n.id);
+  /** Mueve un nivel dentro de su club y manda el orden completo de ESE club. */
+  function mover(clubId: string, lista: Nivel[], indice: number, direccion: -1 | 1) {
+    const ids = lista.map((n) => n.id);
     const destino = indice + direccion;
     if (destino < 0 || destino >= ids.length) return;
     [ids[indice], ids[destino]] = [ids[destino]!, ids[indice]!];
-    ejecutar(() => reordenarNiveles(ids));
+    ejecutar(() => reordenarNiveles(clubId, ids));
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {aviso?.error && <Aviso tono="error">{aviso.error}</Aviso>}
       {aviso?.ok && aviso.mensaje && <Aviso tono="exito">{aviso.mensaje}</Aviso>}
 
       <div className="flex justify-end">
-        <Boton onClick={() => setEditando("nuevo")}>Nuevo nivel</Boton>
+        <Boton onClick={() => setEditando("nuevo")} disabled={clubes.length === 0}>
+          Nuevo nivel
+        </Boton>
       </div>
 
-      {niveles.length === 0 && (
-        <p className="rounded-lg border-2 border-dashed border-gris-borde bg-blanco px-6 py-10 text-center text-texto-sec">
-          Todavía no hay niveles. Crea el primero: aparecerá en la página de semilleros.
-        </p>
+      {clubes.length === 0 && (
+        <Aviso tono="aviso">
+          No hay clubes activos. Un nivel pertenece a un club, así que primero hay que dar de alta
+          al menos uno.
+        </Aviso>
       )}
 
-      <ol className="flex flex-col gap-3">
-        {niveles.map((n, indice) => (
-          <li key={n.id} className="rounded-lg border border-gris-borde bg-blanco p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-display text-lg text-acento-oscuro" aria-hidden="true">
-                    {indice + 1}
-                  </span>
-                  <ChipEstado tipo="activo" valor={n.activo} />
-                </div>
-                <h3 className="mt-1 text-lg">{n.nombre}</h3>
-                <p className="text-sm text-texto-sec">
-                  {[n.rango_edad, n.horario].filter(Boolean).join(" · ") || "Sin edades ni horario definidos"}
-                </p>
-                {n.criterio_promocion && (
-                  <p className="mt-1 text-sm text-texto-sec">
-                    <span className="font-semibold">Promoción:</span> {n.criterio_promocion}
-                  </p>
-                )}
-              </div>
+      {grupos.map(({ club, niveles: lista }) => (
+        <section key={club.id} aria-labelledby={`club-${club.id}`} className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-gris-borde pb-2">
+            <h2 id={`club-${club.id}`} className="text-lg uppercase">
+              {club.nombre}
+            </h2>
+            <span className="text-sm text-texto-sec">
+              {lista.length === 1 ? "1 nivel" : `${lista.length} niveles`}
+            </span>
+          </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Solo un glifo: sin el ancho mínimo, el área táctil se queda en 39 px. */}
-                <Boton
-                  tamano="sm"
-                  variante="fantasma"
-                  className="min-w-[44px]"
-                  disabled={pendiente || indice === 0}
-                  onClick={() => mover(indice, -1)}
-                >
-                  ↑ <span className="sr-only">Subir {n.nombre}</span>
-                </Boton>
-                <Boton
-                  tamano="sm"
-                  variante="fantasma"
-                  className="min-w-[44px]"
-                  disabled={pendiente || indice === niveles.length - 1}
-                  onClick={() => mover(indice, 1)}
-                >
-                  ↓ <span className="sr-only">Bajar {n.nombre}</span>
-                </Boton>
-                <Boton tamano="sm" variante="secundario" onClick={() => setEditando(n)}>
-                  Editar
-                </Boton>
-                <Boton
-                  tamano="sm"
-                  variante="fantasma"
-                  disabled={pendiente}
-                  onClick={() => ejecutar(() => alternarNivel(n.id, !n.activo))}
-                >
-                  {n.activo ? "Desactivar" : "Activar"}
-                </Boton>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
+          {lista.length === 0 ? (
+            <p className="rounded-lg border-2 border-dashed border-gris-borde bg-blanco px-6 py-8 text-center text-texto-sec">
+              Este club todavía no tiene niveles.
+            </p>
+          ) : (
+            <ol className="flex flex-col gap-3">
+              {lista.map((n, indice) => (
+                <li key={n.id} className="rounded-lg border border-gris-borde bg-blanco p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-display text-lg text-acento-oscuro" aria-hidden="true">
+                          {indice + 1}
+                        </span>
+                        <ChipEstado tipo="activo" valor={n.activo} />
+                      </div>
+                      <h3 className="mt-1 text-lg">{n.nombre}</h3>
+                      <p className="text-sm text-texto-sec">
+                        {[
+                          n.rango_edad,
+                          n.horario,
+                          n.cupo_maximo ? `Máximo ${n.cupo_maximo} deportistas` : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || "Sin edades, horario ni cupo definidos"}
+                      </p>
+                      {n.criterio_promocion && (
+                        <p className="mt-1 text-sm text-texto-sec">
+                          <span className="font-semibold">Promoción:</span> {n.criterio_promocion}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Solo un glifo: sin el ancho mínimo, el área táctil se queda en 39 px. */}
+                      <Boton
+                        tamano="sm"
+                        variante="fantasma"
+                        className="min-w-[44px]"
+                        disabled={pendiente || indice === 0}
+                        onClick={() => mover(club.id, lista, indice, -1)}
+                      >
+                        ↑ <span className="sr-only">Subir {n.nombre}</span>
+                      </Boton>
+                      <Boton
+                        tamano="sm"
+                        variante="fantasma"
+                        className="min-w-[44px]"
+                        disabled={pendiente || indice === lista.length - 1}
+                        onClick={() => mover(club.id, lista, indice, 1)}
+                      >
+                        ↓ <span className="sr-only">Bajar {n.nombre}</span>
+                      </Boton>
+                      <Boton tamano="sm" variante="secundario" onClick={() => setEditando(n)}>
+                        Editar
+                      </Boton>
+                      <Boton
+                        tamano="sm"
+                        variante="fantasma"
+                        disabled={pendiente}
+                        onClick={() => ejecutar(() => alternarNivel(n.id, !n.activo))}
+                      >
+                        {n.activo ? "Desactivar" : "Activar"}
+                      </Boton>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+      ))}
 
       <ModalNivel
         nivel={editando}
+        clubes={clubes}
         alCerrar={() => setEditando(null)}
         alGuardar={guardarNivel}
         onGuardado={(resultado) => {
@@ -127,16 +183,20 @@ export function NivelesAdmin({ niveles }: { niveles: Nivel[] }) {
 
 function ModalNivel({
   nivel,
+  clubes,
   alCerrar,
   alGuardar,
   onGuardado,
 }: {
   nivel: Nivel | "nuevo" | null;
+  clubes: Club[];
   alCerrar: () => void;
   alGuardar: (entrada: {
     id?: string;
+    clubId: string;
     nombre: string;
     orden: number;
+    cupoMaximo?: number | null;
     rangoEdad?: string;
     horario?: string;
     descripcion?: string;
@@ -148,8 +208,10 @@ function ModalNivel({
   const esNuevo = nivel === "nuevo";
   const existente = nivel && nivel !== "nuevo" ? nivel : null;
 
+  const [clubId, setClubId] = useState(existente?.club_id ?? clubes[0]?.id ?? "");
   const [nombre, setNombre] = useState(existente?.nombre ?? "");
   const [rangoEdad, setRangoEdad] = useState(existente?.rango_edad ?? "");
+  const [cupo, setCupo] = useState(existente?.cupo_maximo ? String(existente.cupo_maximo) : "");
   const [horario, setHorario] = useState(existente?.horario ?? "");
   const [descripcion, setDescripcion] = useState(existente?.descripcion ?? "");
   const [criterio, setCriterio] = useState(existente?.criterio_promocion ?? "");
@@ -159,13 +221,22 @@ function ModalNivel({
 
   async function guardar() {
     setError(null);
+    if (!clubId) return setError("Elige el club al que pertenece el nivel.");
     if (nombre.trim().length < 3) return setError("El nombre es obligatorio.");
+    // El cupo es opcional, pero si se escribe algo tiene que ser un entero
+    // positivo: un "14 deportistas" tecleado a mano llegaría como NaN.
+    const cupoLimpio = cupo.trim();
+    if (cupoLimpio && !/^\d+$/.test(cupoLimpio)) return setError("El cupo es un número entero de deportistas.");
+    if (cupoLimpio && Number(cupoLimpio) < 1) return setError("El cupo debe ser mayor que cero.");
+
     setCargando(true);
     const resultado = await alGuardar({
       id: existente?.id,
+      clubId,
       nombre: nombre.trim(),
-      // El orden lo asigna reordenar: uno más del máximo actual.
+      // El orden lo asigna reordenar: uno más del máximo actual de su club.
       orden: existente?.orden ?? 0,
+      cupoMaximo: cupoLimpio ? Number(cupoLimpio) : null,
       rangoEdad: rangoEdad.trim() || undefined,
       horario: horario.trim() || undefined,
       descripcion: descripcion.trim() || undefined,
@@ -179,14 +250,49 @@ function ModalNivel({
   }
 
   return (
-    <Modal abierto={nivel !== null} alCerrar={alCerrar} titulo={esNuevo ? "Nuevo nivel" : `Editar — ${existente?.nombre ?? ""}`} className="sm:max-w-xl">
+    <Modal
+      abierto={nivel !== null}
+      alCerrar={alCerrar}
+      titulo={esNuevo ? "Nuevo nivel" : `Editar — ${existente?.nombre ?? ""}`}
+      className="sm:max-w-xl"
+    >
       <div className="flex flex-col gap-4">
         {error && <Aviso tono="error">{error}</Aviso>}
+        <Select
+          etiqueta="Club"
+          value={clubId}
+          onChange={(e) => setClubId(e.target.value)}
+          required
+          ayuda="Minirider e Intermedio existen en los dos clubes: son niveles distintos, con su propio horario."
+          opciones={clubes.map((c) => ({ valor: c.id, etiqueta: c.nombre }))}
+        />
         <Campo etiqueta="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} maxLength={120} required />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Campo etiqueta="Rango de edad" value={rangoEdad} onChange={(e) => setRangoEdad(e.target.value)} maxLength={80} placeholder="6 a 9 años" />
-          <Campo etiqueta="Horario" value={horario} onChange={(e) => setHorario(e.target.value)} maxLength={200} placeholder="Sáb 8:00–10:00" />
+          <Campo
+            etiqueta="Rango de edad"
+            value={rangoEdad}
+            onChange={(e) => setRangoEdad(e.target.value)}
+            maxLength={80}
+            placeholder="De 2 años y medio a 5 años"
+          />
+          <Campo
+            etiqueta="Cupo máximo"
+            type="text"
+            inputMode="numeric"
+            value={cupo}
+            onChange={(e) => setCupo(e.target.value)}
+            maxLength={4}
+            placeholder="14"
+            ayuda="Deportistas por grupo. Déjalo vacío si el nivel no fija cupo."
+          />
         </div>
+        <Campo
+          etiqueta="Horario"
+          value={horario}
+          onChange={(e) => setHorario(e.target.value)}
+          maxLength={200}
+          placeholder="Miércoles y viernes, 4:00 a 6:00 p. m."
+        />
         <AreaTexto etiqueta="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} maxLength={1000} />
         <AreaTexto
           etiqueta="Criterio de promoción"

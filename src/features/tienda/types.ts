@@ -30,9 +30,28 @@ export function precioDesde(producto: ProductoConVariantes): number | null {
 /** Bucket de fotos del catálogo, subidas desde el panel. */
 export const BUCKET_PRODUCTOS = "productos";
 
-/** Etiqueta legible de cada categoría del enum `categoria_producto`. */
+/**
+ * Etiqueta legible de cada tipo de prenda. Desde la migración 17 el enum dice
+ * QUÉ es el producto; de quién es lo dice `club_id` (nulo = marca TSW).
+ */
 export const ETIQUETA_CATEGORIA: Record<CategoriaProducto, string> = {
-  uniformes: "Uniformes",
-  proteccion: "Protección",
-  merchandising: "Merchandising",
+  buso: "Buso",
+  guantes: "Guantes",
+  camiseta: "Camiseta",
+  gorra: "Gorra",
 };
+
+/**
+ * La etiqueta, o null si el producto no está clasificado. `categoria` es
+ * nulable desde la 17: los cuatro productos de la semilla quedaron sin prenda
+ * porque sus categorías viejas no traducían a ninguna, y el panel es quien
+ * las corrige. Indexar el mapa con null reventaba en tiempo de ejecución.
+ */
+export function etiquetaCategoria(categoria: CategoriaProducto | null): string | null {
+  return categoria ? ETIQUETA_CATEGORIA[categoria] : null;
+}
+
+/** Merchandising de la marca: sin club dueño. */
+export function esDeLaMarca(producto: Pick<Producto, "club_id">): boolean {
+  return producto.club_id === null;
+}

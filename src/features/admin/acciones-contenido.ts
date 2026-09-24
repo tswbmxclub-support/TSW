@@ -272,8 +272,14 @@ export async function guardarNivel(entrada: EntradaNivel): Promise<ResultadoEscr
     const n = datos.data;
     await ejecutarRpc("guardar_nivel", {
       p_id: n.id,
+      // Obligatorio desde la migración 17. TypeScript no lo exige porque la
+      // RPC le puso DEFAULT null al parámetro, pero la función lanza «Falta el
+      // club del nivel.» si llega vacío: el tipo generado no lo ve y el build
+      // pasaría con un guardado roto.
+      p_club_id: n.clubId,
       p_nombre: n.nombre,
       p_orden: n.orden,
+      p_cupo_maximo: n.cupoMaximo ?? undefined,
       p_rango_edad: n.rangoEdad || undefined,
       p_horario: n.horario || undefined,
       p_descripcion: n.descripcion || undefined,
@@ -288,17 +294,18 @@ export async function guardarNivel(entrada: EntradaNivel): Promise<ResultadoEscr
 }
 
 /**
- * Reordenar: la RPC escribe la secuencia completa en una transacción con el
- * UNIQUE diferido (migración 11). El cliente manda el orden completo de ids.
+ * Reordenar los niveles DE UN CLUB. Desde la migración 17 el UNIQUE es
+ * (club_id, orden) y la RPC exige el conjunto completo de ese club: rechaza
+ * listas parciales y listas que mezclen clubes, con mensaje propio.
  */
-export async function reordenarNiveles(ids: string[]): Promise<ResultadoEscritura> {
-  const datos = esquemaReordenarNiveles.safeParse({ ids });
+export async function reordenarNiveles(clubId: string, ids: string[]): Promise<ResultadoEscritura> {
+  const datos = esquemaReordenarNiveles.safeParse({ clubId, ids });
   if (!datos.success) {
     return { ok: false, error: Object.values(camposDeZod(datos.error))[0] ?? "No hay niveles para reordenar." };
   }
 
   try {
-    await ejecutarRpc("reordenar_niveles", { p_ids: datos.data.ids });
+    await ejecutarRpc("reordenar_niveles", { p_club_id: datos.data.clubId, p_ids: datos.data.ids });
     revalidarPublico("nivel");
     return { ok: true, mensaje: "Orden actualizado." };
   } catch (error) {

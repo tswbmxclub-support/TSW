@@ -181,7 +181,7 @@ async function insertProducto(reporte: Reporte, anon: Cliente, servicio: Cliente
   const slug = `intruso-${Date.now()}`;
   const { data, error } = await anon
     .from("producto")
-    .insert({ nombre: "[intruso]", slug, categoria: "uniformes" })
+    .insert({ nombre: "[intruso]", slug, categoria: "buso" })
     .select("id");
 
   if (error) {
