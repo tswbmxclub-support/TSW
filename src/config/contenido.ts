@@ -170,38 +170,68 @@ export const MATRICULAS = {
 // --- Semilleros ------------------------------------------------------------------
 
 export const SEMILLEROS = {
-  /** Tres cifras de la ruta formativa. `valor` en null muestra el marcador. */
+  /**
+   * Cifras de la metodología, tomadas del documento del cliente (22-09-2026).
+   * Son de la corporación, no de un club: los dos clubes trabajan los mismos
+   * tres niveles con el mismo cuerpo técnico.
+   */
   cifras: [
-    { id: "etapas", etiqueta: "[Etapas formativas]", valor: null as string | null, detalle: "[Desde la iniciación hasta la competencia.]" },
-    { id: "ratio", etiqueta: "[Deportistas por entrenador]", valor: null as string | null, detalle: "[Ratio máximo por grupo.]" },
-    { id: "entrenadores", etiqueta: "[Entrenadores certificados]", valor: null as string | null, detalle: "[Formación del cuerpo técnico.]" },
+    {
+      id: "niveles",
+      etiqueta: "3 niveles",
+      valor: "3" as string | null,
+      detalle: "De formación: Minirider, Intermedio y Avanzado.",
+    },
+    {
+      id: "cupo",
+      etiqueta: "14 máximo",
+      valor: "14" as string | null,
+      detalle: "Deportistas por grupo en Minirider e Intermedio (25 en Avanzado).",
+    },
+    {
+      id: "entrenadores",
+      etiqueta: "5 entrenadores",
+      valor: "5" as string | null,
+      detalle: "Ex atletas de BMX y licenciados en deporte.",
+    },
   ],
-  /** Preguntas frecuentes. Cambian poco y las edita quien mantiene el sitio. */
+  /** Preguntas frecuentes, del documento del cliente. */
   preguntas: [
     {
       id: "edad",
       titulo: "¿Desde qué edad se puede ingresar?",
-      contenido: "[Edad mínima de ingreso y si hay tope de edad. Indicar a qué nivel entra un deportista sin experiencia.]",
+      contenido:
+        "Desde los 2 años y medio, en el nivel Minirider con bici de impulso. No se necesita experiencia previa. El Programa de Habilidades Motrices recibe personas de todas las edades.",
+    },
+    {
+      id: "prueba",
+      titulo: "¿Puedo hacer una clase de prueba?",
+      contenido:
+        "Sí, y es gratis. Escríbenos por WhatsApp y la agendamos. Te prestamos la bicicleta y el casco; solo tienes que llegar con ropa cómoda.",
     },
     {
       id: "bicicleta",
       titulo: "¿Hay que tener bicicleta y protección propias?",
-      contenido: "[Política del club sobre bicicletas y elementos de protección: si presta, alquila o exige equipo propio.]",
+      contenido:
+        "Para las clases de prueba te prestamos la bicicleta y el casco. Después, cada rider debe tener su propio casco y su protección. Para iniciar también podemos prestar la bicicleta, aunque lo ideal es tener una propia; nuestros entrenadores te orientan sobre cuál comprar según la edad y el nivel.",
     },
     {
       id: "horarios",
       titulo: "¿Cuáles son los horarios de entrenamiento?",
-      contenido: "Cada nivel tiene su franja. Está en la ficha de cada semillero, arriba en esta página.",
+      contenido:
+        "Dependen del club y del nivel. Consulta la ficha de cada nivel en esta página o escríbenos por WhatsApp.",
     },
     {
       id: "promocion",
       titulo: "¿Cómo se pasa de un nivel al siguiente?",
-      contenido: "[Quién evalúa y con qué frecuencia. El criterio de promoción de cada nivel aparece en su ficha.]",
+      contenido:
+        "Nuestros entrenadores evalúan a cada rider de forma periódica. Cuando domina las habilidades de su nivel, pasa al siguiente y se le informa a la familia. En TSW, el ingreso al nivel Avanzado, que es el grupo competitivo del club, se define según el desempeño y los resultados.",
     },
     {
       id: "costos",
-      titulo: "¿Cuánto cuesta la matrícula y la mensualidad?",
-      contenido: "[Valores y formas de pago. No se publican hasta que el club los confirme.]",
+      titulo: "¿Cuánto cuestan la matrícula y la mensualidad?",
+      contenido:
+        "Escríbenos por WhatsApp y te compartimos los valores vigentes y lo que incluyen.",
     },
   ],
 } as const;

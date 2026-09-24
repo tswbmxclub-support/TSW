@@ -36,6 +36,17 @@ Estas nacieron de fallos reales en esta sesión. No las relajes:
   archivo:línea. Iterar hasta "VALIDACIÓN LIMPIA", máximo 5 vueltas.
 - **libpg_query no cubre los cuerpos plpgsql.** Di siempre qué queda sin
   verificar.
+- **Un parámetro con `DEFAULT` en la RPC no es opcional para quien la llama.**
+  El tipo que genera Supabase lo marca opcional porque *tiene* un default, y
+  el build pasa limpio aunque la acción no lo mande. Si el cuerpo empieza con
+  `if p_x is null then raise exception …`, ese parámetro es **obligatorio de
+  hecho** y el tipo miente. Pasó con `p_club_id` en `guardar_nivel` (migración
+  17): `tsc` verde, y cada guardado de nivel habría muerto en ejecución con
+  "Falta el club del nivel.". Es la misma clase de mentira que los tipos
+  regenerados en local, con otra forma.
+  Lo cruza `npm run verificar:parametros`, que lee las firmas de las
+  migraciones y las llamadas a `ejecutarRpc`: un parámetro sin `default`, o
+  con `default` pero exigido en el cuerpo, tiene que aparecer en la llamada.
 
 ### Nunca te autentiques como un usuario real
 
@@ -123,20 +134,46 @@ Un repo, un deploy, sin CORS, menos superficie de ataque.
 
 ## Colorimetría y tipografía
 
+El acento sale del logo de la corporación (23-09-2026). **No hay rojo en el
+sistema**: el rojo es el color de identidad de BMX Mastercross y vive en su
+fila de `club` (`club.color_identidad`). Ningún componente genérico lo usa.
+
 ```
 --azul-profundo: #0B1B33   fondo oscuro, header, footer
 --azul-medio:    #12294D   superficies sobre azul profundo
---rojo:          #D7263D   acento único: CTAs, estados activos
---rojo-oscuro:   #A31128   hover del acento
+--acento:        #008DFE   sobre OSCURO: activos, bordes, íconos   5.12 AA
+--acento-oscuro: #0A5BB5   sobre CLARO: texto y botón primario     6.61 AA
+--acento-hover:  #094F9E   hover del primario, blanco encima       8.00 AA
+--cian:          #00BBFE   decorativo sobre oscuro, NUNCA texto    7.83 / 2.20
+--foco:          #1A7FE0   anillo de foco                     peor caso 3.56
+--error:         #B3261E   estado de error. Funcional, no de marca 6.54 AA
 --blanco:        #FFFFFF
 --gris-frio:     #F2F4F7   fondo de secciones claras
 --gris-borde:    #DCE3EC
 --texto-sec:     #46566F
 ```
 
+**Dos tokens de acento y no uno** porque ningún azul pasa AA sobre marino y
+sobre blanco a la vez: el cian brilla sobre oscuro y desaparece sobre claro,
+el azul profundo hace lo contrario.
+
+**El foco tiene token propio** porque es el único color que debe verse sobre
+los cuatro fondos. `--acento` pasaría, pero con 3.05 sobre gris frío, a un
+1,7 % del mínimo. De paso arregló un fallo que ya existía: el anillo rojo se
+quedaba en 2.92 sobre azul medio, por debajo del 3:1 que pide WCAG.
+
+**El error tiene color propio** y no es el de marca: `#D7263D` ahora
+identifica a un club y no puede significar "algo salió mal".
+
+**Los chips sobre oscuro** van `bg-acento` con texto en azul profundo (5.12),
+no acento oscuro con blanco: sobre marino el acento oscuro se queda en 2.61 y
+el chip desaparecería contra el fondo.
+
 **Archivo Black** (títulos) + **Barlow** (cuerpo), con `next/font/google`.
-El rojo es acento, no fondo dominante. Colores como variables CSS expuestas a
-Tailwind; ninguno hardcodeado.
+Colores como variables CSS expuestas a Tailwind; ninguno hardcodeado, y
+`npm run verificar:paleta` falla si se escapa una utilidad de rojo o un
+hexadecimal de marca suelto — sin `--color-rojo` en `@theme`, un `bg-rojo`
+olvidado no genera utilidad, no da error y deja el elemento transparente.
 
 ---
 

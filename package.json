@@ -18,6 +18,7 @@
     "correo:probar": "node --conditions=react-server --import tsx scripts/probar-correo.ts",
     "verificar:paleta": "node scripts/verificar-paleta.mjs",
     "verificar:politicas": "node scripts/verificar-politicas-anon.mjs",
+    "verificar:parametros": "node scripts/verificar-parametros-rpc.mjs",
     "verificar:rls": "tsx scripts/verificar-rls.ts",
     "verificar:inventario": "tsx scripts/verificar-inventario.ts",
     "verificar:auditoria": "tsx scripts/verificar-auditoria.ts",
