@@ -16,30 +16,23 @@
  * service_role por la RPC. Aquí se comprueba con la llave real, no leyendo el
  * esquema.
  *
- * `npx tsx scripts/verificar-contenido-remoto.ts`
+ * `npm run verificar:contenido-remoto`. Crea un usuario temporal propio para ser
+ * el actor de la bitácora y lo borra al terminar, confirmando el borrado por
+ * consulta: es el método que prescribe CLAUDE.md, y no se abre ninguna sesión.
  */
-import { createClient } from "@supabase/supabase-js";
-
-import { cargarEnvLocal, clienteAnon, clienteServicio, llaveAnon, urlProyecto } from "./_comun";
+import { cargarEnvLocal, clienteAnon, clienteServicio } from "./_comun";
 
 cargarEnvLocal();
 
 async function main(): Promise<void> {
 
-  // Cliente tipado para lo que ya existe en los tipos generados (Storage).
-const anon = clienteAnon();
-
-// Y uno SIN tipar para contenido_sitio. Los tipos generados todavía no la
-// incluyen porque se corrió el push sin ; la regla del proyecto es
-// que vayan juntos. Aquí se acepta porque este script comprueba la BASE, no el
-// código: el de la aplicación espera a los tipos.
-const anonSinTipar = createClient(urlProyecto(), llaveAnon());
+  const anon = clienteAnon();
   const casos: { nombre: string; ok: boolean; detalle: string }[] = [];
   const anotar = (nombre: string, ok: boolean, detalle = "") => casos.push({ nombre, ok, detalle });
 
   // --- 1. Lectura con anon ----------------------------------------------------
 
-  const lectura = await anonSinTipar.from("contenido_sitio").select("clave, actualizado_en");
+  const lectura = await anon.from("contenido_sitio").select("clave, actualizado_en");
   anotar(
     "anon puede LEER contenido_sitio",
     lectura.error === null,
@@ -55,7 +48,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
 
   // `portada` es una clave válida del CHECK a propósito: si el insert fallara por
   // la lista de claves en vez de por RLS, la prueba no diría nada sobre RLS.
-  const insercion = await anonSinTipar
+  const insercion = await anon
     .from("contenido_sitio")
     .insert({ clave: "portada", valor: { colado: "por anon" } });
 
@@ -65,7 +58,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
     insercion.error ? `rechazado con ${insercion.error.code ?? "?"}` : "SE ESCRIBIÓ: hay una política de escritura que no debería existir",
   );
 
-  const actualizacion = await anonSinTipar
+  const actualizacion = await anon
     .from("contenido_sitio")
     .update({ valor: { colado: "por anon" } })
     .eq("clave", "portada");
@@ -76,7 +69,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
     actualizacion.error ? `rechazado con ${actualizacion.error.code ?? "?"}` : "sin filas afectadas",
   );
 
-  const borrado = await anonSinTipar.from("contenido_sitio").delete().eq("clave", "portada");
+  const borrado = await anon.from("contenido_sitio").delete().eq("clave", "portada");
   anotar(
     "anon NO puede borrar",
     borrado.error !== null || (borrado.count ?? 0) === 0,
@@ -85,7 +78,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
 
   // --- 3. Las RPC no están al alcance de anon ---------------------------------
 
-  const rpc = await anonSinTipar.rpc("guardar_contenido", {
+  const rpc = await anon.rpc("guardar_contenido", {
     p_actor_id: "00000000-0000-0000-0000-000000000000",
     p_clave: "portada",
     p_valor: { colado: "por anon" },
@@ -96,7 +89,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
     rpc.error ? `rechazado con ${rpc.error.code ?? "?"}` : "SE EJECUTÓ: el revoke no está en remoto",
   );
 
-  const rpcReset = await anonSinTipar.rpc("restablecer_contenido", {
+  const rpcReset = await anon.rpc("restablecer_contenido", {
     p_actor_id: "00000000-0000-0000-0000-000000000000",
     p_clave: "portada",
   });
@@ -150,25 +143,21 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
     const actorId = alta.data.user.id;
     anotar("usuario temporal creado para ser el actor", true, `id ${actorId.slice(0, 8)}…`);
 
-    // Sin tipar, por lo mismo que el de anon: las RPC nuevas no están en los tipos
-    // generados todavía.
-    const rpcServicio = createClient(urlProyecto(), process.env.SUPABASE_SERVICE_ROLE_KEY ?? "");
-
-    const crear = await rpcServicio.rpc("guardar_contenido", {
+    const crear = await servicio.rpc("guardar_contenido", {
       p_actor_id: actorId,
       p_clave: "tienda",
       p_valor: { beneficios: [{ id: "prueba", titulo: "Prueba de verificación", texto: "Se borra al terminar." }] },
     });
     anotar("guardar_contenido escribe (service role)", crear.error === null, crear.error?.message ?? "fila creada");
 
-    const actualizar = await rpcServicio.rpc("guardar_contenido", {
+    const actualizar = await servicio.rpc("guardar_contenido", {
       p_actor_id: actorId,
       p_clave: "tienda",
       p_valor: { beneficios: [{ id: "prueba", titulo: "Prueba modificada", texto: "Se borra al terminar." }] },
     });
     anotar("guardar_contenido reemplaza la misma clave", actualizar.error === null, actualizar.error?.message ?? "fila actualizada");
 
-    const restablecer = await rpcServicio.rpc("restablecer_contenido", { p_actor_id: actorId, p_clave: "tienda" });
+    const restablecer = await servicio.rpc("restablecer_contenido", { p_actor_id: actorId, p_clave: "tienda" });
     anotar("restablecer_contenido borra la fila", restablecer.error === null, restablecer.error?.message ?? "fila borrada");
 
     // Los tres eventos, con el actor, ANTES de borrar la cuenta.
@@ -193,7 +182,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
 
     // La fila de prueba no se queda: restablecer_contenido ya la borró, pero se
     // confirma, porque una fila colada cambiaría el contenido del sitio público.
-    const restante = await anonSinTipar.from("contenido_sitio").select("clave").eq("clave", "tienda");
+    const restante = await anon.from("contenido_sitio").select("clave").eq("clave", "tienda");
     anotar("no queda la fila de prueba en contenido_sitio", (restante.data?.length ?? 0) === 0, `${restante.data?.length ?? 0} filas`);
 
     // --- Limpieza -----------------------------------------------------------
@@ -242,9 +231,7 @@ const anonSinTipar = createClient(urlProyecto(), llaveAnon());
   console.log("    prueba que anon no escribe y que no hay política de escritura para NADIE, que");
   console.log("    es más fuerte; intentarlo con una sesión de usuario exige autenticarse con");
   console.log("    esa cuenta, y eso necesita permiso explícito de Samuel.");
-  console.log("  · Que el panel escriba de verdad: falta la capa de acciones. Y antes falta");
-  console.log("    `npm run db:types:remote`: los tipos generados todavía no conocen");
-  console.log("    contenido_sitio, y por eso este script usa un cliente sin tipar.");
+  console.log("  · Que el panel escriba de verdad: faltan la capa de lectura y la pantalla.");
 
 }
 

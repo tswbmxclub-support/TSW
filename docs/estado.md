@@ -81,10 +81,10 @@ terminar y con el borrado confirmado por consulta: tres eventos —crear,
 actualizar, eliminar— con su id como actor, y los tres siguen en la bitácora con
 el actor anonimizado tras borrar la cuenta (migración 16).
 
-**Queda pendiente `npm run db:types:remote`.** El push se corrió sin `gen types`,
-así que los tipos generados no conocen `contenido_sitio` ni las dos RPC nuevas.
-La capa de lectura y la pantalla no se pueden escribir hasta entonces: es la regla
-de que base y tipos se regeneran juntos.
+**Tipos regenerados** (`database.types.ts` ya conoce `contenido_sitio`,
+`guardar_contenido` y `restablecer_contenido`). Con `tsc` limpio y
+`verificar:parametros` en 67 casos, la capa de lectura y la pantalla ya se pueden
+escribir.
 
 Probar que un usuario **con sesión** y sin rol de administrador no escribe exige
 autenticarse con esa cuenta y necesita permiso explícito de Samuel. Lo verificado
