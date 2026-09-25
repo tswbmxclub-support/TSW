@@ -1,5 +1,9 @@
 # TSW BMX — Contexto del proyecto
 
+> **¿Retomando?** Empieza por [docs/estado.md](docs/estado.md): rama, qué está
+> hecho, el estado de los tres interruptores, qué falta y de quién. Este archivo
+> es el porqué de las decisiones; el otro, dónde quedó todo.
+
 ## Cómo trabajar conmigo
 
 Soy Samuel. Trátame de forma cercana y directa. Ajusta la extensión al tema:
