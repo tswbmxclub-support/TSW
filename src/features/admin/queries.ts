@@ -1,7 +1,7 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { exigirAdmin } from "@/lib/auth";
 import type { DocumentoConVersiones, CompetenciaConResultados, EventoAuditoria, Nivel } from "./types";
-import type { ProductoConVariantes } from "@/features/tienda/types";
+import type { ProductoConVariantesCompletas } from "@/features/tienda/types";
 
 // --- Bitácora ---------------------------------------------------------------
 
@@ -186,7 +186,7 @@ export async function listarNivelesPanel(): Promise<Nivel[]> {
  * El público solo ve activos; el administrador necesita ver todo para poder
  * reactivar.
  */
-export async function listarProductosPanel(): Promise<ProductoConVariantes[]> {
+export async function listarProductosPanel(): Promise<ProductoConVariantesCompletas[]> {
   await exigirAdmin();
 
   const supabase = await crearClienteServidor();

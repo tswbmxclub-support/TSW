@@ -87,7 +87,7 @@ export function ListaCarrito() {
                   </Link>
                   <p className="mt-1 text-sm text-texto-sec">
                     Talla {item.talla}
-                    {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(item.precioCentavos)} c/u</>}
+                    {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(item.precioCentavos ?? 0)} c/u</>}
                   </p>
                 </div>
 
@@ -106,7 +106,7 @@ export function ListaCarrito() {
                     <div className="text-right">
                       <p className="text-sm text-texto-sec">Subtotal</p>
                       <p className="font-display text-xl text-azul-profundo">
-                        {item.estado === "disponible" ? formatearPrecio(item.cantidad * item.precioCentavos) : "—"}
+                        {item.estado === "disponible" ? formatearPrecio(item.cantidad * (item.precioCentavos ?? 0)) : "—"}
                       </p>
                     </div>
                   )}

@@ -6,7 +6,8 @@ export type LineaMensaje = {
   nombreProducto: string;
   talla: string;
   cantidad: number;
-  precioCentavos: number;
+  /** Ausente con la tienda en modo catálogo. */
+  precioCentavos?: number;
 };
 
 /**
@@ -41,7 +42,7 @@ export function construirMensajePedido(lineas: LineaMensaje[], totalCentavos: nu
   const cuerpo = lineas
     .map((l) => {
       const linea = `• ${l.nombreProducto} — Talla ${l.talla} — Cantidad ${l.cantidad}`;
-      return TIENDA_MUESTRA_PRECIOS ? `${linea} — ${precio(l.precioCentavos)}` : linea;
+      return TIENDA_MUESTRA_PRECIOS ? `${linea} — ${precio(l.precioCentavos ?? 0)}` : linea;
     })
     .join("\n");
 

@@ -51,6 +51,29 @@ export const IDENTIDAD_LEGAL = {
   direccionNotificacion: null,
 } as const;
 
+/** Lo que `nitPublicable` necesita saber. Suelto, para poder probarlo en los dos estados. */
+export type IdentidadNit = {
+  nit: string;
+  nitDv: number;
+  nitConfirmado: boolean;
+};
+
+/**
+ * El NIT listo para publicar —"902.072.786-0"—, o null mientras no esté
+ * confirmado.
+ *
+ * Una sola función y no un `&&` en cada plantilla: el NIT sale en el pie y en
+ * las tres páginas legales, y cuatro condiciones repetidas son cuatro sitios
+ * donde olvidarse de una. Quien quiera publicarlo pregunta aquí; si devuelve
+ * null, no hay nada que poner y no se pone nada —ni un guion, ni corchetes—.
+ */
+export function nitPublicable(identidad: IdentidadNit): string | null {
+  return identidad.nitConfirmado ? `${identidad.nit}-${identidad.nitDv}` : null;
+}
+
+/** El NIT de la corporación, o null. Lo que usan las páginas. */
+export const NIT_PUBLICO = nitPublicable(IDENTIDAD_LEGAL);
+
 /**
  * Contacto, del documento de la cliente (sección 1).
  *

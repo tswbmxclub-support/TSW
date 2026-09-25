@@ -92,7 +92,7 @@ export function SelectorVariantes({ producto }: { producto: ProductoConVariantes
       {variante && (
         <p className="mt-3 text-sm text-texto-sec">
           {unidades <= 5 ? `¡Quedan ${unidades} unidades!` : `${unidades} unidades disponibles`}
-          {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(variante.precio_centavos)}</>}
+          {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(variante.precio_centavos ?? 0)}</>}
         </p>
       )}
 

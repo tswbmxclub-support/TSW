@@ -29,6 +29,12 @@ export {
   type ChipEstadoProps,
 } from "./ChipEstado";
 export { Aviso, type AvisoProps, type TonoAviso } from "./Aviso";
+export {
+  DocumentoLegal,
+  type DocumentoLegalProps,
+  type SeccionLegal,
+  type BloqueLegal,
+} from "./DocumentoLegal";
 export { BotonWhatsApp, type BotonWhatsAppProps } from "./BotonWhatsApp";
 export { Archivo, type ArchivoProps } from "./Archivo";
 export { LogoClub, type LogoClubProps, type TamanoLogoClub } from "./LogoClub";

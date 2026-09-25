@@ -17,7 +17,7 @@
  */
 import assert from "node:assert/strict";
 
-import { IDENTIDAD_LEGAL } from "../src/config/sitio";
+import { IDENTIDAD_LEGAL, NIT_PUBLICO, nitPublicable } from "../src/config/sitio";
 import { calcularDvNit } from "../src/lib/utils/nit";
 
 const casos: [string, () => void][] = [
@@ -34,17 +34,28 @@ const casos: [string, () => void][] = [
     },
   ],
   [
-    "el NIT no se publica mientras no esté confirmado con el RUT",
-    () => {
-      // No es una comprobación de aritmética: es el recordatorio de que el dato
-      // sigue oculto a propósito. Cuando la cliente mande el RUT, este caso se
-      // borra junto con `nitConfirmado`.
+    "confirmado, el NIT publicable es el número con su dígito",
+    () =>
       assert.equal(
-        IDENTIDAD_LEGAL.nitConfirmado,
-        false,
-        "nitConfirmado pasó a true: borra este caso y comprueba que el NIT aparece en /legal/datos y /legal/terminos.",
-      );
-    },
+        nitPublicable({ nit: IDENTIDAD_LEGAL.nit, nitDv: IDENTIDAD_LEGAL.nitDv, nitConfirmado: true }),
+        `${IDENTIDAD_LEGAL.nit}-${IDENTIDAD_LEGAL.nitDv}`,
+      ),
+  ],
+  [
+    "sin confirmar, no hay NIT publicable: null, no una cadena a medias",
+    () =>
+      assert.equal(
+        nitPublicable({ nit: IDENTIDAD_LEGAL.nit, nitDv: IDENTIDAD_LEGAL.nitDv, nitConfirmado: false }),
+        null,
+      ),
+  ],
+  [
+    "NIT_PUBLICO concuerda con el estado configurado hoy",
+    () =>
+      assert.equal(
+        NIT_PUBLICO,
+        IDENTIDAD_LEGAL.nitConfirmado ? `${IDENTIDAD_LEGAL.nit}-${IDENTIDAD_LEGAL.nitDv}` : null,
+      ),
   ],
   [
     "resto 0: el dígito es el propio resto (el caso de la corporación, suma 759)",

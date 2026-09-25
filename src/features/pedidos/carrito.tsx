@@ -166,7 +166,14 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
         const previo = previos[linea.varianteId];
         // Con la tienda en modo catálogo el visitante nunca vio un precio, así
         // que avisarle de que "cambió" solo lo confundiría.
-        if (TIENDA_MUESTRA_PRECIOS && previo && previo.precioCentavos !== fresco.precioCentavos) {
+        // Los dos precios tienen que existir: en modo catálogo no se consultan, y
+        // comparar undefined con undefined no dice nada que valga avisar.
+        if (
+          TIENDA_MUESTRA_PRECIOS &&
+          typeof previo?.precioCentavos === "number" &&
+          typeof fresco.precioCentavos === "number" &&
+          previo.precioCentavos !== fresco.precioCentavos
+        ) {
           notas.push(`El precio cambió de ${formatearPrecio(previo.precioCentavos)} a ${formatearPrecio(fresco.precioCentavos)}.`);
         }
         let ajustada = linea;
@@ -264,7 +271,9 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
       ];
     });
     const disponibles = items.filter((i) => i.estado === "disponible");
-    const subtotalCentavos = disponibles.reduce((total, i) => total + i.cantidad * i.precioCentavos, 0);
+    // Sin precios consultados cada línea suma 0 y el total queda en 0: no se
+    // enseña en ninguna parte con la tienda en modo catálogo.
+    const subtotalCentavos = disponibles.reduce((total, i) => total + i.cantidad * (i.precioCentavos ?? 0), 0);
 
     return {
       items,

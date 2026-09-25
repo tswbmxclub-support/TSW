@@ -1,13 +1,13 @@
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { ErrorNoEncontrado } from "@/lib/errors";
-import type { ProductoConVariantes } from "./types";
+import { CAMPOS_PRODUCTO_PUBLICO, type ProductoConVariantes } from "./types";
 
 /** Catálogo público. RLS deja fuera productos y variantes inactivos. */
 export async function listarProductos(): Promise<ProductoConVariantes[]> {
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase
     .from("producto")
-    .select("*, variante(*)")
+    .select(CAMPOS_PRODUCTO_PUBLICO)
     .order("orden", { ascending: true });
 
   if (error) throw error;
@@ -22,7 +22,7 @@ export async function obtenerProductoPorSlug(slug: string): Promise<ProductoConV
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase
     .from("producto")
-    .select("*, variante(*)")
+    .select(CAMPOS_PRODUCTO_PUBLICO)
     .eq("slug", slug)
     .maybeSingle();
 
@@ -42,7 +42,7 @@ export async function listarProductosDestacados(limite = 4): Promise<ProductoCon
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase
     .from("producto")
-    .select("*, variante(*)")
+    .select(CAMPOS_PRODUCTO_PUBLICO)
     .order("orden", { ascending: true })
     .limit(limite);
 

@@ -5,6 +5,7 @@ import {
   CONTACTO,
   ENLACES_LEGALES,
   IDENTIDAD_LEGAL,
+  NIT_PUBLICO,
   PIE_INSTITUCIONAL,
   PIE_SERVICIOS,
   REDES,
@@ -35,9 +36,9 @@ export function Footer() {
           {/* El NIT solo aparece confirmado con el RUT: ver IDENTIDAD_LEGAL.
               Las afiliaciones sí están en el documento de la cliente. */}
           <p className="mt-4 text-xs text-blanco/60">
-            {IDENTIDAD_LEGAL.nitConfirmado && (
+            {NIT_PUBLICO && (
               <>
-                NIT {IDENTIDAD_LEGAL.nit}-{IDENTIDAD_LEGAL.nitDv}
+                NIT {NIT_PUBLICO}
                 <span aria-hidden="true"> · </span>
               </>
             )}

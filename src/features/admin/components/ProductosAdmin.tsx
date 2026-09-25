@@ -21,7 +21,7 @@ import {
 import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { aSlug } from "@/lib/utils";
 import { MAXIMO_IMAGEN_BYTES, MIMES_IMAGEN } from "../constantes";
-import { disponible, type ProductoConVariantes } from "@/features/tienda/types";
+import { disponible, type ProductoConVariantesCompletas } from "@/features/tienda/types";
 import type { Club } from "@/features/clubes/types";
 import {
   alternarProducto,
@@ -75,13 +75,13 @@ export function ProductosAdmin({
   productos,
   clubes,
 }: {
-  productos: ProductoConVariantes[];
+  productos: ProductoConVariantesCompletas[];
   clubes: Club[];
 }) {
   const router = useRouter();
   const [aviso, setAviso] = useState<ResultadoAccion | null>(null);
-  const [editando, setEditando] = useState<ProductoConVariantes | "nuevo" | null>(null);
-  const [confirmarDesactivar, setConfirmarDesactivar] = useState<ProductoConVariantes | null>(null);
+  const [editando, setEditando] = useState<ProductoConVariantesCompletas | "nuevo" | null>(null);
+  const [confirmarDesactivar, setConfirmarDesactivar] = useState<ProductoConVariantesCompletas | null>(null);
 
   function ejecutar(accion: () => Promise<ResultadoAccion>) {
     setAviso(null);
@@ -153,7 +153,7 @@ export function ProductosAdmin({
               </div>
             ),
           },
-        ] satisfies ColumnaTabla<ProductoConVariantes>[]}
+        ] satisfies ColumnaTabla<ProductoConVariantesCompletas>[]}
       />
 
       {productos.length === 0 && (
@@ -214,7 +214,7 @@ function ModalProducto({
   onGuardado,
 }: {
   clubes: Club[];
-  producto: ProductoConVariantes | "nuevo" | null;
+  producto: ProductoConVariantesCompletas | "nuevo" | null;
   alCerrar: () => void;
   onGuardado: (resultado: ResultadoAccion) => void;
 }) {

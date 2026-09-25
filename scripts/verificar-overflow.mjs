@@ -26,6 +26,8 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 
+import { apagarAlRecibirSenal, apagarServidor, encenderServidor, esperar } from "./_servidor.mjs";
+
 const PUERTO = process.env.PUERTO ?? "3311";
 const ANCHOS = [360, 1280];
 const PUERTO_DEVTOOLS = process.env.PUERTO_DEVTOOLS ?? "9223";
@@ -57,65 +59,6 @@ const ejecutable =
     : "chrome");
 
 const perfil = fs.mkdtempSync(path.join(os.tmpdir(), "tsw-chrome-"));
-const BASE = `http://localhost:${PUERTO}`;
-
-function esperar(ms) {
-  return new Promise((res) => setTimeout(res, ms));
-}
-
-/** ¿Contesta algo en el puerto? Cualquier respuesta HTTP cuenta, incluido un 404. */
-async function servidorVivo() {
-  try {
-    await fetch(BASE, { signal: AbortSignal.timeout(1500) });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Levanta `next dev` en PUERTO y espera a que conteste. Devuelve null si ya
- * había uno vivo, para no apagar el servidor de nadie en el `finally`.
- */
-async function encenderServidor() {
-  if (await servidorVivo()) {
-    console.log(`Reutilizando el servidor que ya contesta en ${BASE}.`);
-    return null;
-  }
-
-  console.log(`Levantando next dev en ${BASE} (el primer arranque compila).`);
-  const servidor = spawn(
-    process.execPath,
-    ["node_modules/next/dist/bin/next", "dev", "-p", String(PUERTO)],
-    { stdio: "ignore", detached: process.platform !== "win32" },
-  );
-
-  // 120 s: el primer `next dev` de un árbol limpio compila antes de contestar.
-  for (let i = 0; i < 240; i++) {
-    if (await servidorVivo()) return servidor;
-    await esperar(500);
-  }
-  apagarServidor(servidor);
-  throw new Error(`next dev no contestó en ${BASE}.`);
-}
-
-/**
- * Apaga el servidor con todo su árbol. Next bifurca un proceso hijo para
- * servir, así que matar solo al padre deja el puerto ocupado y la siguiente
- * corrida "reutiliza" un servidor con el código viejo.
- */
-function apagarServidor(servidor) {
-  if (!servidor) return;
-  try {
-    if (process.platform === "win32") {
-      spawn("taskkill", ["/PID", String(servidor.pid), "/T", "/F"], { stdio: "ignore" });
-    } else {
-      process.kill(-servidor.pid, "SIGTERM");
-    }
-  } catch {
-    /* ya estaba muerto */
-  }
-}
 
 /** Enciende Chrome headless con puerto de depuración y espera el endpoint. */
 async function encenderChrome() {
@@ -245,17 +188,9 @@ const SONDA_RECORTE = [
 ].join("\n");
 
 let fallos = 0;
-const servidor = await encenderServidor();
+const servidor = await encenderServidor(PUERTO);
 
-// Ctrl-C no pasa por el `finally`, y en Unix el servidor va en su propio grupo
-// de procesos —eso es lo que hace `detached`—, así que la señal del terminal no
-// le llega. Sin esto, cortar la verificación a mano dejaría el puerto ocupado.
-for (const senal of ["SIGINT", "SIGTERM"]) {
-  process.once(senal, () => {
-    apagarServidor(servidor);
-    process.exit(130);
-  });
-}
+apagarAlRecibirSenal(servidor);
 const chrome = await encenderChrome();
 const pesta = await abrirPestana();
 

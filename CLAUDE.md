@@ -648,6 +648,8 @@ cero si cae cualquiera:
 | `verificar:politicas` | Una política que llegue a `anon` llamando a una función revocada para `anon` |
 | `verificar:parametros` | Una llamada a RPC sin un parámetro que el cuerpo exige, aunque `tsc` pase |
 | `verificar:club` | Que `/semilleros` caiga a un club equivocado o a un programa sin niveles |
+| `verificar:legales` | Un NIT cuyo dígito de verificación no cuadra con el algoritmo DIAN |
+| `verificar:payload` | Que viaje al navegador lo que está oculto: precios en modo catálogo, NIT sin confirmar |
 | `verificar:overflow` | Scroll horizontal, y contenido recortado fuera del viewport |
 
 `verificar:overflow` levanta `next dev` él mismo si el puerto no contesta y lo
@@ -668,6 +670,28 @@ scroll` —eso último es contenido pensado para desplazarse dentro de su caja�
 Los tres chequeos que sí hablan con el remoto (`rls`, `inventario`,
 `auditoria`) viven aparte, en `npm run verificar:remoto`: piden claves y no
 pueden ser un requisito de cada commit.
+
+**`npm run verificar:foco` va aparte y sobre build de producción.** Mide el
+contraste real del anillo de foco tabulando con teclas de verdad: para cada
+elemento resuelve el color del anillo —si `outline-color` computa a
+`currentcolor`, el que vale es el `color` del elemento— y el fondo sobre el que
+cae, y exige 3:1. Dos cosas aprendidas midiéndolo, que valen para cualquier
+medición futura:
+
+- **El fondo que cuenta es el del PADRE**, no el del elemento, porque con
+  `outline-offset` positivo el anillo se pinta por fuera del borde. Medirlo
+  desde el elemento daba falsos positivos en todos los botones primarios.
+- **`transition-colors` de Tailwind 4 incluye `outline-color`**, así que hay que
+  esperar a que la transición termine antes de leer el color; si no, se lee el
+  instante 0 y sale `currentColor`. Por eso `Boton` enumera las propiedades que
+  transiciona en vez de usar `transition-colors`: el anillo no debe aparecer
+  desvaneciéndose, porque durante ese rato es invisible.
+
+De ahí salió un fallo real: el token `--foco` da **1.62:1 sobre
+`--acento-oscuro`**, que es el fondo de la franja de cierre. El token se eligió
+para los cuatro fondos de página y la franja es un quinto. Sobre franja el
+anillo va en blanco (6.61:1), y eso lo decide `ANILLO` en `Boton`, no cada
+página.
 
 Además, al cerrar un bloque:
 

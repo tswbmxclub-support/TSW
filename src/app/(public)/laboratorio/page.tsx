@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import {
+  DocumentoLegal,
   LogoClub,
   Acordeon,
   AreaTexto,
@@ -941,6 +942,58 @@ export default function PaginaLaboratorio() {
         </SeccionTitulo>
         <div className="mt-8">
           <DemoResumenCuenta />
+        </div>
+      </Seccion>
+
+      {/* --- DocumentoLegal ------------------------------------------------ */}
+      <Seccion tono="claro" tituloId="titulo-documento-legal">
+        <SeccionTitulo
+          id="titulo-documento-legal"
+          bajada="Un documento legal largo, con índice y tres formas de bloque: párrafo, lista y pares término/explicación. El índice se queda fijo al lado en pantalla ancha y va arriba en móvil, que es donde sirve. Los pares van en dl de verdad, porque en un texto legal el término es lo que se cita."
+        >
+          DocumentoLegal
+        </SeccionTitulo>
+        <div className="mt-8 overflow-hidden rounded-lg border border-gris-borde bg-blanco">
+          <DocumentoLegal
+            tituloId="titulo-demo-legal"
+            titulo="Ejemplo de documento legal"
+            secciones={[
+              {
+                id: "demo-parrafos",
+                titulo: "Sección con párrafos",
+                bloques: [
+                  { tipo: "parrafo", texto: "Un párrafo corriente del documento, con el ancho de lectura limitado a max-w-prose." },
+                  { tipo: "parrafo", texto: "Dos párrafos seguidos se separan con el mismo espacio que el resto de los bloques." },
+                ],
+              },
+              {
+                id: "demo-lista",
+                titulo: "Sección con lista",
+                bloques: [
+                  {
+                    tipo: "lista",
+                    items: [
+                      "Cada punto lleva su viñeta propia, alineada con la primera línea.",
+                      "Un punto largo envuelve con sangría, no debajo de la viñeta.",
+                    ],
+                  },
+                ],
+              },
+              {
+                id: "demo-definiciones",
+                titulo: "Sección con definiciones",
+                bloques: [
+                  {
+                    tipo: "definiciones",
+                    items: [
+                      { termino: "Término", texto: "La explicación que lo acompaña, en el gris de texto secundario." },
+                      { termino: "Otro término", texto: "El marcado es dt y dd dentro de un dl." },
+                    ],
+                  },
+                ],
+              },
+            ]}
+          />
         </div>
       </Seccion>
 

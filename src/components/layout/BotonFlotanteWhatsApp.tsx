@@ -32,7 +32,11 @@ export function BotonFlotanteWhatsApp() {
       aria-label="Escribir al club por WhatsApp"
       className={[
         "fixed right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full",
-        "bg-acento-oscuro text-blanco shadow-lg transition-colors hover:bg-acento-hover",
+        // `transition-colors` se cambia por la lista explícita: en Tailwind 4
+        // esa utilidad incluye `outline-color`, así que el anillo de foco
+        // entraba desvaneciéndose desde `currentColor` —blanco— y durante los
+        // primeros ~150 ms era invisible sobre el fondo claro de la página.
+        "bg-acento-oscuro text-blanco shadow-lg transition-[background-color] hover:bg-acento-hover",
         "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
       ].join(" ")}
       style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}

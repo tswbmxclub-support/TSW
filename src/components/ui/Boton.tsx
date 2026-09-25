@@ -19,7 +19,10 @@ const BASE =
   "inline-flex items-center justify-center gap-2 rounded-md font-semibold " +
   // Área táctil mínima de 44 px y foco visible: requisitos, no adornos.
   "min-h-[44px] transition-[background-color,color,border-color,transform] duration-150 " +
-  "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco " +
+  // El COLOR del anillo no va aquí: depende del fondo (ver ANILLO). Dos
+  // utilidades de outline-color en el mismo elemento se resolverían por el
+  // orden del CSS generado, no por el orden en que se escriben.
+  "focus-visible:outline-3 focus-visible:outline-offset-2 " +
   "disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.99]";
 
 /**
@@ -62,6 +65,25 @@ const PALETAS: Record<FondoBoton, Record<VarianteBoton, string>> = {
   claro: VARIANTES,
   oscuro: VARIANTES_OSCURO,
   franja: VARIANTES_FRANJA,
+};
+
+/**
+ * Color del anillo de foco según el fondo.
+ *
+ * Sobre la franja va en BLANCO y no con el token `--foco`. Medido sobre el
+ * build de producción: `--foco` (#1A7FE0) contra `--acento-oscuro` (#0A5BB5)
+ * da **1.62:1**, muy por debajo del 3:1 que pide WCAG para un componente de
+ * interfaz; el blanco da 6.61:1. El token de foco se eligió para verse sobre
+ * los cuatro fondos de página (blanco, gris frío, azul profundo, azul medio),
+ * y la franja de acento es un quinto fondo que no estaba en esa cuenta.
+ *
+ * El anillo va por fuera del botón (`outline-offset-2`), así que lo que
+ * importa es el fondo de la SECCIÓN, no el relleno del botón.
+ */
+const ANILLO: Record<FondoBoton, string> = {
+  claro: "focus-visible:outline-foco",
+  oscuro: "focus-visible:outline-foco",
+  franja: "focus-visible:outline-blanco",
 };
 
 const TAMANOS: Record<TamanoBoton, string> = {
@@ -114,7 +136,7 @@ type PropsAsChild = PropsComunes & {
 export type BotonProps = PropsBoton | PropsEnlace | PropsAsChild;
 
 function clases({ variante = "primario", tamano = "md", fondo = "claro", completo, className }: PropsComunes) {
-  return cn(BASE, PALETAS[fondo][variante], TAMANOS[tamano], completo && "w-full", className);
+  return cn(BASE, ANILLO[fondo], PALETAS[fondo][variante], TAMANOS[tamano], completo && "w-full", className);
 }
 
 export const Boton = forwardRef<HTMLButtonElement, BotonProps>(function Boton(props, ref) {
