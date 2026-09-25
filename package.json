@@ -21,6 +21,7 @@
     "verificar:parametros": "node scripts/verificar-parametros-rpc.mjs",
     "verificar:club": "tsx scripts/verificar-club-publico.ts",
     "verificar:legales": "tsx scripts/verificar-datos-legales.ts",
+    "verificar:contenido": "node scripts/verificar-contenido-sitio.mjs",
     "verificar:payload": "node scripts/verificar-payload.mjs",
     "verificar:overflow": "node scripts/verificar-overflow.mjs",
     "verificar:foco": "node scripts/verificar-foco.mjs",
