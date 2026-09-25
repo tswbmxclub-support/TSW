@@ -67,16 +67,28 @@ email" apagado, y registrando `${NEXT_PUBLIC_SITE_URL}/admin/auth/callback` en
 Authentication → URL Configuration → Redirect URLs. Esto es lo que hoy impide
 entrar al panel en producción.
 
-**(d) Mis comprobaciones contra el remoto**, que no puedo hacer antes de (b):
+**(d) Mis comprobaciones contra el remoto** — **hechas el 25-09-2026**, 22 de 22 con
+`npm run verificar:contenido-remoto`. Lo que cubren:
 
 1. Lectura de `contenido_sitio` con la anon key: debe funcionar sin tocar `es_admin()`.
 2. `insert` con la anon key: debe fallar (no hay política de escritura).
 3. `guardar_contenido` por RPC y consulta de `evento_auditoria`: `entidad = 'contenido_sitio'` y `actor_id` no nulo.
 4. Las siete políticas de escritura de Storage endurecidas, contra el remoto.
 
-El paso 3 necesita además el login funcionando, así que depende de (c). Probar
-que un usuario **con sesión** y sin rol de administrador no escribe exige un
-usuario temporal y permiso explícito de Samuel en ese momento.
+Los cuatro salieron limpios. La bitácora se probó con un **usuario temporal
+propio** (`verificacion-contenido-<timestamp>@tsw-verificacion.com`), borrado al
+terminar y con el borrado confirmado por consulta: tres eventos —crear,
+actualizar, eliminar— con su id como actor, y los tres siguen en la bitácora con
+el actor anonimizado tras borrar la cuenta (migración 16).
+
+**Queda pendiente `npm run db:types:remote`.** El push se corrió sin `gen types`,
+así que los tipos generados no conocen `contenido_sitio` ni las dos RPC nuevas.
+La capa de lectura y la pantalla no se pueden escribir hasta entonces: es la regla
+de que base y tipos se regeneran juntos.
+
+Probar que un usuario **con sesión** y sin rol de administrador no escribe exige
+autenticarse con esa cuenta y necesita permiso explícito de Samuel. Lo verificado
+es más fuerte en un sentido: no hay política de escritura para NADIE.
 
 ## Para fusionar a `main`
 

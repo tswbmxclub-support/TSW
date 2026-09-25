@@ -150,6 +150,27 @@ export type Database = {
         }
         Relationships: []
       }
+      contenido_sitio: {
+        Row: {
+          actualizado_en: string
+          clave: string
+          id: string
+          valor: Json
+        }
+        Insert: {
+          actualizado_en?: string
+          clave: string
+          id?: string
+          valor: Json
+        }
+        Update: {
+          actualizado_en?: string
+          clave?: string
+          id?: string
+          valor?: Json
+        }
+        Relationships: []
+      }
       documento: {
         Row: {
           activo: boolean
@@ -1025,6 +1046,21 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      guardar_contenido: {
+        Args: { p_actor_id: string; p_clave: string; p_valor: Json }
+        Returns: {
+          actualizado_en: string
+          clave: string
+          id: string
+          valor: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contenido_sitio"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       guardar_documento: {
         Args: {
           p_activo?: boolean
@@ -1270,6 +1306,10 @@ export type Database = {
       reservar_stock: {
         Args: { p_cantidad: number; p_variante_id: string }
         Returns: number
+      }
+      restablecer_contenido: {
+        Args: { p_actor_id: string; p_clave: string }
+        Returns: undefined
       }
       siguiente_version_documento: {
         Args: { p_documento_id: string }
