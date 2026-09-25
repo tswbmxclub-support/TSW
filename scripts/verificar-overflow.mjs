@@ -1,6 +1,19 @@
 // Verificación de overflow horizontal a 360px y 1280px con Chrome headless.
 // Habla con el protocolo DevTools por websocket (módulo nativo de Node 22+),
-// mide scrollWidth > clientWidth en cada ruta y ancho, y sale 1 si hay
+// comprueba si la página SCROLLEA de verdad en horizontal en cada ruta y
+// ancho, y sale 1 si lo hace.
+//
+// Por qué no `scrollWidth - clientWidth`, que es lo que medía antes: esa
+// resta da positivo en cualquier página que contenga un contenedor con
+// scroll horizontal propio —el carrusel del hero, la tira de pestañas—
+// aunque la página no se mueva ni un píxel. Medido: /laboratorio daba 548
+// px de "desborde" y `scrollTo(500, 0)` dejaba `scrollX` en 0. Además
+// dependía del momento: antes de que cargaran las imágenes del carrusel,
+// la misma página daba 0.
+//
+// La prueba de abajo es la que importa para el requisito real —que nadie
+// tenga que arrastrar la pantalla de lado—: se pide desplazar y se mira si
+// se desplazó. Antes se sale 1 si hay
 // desbordamiento. Uso: PUERTO=3311 node scripts/verificar-overflow.mjs
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -18,15 +31,15 @@ const PUERTO_DEVTOOLS = process.env.PUERTO_DEVTOOLS ?? "9223";
 const RUTAS_POR_DEFECTO = [
   "/",
   "/semilleros",
-  "/semilleros?deporte=deporte-2",
+  "/semilleros?club=bmx-mastercross",
+  "/semilleros?club=habilidades-motrices",
+  "/semilleros?club=no-existe",
   "/competencias",
   "/matriculas",
   "/tienda",
+  "/carrito",
   "/laboratorio",
-  "/cuenta",
-  "/cuenta/acceso",
-  "/cuenta/mensualidades",
-  "/cuenta/recuperar",
+  "/admin/login",
 ];
 
 // RUTAS="/,/tienda" node scripts/verificar-overflow.mjs acota la lista.
@@ -144,11 +157,17 @@ try {
         await esperar(1500); // carga, hidratación y fuentes
 
         const exceso = await pesta.evaluar(
-          `(function () { var d = document.documentElement; return d.scrollWidth - d.clientWidth; })()`,
+          `(function () {
+            var antes = window.scrollX;
+            window.scrollTo(9999, window.scrollY);
+            var movido = window.scrollX;
+            window.scrollTo(antes, window.scrollY);
+            return movido;
+          })()`,
         );
         const ok = exceso !== null && exceso <= 0;
         if (!ok) fallos++;
-        console.log(`${ancho}px ${ruta} -> ${ok ? "ok" : `DESBORDA ${exceso}px`}`);
+        console.log(`${ancho}px ${ruta} -> ${ok ? "ok" : `DESPLAZA ${exceso}px en horizontal`}`);
       } catch (error) {
         fallos++;
         console.log(`${ancho}px ${ruta} -> ERROR: ${error.message}`);
@@ -169,7 +188,7 @@ try {
 }
 
 if (fallos > 0) {
-  console.log(`FALLO: ${fallos} medición(es) con desbordamiento.`);
+  console.log(`FALLO: ${fallos} medición(es) con desplazamiento horizontal.`);
   process.exit(1);
 }
-console.log("VERIFICACIÓN LIMPIA: 0 desbordamientos.");
+console.log("VERIFICACIÓN LIMPIA: ninguna ruta se desplaza en horizontal.");

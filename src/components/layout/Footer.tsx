@@ -68,11 +68,17 @@ export function Footer() {
             </a>
             <span className="text-blanco/70">{CONTACTO.horario}</span>
           </address>
-          <ul className="mt-4 flex flex-wrap gap-x-4">
+          <h2 className="mt-6 text-sm uppercase tracking-widest text-blanco/60">
+            Síguenos en Instagram
+          </h2>
+          <ul className="mt-3 flex flex-col gap-2">
             {REDES.map((red) => (
               <li key={red.nombre}>
                 <a href={red.url} target="_blank" rel="noreferrer noopener" className={ENLACE}>
-                  {red.nombre}
+                  {/* El arroba se saca de la propia URL: una cuenta nueva se
+                      añade con su enlace y nada más. */}
+                  @{red.url.split("/").filter(Boolean).pop()}
+                  <span className="sr-only"> — {red.nombre}</span>
                 </a>
               </li>
             ))}

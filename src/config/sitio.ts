@@ -27,10 +27,15 @@ export const CONTACTO = {
   // El WhatsApp no va aquí: sale de NEXT_PUBLIC_WHATSAPP_NUMERO (src/lib/whatsapp.ts).
 } as const;
 
+/**
+ * Las tres cuentas de Instagram del documento del cliente (22-09-2026). No hay
+ * Facebook ni YouTube: los iconos que estaban antes apuntaban a una URL entre
+ * corchetes, así que eran enlaces rotos con forma de red social.
+ */
 export const REDES = [
-  { nombre: "Instagram", url: "[https://instagram.com/...]" },
-  { nombre: "Facebook", url: "[https://facebook.com/...]" },
-  { nombre: "YouTube", url: "[https://youtube.com/...]" },
+  { nombre: "Corporación Deportiva TSW", url: "https://www.instagram.com/corporaciond.tsw" },
+  { nombre: "BMX Club TSW", url: "https://www.instagram.com/bmx_clubtsw" },
+  { nombre: "BMX Mastercross", url: "https://www.instagram.com/bmxmastercross" },
 ] as const;
 
 /**
@@ -56,7 +61,11 @@ export const PIE_INSTITUCIONAL = [
   { etiqueta: "Nuestros pilares", href: "/#titulo-pilares" },
   { etiqueta: "Nuestros deportes", href: "/#titulo-deportes" },
   { etiqueta: "Documentos", href: "/#titulo-documentos-portal" },
-  { etiqueta: "[Estatutos y reglamentos]", href: "/matriculas" },
+  // El documento del cliente pide renombrarlo o quitarlo: se llamaba
+  // "[Estatutos y reglamentos]" —un placeholder— y llevaba a Matrículas, que
+  // es donde de verdad se descarga el reglamento interno. Renombrado, no
+  // inventado: no hay URL propia del PDF hasta que se publique su versión.
+  { etiqueta: "Reglamento interno", href: "/matriculas" },
 ] as const;
 
 export const PIE_SERVICIOS = [

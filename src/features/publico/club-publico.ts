@@ -26,18 +26,30 @@ export type ClubSeleccionado =
   | { estado: "desconocido"; club: null };
 
 /**
+ * El club por defecto: el primero de `tipo = "club"` por orden.
+ *
+ * Por orden y no por un slug escrito aquí, porque el orden lo decide el
+ * administrador desde el panel. Y filtrando por tipo, porque "el primero de la
+ * lista" podría acabar siendo un PROGRAMA si alguien reordena: la página de
+ * niveles abriría en Habilidades Motrices, que no tiene niveles, y el visitante
+ * vería un bloque de texto donde esperaba la ruta formativa.
+ *
+ * Si no hay ningún club activo se cae al primer registro que haya, sea
+ * programa o lo que sea: enseñar el programa es mejor que no enseñar nada.
+ * Con la lista vacía devuelve null y la página muestra su estado vacío.
+ */
+export function clubPorDefecto(clubes: Club[]): Club | null {
+  return clubes.find((c) => c.tipo === "club") ?? clubes[0] ?? null;
+}
+
+/**
  * Resuelve el club de la petición.
  *
- * Sin parámetro se devuelve el PRIMERO POR ORDEN, no un slug escrito aquí: el
- * orden lo decide el administrador desde el panel, así que el club por defecto
- * es su decisión y no una constante del código. Hoy es BMX Club TSW, que el
- * documento del cliente llama "el club de la casa, el que da nombre a la
- * corporación".
- *
  * Un slug que no corresponde a ningún club activo NO cae al primero en
- * silencio: se marca como desconocido para que la página redirija a la URL
- * canónica. Caer al primero dejaría una URL que miente —dice un club y
- * muestra otro— y dos direcciones con el mismo contenido.
+ * silencio: se marca como desconocido para que la página lo diga y ponga el
+ * `canonical` en la URL sin parámetro. Caer al primero sin avisar dejaría una
+ * URL que miente —dice un club y muestra otro— y dos direcciones indexables
+ * con el mismo contenido.
  */
 export function clubDeParametros(
   clubes: Club[],
@@ -47,8 +59,8 @@ export function clubDeParametros(
   const slug = Array.isArray(crudo) ? crudo[0] : crudo;
 
   if (!slug) {
-    const primero = clubes[0];
-    return primero ? { estado: "por-defecto", club: primero } : { estado: "desconocido", club: null };
+    const porDefecto = clubPorDefecto(clubes);
+    return porDefecto ? { estado: "por-defecto", club: porDefecto } : { estado: "desconocido", club: null };
   }
 
   const club = clubes.find((c) => c.slug === slug);

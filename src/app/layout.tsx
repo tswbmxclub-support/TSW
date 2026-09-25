@@ -23,7 +23,9 @@ const fuenteCuerpo = Barlow({
 
 export const metadata: Metadata = {
   title: {
-    default: "TSW — Escuela de BMX",
+    // Título de la pestaña, del documento del cliente: ya no es una escuela
+    // de BMX, es una corporación con dos clubes y un programa.
+    default: "Corporación Deportiva TSW — BMX en Medellín",
     template: "%s | TSW",
   },
   description: SITIO.descripcion,

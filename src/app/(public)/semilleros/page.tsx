@@ -20,25 +20,39 @@ import type { Club } from "@/features/clubes/types";
 import { FichaNiveles } from "@/features/niveles/components/FichaNiveles";
 import { listarNiveles } from "@/features/niveles/queries";
 import { SelectorClubPublico } from "@/features/publico/components/SelectorClubPublico";
-import { clubDeParametros, type ParametrosBusqueda } from "@/features/publico/club-publico";
+import { clubDeParametros, clubPorDefecto, type ParametrosBusqueda } from "@/features/publico/club-publico";
 
 const TITULO = "Niveles de formación";
 const DESCRIPCION =
   "Niveles Minirider, Intermedio y Avanzado de BMX Club TSW y BMX Mastercross: edades, horarios y cómo avanzar. Clase de prueba gratis.";
 
-export const metadata: Metadata = {
-  title: TITULO,
-  description: DESCRIPCION,
-  openGraph: { title: `${TITULO} | TSW`, description: DESCRIPCION, type: "website" },
-};
+/**
+ * El `canonical` apunta a `/semilleros` a secas cuando el `?club=` pedido no
+ * existe: esa URL muestra el club por defecto, así que sin canónica quedarían
+ * dos direcciones indexables con el mismo contenido y una de ellas prometiendo
+ * un club que no está.
+ */
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const [clubes, parametros] = await Promise.all([listarClubes(), searchParams]);
+  const seleccion = clubDeParametros(clubes, parametros);
+
+  return {
+    title: TITULO,
+    description: DESCRIPCION,
+    openGraph: { title: `${TITULO} | TSW`, description: DESCRIPCION, type: "website" },
+    ...(seleccion.estado === "desconocido" ? { alternates: { canonical: "/semilleros" } } : {}),
+  };
+}
 
 type Props = { searchParams: Promise<ParametrosBusqueda> };
 
 /**
  * Niveles de formación, por club.
  *
- * Qué se ve sin `?club`: el PRIMERO POR ORDEN, que es la decisión del
- * administrador en el panel y no un slug escrito aquí. Hoy es BMX Club TSW,
+ * Qué se ve sin `?club`: el primer registro de `tipo = "club"` por orden. Por
+ * orden, porque lo decide el administrador desde el panel; y filtrando por
+ * tipo, porque si alguien reordena y queda un programa de primero, esta página
+ * abriría en Habilidades Motrices, que no tiene niveles. Hoy es BMX Club TSW,
  * "el club de la casa" según el documento del cliente.
  *
  * Qué pasa con un slug que no existe o cuyo club está inactivo: se muestra el
@@ -65,7 +79,7 @@ export default async function PaginaSemilleros({ searchParams }: Props) {
   if (clubes.length === 0) return <SinClubes />;
 
   const desconocido = seleccion.estado === "desconocido";
-  const club = seleccion.club ?? clubes[0]!;
+  const club = seleccion.club ?? clubPorDefecto(clubes)!;
   const esPrograma = club.tipo === "programa";
   const niveles = esPrograma ? [] : await listarNiveles(club.id);
 

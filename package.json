@@ -19,6 +19,8 @@
     "verificar:paleta": "node scripts/verificar-paleta.mjs",
     "verificar:politicas": "node scripts/verificar-politicas-anon.mjs",
     "verificar:parametros": "node scripts/verificar-parametros-rpc.mjs",
+    "verificar:club": "tsx scripts/verificar-club-publico.ts",
+    "verificar:overflow": "node scripts/verificar-overflow.mjs",
     "verificar:rls": "tsx scripts/verificar-rls.ts",
     "verificar:inventario": "tsx scripts/verificar-inventario.ts",
     "verificar:auditoria": "tsx scripts/verificar-auditoria.ts",

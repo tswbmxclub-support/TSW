@@ -77,7 +77,14 @@ for (const archivo of readdirSync(DIR).filter((f) => f.endsWith(".sql")).sort())
       p.exigidoEnElCuerpo = re.test(cuerpo);
     }
 
-    firmas.set(nombre, { archivo, parametros });
+    const previa = firmas.get(nombre);
+    firmas.set(nombre, {
+      archivo,
+      parametros,
+      // Todas las migraciones que la definen, en orden. La última gana, igual
+      // que en la base: `create or replace` reemplaza a la anterior.
+      definidaEn: [...(previa?.definidaEn ?? []), archivo.slice(0, 8)],
+    });
   }
 }
 
@@ -132,6 +139,32 @@ for (const llamada of llamadas) {
       : obligatorios.length
         ? `obligatorios: ${obligatorios.map((p) => p.nombre).join(", ")}`
         : "todos sus parámetros son opcionales de verdad",
+  );
+
+  // El error simétrico: un parámetro que la RPC no declara. PostgREST resuelve
+  // la sobrecarga por el conjunto de claves del cuerpo, así que uno de más
+  // significa "no existe esa función" y responde 404 (PGRST202) en ejecución.
+  // Pasa al renombrar un parámetro en una migración y dejar el nombre viejo en
+  // la acción: el tipo generado lo marca como error, salvo que el objeto se
+  // arme con un spread, que es justo lo que hace ejecutarRpc.
+  const declarados = new Set(firma.parametros.map((p) => p.nombre));
+  const sobran = llamada.claves.filter((c) => !declarados.has(c));
+  verificar(
+    `${llamada.funcion}: no manda parámetros que la RPC no declara`,
+    sobran.length === 0,
+    ref,
+    sobran.length ? `sobra ${sobran.join(", ")} -> PostgREST no encuentra la función (404)` : "",
+  );
+}
+
+// Si una RPC se redefine, el cruce usa la ÚLTIMA firma, como la base.
+for (const [nombre, firma] of firmas) {
+  if (firma.definidaEn.length < 2) continue;
+  verificar(
+    `${nombre}: se cruza contra la última de sus ${firma.definidaEn.length} definiciones`,
+    firma.archivo.slice(0, 8) === firma.definidaEn.at(-1),
+    firma.archivo.slice(0, 8),
+    `definida en ${firma.definidaEn.join(" -> ")}; gana ${firma.definidaEn.at(-1)}`,
   );
 }
 
