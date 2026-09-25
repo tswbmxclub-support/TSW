@@ -100,6 +100,17 @@ contrario deja sin cubrir el único canal por el que hoy entran datos de verdad.
 Lo que sí sigue diciendo, porque es cierto y le conviene: el sitio no tiene
 formularios ni cuentas, y los formatos de matrícula se entregan en papel.
 
+**Sobre el plazo de conservación, para que quede claro de dónde sale.** No se
+inventó ninguno. La frase dice «mientras sea necesario para atender el pedido o
+la consulta y para cumplir las obligaciones legales, contables y de garantía»,
+que es la misma formulación de su propio borrador en la cláusula de Vigencia:
+«Los datos se conservarán mientras exista la relación con el titular y durante el
+tiempo que exijan las obligaciones legales.» **Pendiente suyo:** si quiere fijar
+un plazo concreto para las conversaciones de WhatsApp —por ejemplo, borrar los
+chats de consultas que no acabaron en pedido a los X meses—, dígalo y se escribe.
+Un plazo concreto es más fácil de cumplir y de demostrar que uno abierto, pero
+tiene que ser uno que usted vaya a cumplir de verdad.
+
 ### 1.7 Retirado: la dirección de notificación
 
 > «Dirección de notificación: [dirección que aparece en el RUT].»

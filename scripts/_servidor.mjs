@@ -14,6 +14,20 @@ export function esperar(ms) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
+/**
+ * Carpeta de salida de cada modo, para no pisar el `.next` de Samuel ni pisarse
+ * entre chequeos.
+ *
+ * Dos carpetas y no una: `next dev` y `next start` no pueden compartir salida.
+ * Dev reescribe el manifiesto y borra el id del build de producción, así que un
+ * `verificar:overflow` (dev) dejaba inservible el build que `verificar:foco`
+ * (start) necesita. Con una carpeta por modo, el build se hace una vez al
+ * principio y sobrevive a todo lo demás.
+ *
+ * Lo lee `next.config.ts` por `NEXT_DIST_DIR`.
+ */
+export const CARPETA_SALIDA = { dev: ".next-verificar-dev", start: ".next-verificar" };
+
 /** ¿Contesta algo en el puerto? Cualquier respuesta HTTP cuenta, incluido un 404. */
 export async function servidorVivo(base) {
   try {
@@ -65,7 +79,11 @@ export async function encenderServidor(puerto, modo = "dev") {
   const servidor = spawn(
     process.execPath,
     ["node_modules/next/dist/bin/next", modo, "-p", String(puerto)],
-    { stdio: "ignore", detached: process.platform !== "win32" },
+    {
+      stdio: "ignore",
+      detached: process.platform !== "win32",
+      env: { ...process.env, NEXT_DIST_DIR: CARPETA_SALIDA[modo] ?? ".next" },
+    },
   );
 
   // 120 s: el primer `next dev` de un árbol limpio compila antes de contestar.

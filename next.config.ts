@@ -6,6 +6,12 @@ const supabaseUrl = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Carpeta de salida, configurable para que los chequeos no peleen con el
+  // servidor de desarrollo de Samuel: si los dos escriben en `.next`, el `next
+  // dev` de un chequeo invalida el build de producción del otro y al revés.
+  // Los scripts de verificación la fijan a `.next-verificar*`; sin la variable,
+  // `.next` de siempre.
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   // Fija la raíz del proyecto: sin esto Next puede tomar un lockfile de un
   // directorio superior como raíz del workspace.
   outputFileTracingRoot: path.join(import.meta.dirname, "./"),

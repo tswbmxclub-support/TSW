@@ -695,10 +695,26 @@ página.
 
 ### Antes de fusionar a main: `npm run verificar:completo`
 
-`npm run verificar && npm run build && npm run verificar:foco`, en ese orden y
-no en el del enunciado: `verificar` levanta `next dev`, que **pisa el id del
-build de producción**, y `verificar:foco` necesita `next start`. Con el build en
-medio se construye una vez y sirve para el foco.
+`build`, luego `npm run verificar`, luego `verificar:foco`. **El build va
+primero, como puerta rápida**: si no compila, no tiene sentido medir contraste
+ni desbordamiento.
+
+Ese orden solo es posible desde que **cada servidor escribe en su propia
+carpeta de salida**. `distDir` se lee de `NEXT_DIST_DIR` (por defecto `.next`),
+y los chequeos usan `.next-verificar` para `next start` y `.next-verificar-dev`
+para `next dev`. Dos carpetas y no una porque dev reescribe el manifiesto y
+borra el id del build de producción: con una sola, `verificar:overflow` dejaba
+inservible el build que `verificar:foco` necesita, y por eso el build tenía que
+ir en medio.
+
+El efecto que más se nota: **los chequeos ya no pelean con tu `npm run dev`**.
+Comprobado con un dev en el 3000 vivo en paralelo: `verificar:completo` termina
+en 0, el dev sigue sirviendo, y el `.next` de un build propio queda con el mismo
+BUILD_ID que antes.
+
+Es un script (`scripts/verificar-completo.mjs`) y no una cadena de `&&` porque
+`VAR=valor npm run build` no funciona en Windows, donde npm ejecuta los scripts
+con cmd.exe.
 
 **No se fusiona a `main` con `LEGALES_APROBADAS` en `false`.** Mientras ese
 interruptor esté apagado, las tres páginas de `/legal` son borradores: abren con

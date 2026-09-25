@@ -5,9 +5,14 @@
 
 # build
 /.next/
+/.next-verificar/
+/.next-verificar-dev/
 /out/
 /build
 next-env.d.ts.timestamp
+# Lo regenera Next en cada build y su contenido depende de la carpeta de salida
+# que se usó la última vez: rastrearlo era ruido en cada diff.
+next-env.d.ts
 *.tsbuildinfo
 
 # entorno

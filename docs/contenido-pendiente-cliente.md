@@ -37,6 +37,25 @@ no puesto con un dato de relleno.
 | **Dirección de calle de la sede administrativa** | El documento da las dos pistas y el barrio, no una dirección | Portada, canales de atención |
 | **Título de la pestaña del navegador** | Hoy dice "Corporación Deportiva TSW — BMX en Medellín", como en su documento. Si la corporación va a sumar otros deportes, conviene "Corporación Deportiva TSW — Medellín" | Todas las páginas |
 | **Nombre exacto de la pista** | Su documento lo marcó para confirmar: "Antonio Roldán Betancur" | Pie de página, portada y matrículas |
+| **¿Cuánto tiempo guardan las conversaciones de WhatsApp?** | Ver la pregunta de abajo | Política de tratamiento de datos |
+
+### La pregunta del WhatsApp
+
+La política dice hoy que los datos que llegan por WhatsApp —nombre, teléfono y
+el texto del mensaje— se conservan «mientras sea necesario para atender el
+pedido o la consulta y para cumplir las obligaciones legales, contables y de
+garantía». Esa es la misma redacción de su borrador, y es válida.
+
+**Si quiere, puede ser más concreta**, y le conviene: un plazo fijo es más fácil
+de cumplir y de demostrar que uno abierto. Por ejemplo:
+
+- Consultas que **no** terminaron en pedido: ¿se borra el chat a los 3 meses, a
+  los 6, al año?
+- Conversaciones de un pedido entregado: aquí manda la garantía, así que lo
+  razonable es conservarlas mientras la garantía siga viva.
+
+Solo ponga un plazo que vaya a cumplir de verdad: publicar "borramos a los 3
+meses" y no hacerlo es peor que no publicar nada.
 
 ### Sobre la tienda
 

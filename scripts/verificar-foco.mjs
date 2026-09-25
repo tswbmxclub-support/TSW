@@ -24,7 +24,10 @@
  * programa y el anillo podría no estar aplicado.
  *
  * Uso: PUERTO=3313 node scripts/verificar-foco.mjs
- * Requiere un build hecho: `npm run build` antes.
+ * Requiere un build en `.next-verificar`, que es donde sale el de
+ * `verificar:completo`. Suelto: `NEXT_DIST_DIR=.next-verificar npx next build`.
+ * Un `npm run build` normal sale a `.next` y aquí no sirve — a propósito: así el
+ * chequeo no se apoya en un build que Samuel pueda estar reescribiendo.
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
