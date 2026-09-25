@@ -636,6 +636,41 @@ y un enlace prominente solo ayuda a los escaneos automáticos.
 
 ## Verificación al cerrar cada bloque
 
+**`npm run verificar` antes de cada commit. Sin excepciones.**
+
+Encadena los cinco chequeos que no necesitan el remoto ni credenciales, en
+secuencia y con corte en el primero que falle, y termina con código distinto de
+cero si cae cualquiera:
+
+| Chequeo | Qué impide |
+|---|---|
+| `verificar:paleta` | Una utilidad de rojo o un hexadecimal de marca suelto |
+| `verificar:politicas` | Una política que llegue a `anon` llamando a una función revocada para `anon` |
+| `verificar:parametros` | Una llamada a RPC sin un parámetro que el cuerpo exige, aunque `tsc` pase |
+| `verificar:club` | Que `/semilleros` caiga a un club equivocado o a un programa sin niveles |
+| `verificar:overflow` | Scroll horizontal, y contenido recortado fuera del viewport |
+
+`verificar:overflow` levanta `next dev` él mismo si el puerto no contesta y lo
+apaga al terminar por árbol de procesos: Next bifurca un hijo, y matar solo al
+padre dejaría el puerto ocupado y la corrida siguiente "reutilizando" código
+viejo. Si ya hay un servidor, lo reutiliza y no lo toca.
+
+**Las dos comprobaciones de overflow, y por qué hacen falta las dos:**
+`scrollWidth - clientWidth` daba positivo en cualquier página con un carrusel
+aunque no se moviera un píxel, así que ahora se pide desplazar y se mira si se
+desplazó. Pero esa prueba tiene su propio punto ciego: con `overflow-x: hidden`
+la página no se desplaza **y el contenido de fuera tampoco se puede leer**. La
+segunda comprobación recorre los elementos visibles y marca los que pasan del
+ancho del viewport y **no** cuelgan de un ancestro con `overflow-x: auto |
+scroll` —eso último es contenido pensado para desplazarse dentro de su caja—.
+`hidden` no exime: es justo el caso que busca.
+
+Los tres chequeos que sí hablan con el remoto (`rls`, `inventario`,
+`auditoria`) viven aparte, en `npm run verificar:remoto`: piden claves y no
+pueden ser un requisito de cada commit.
+
+Además, al cerrar un bloque:
+
 1. `npm run build` sin errores de tipos ni de ESLint.
 2. A 360px: sin scroll horizontal.
 3. Recorrido con teclado: foco visible, orden lógico, nada inalcanzable.

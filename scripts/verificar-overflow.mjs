@@ -15,6 +15,11 @@
 // tenga que arrastrar la pantalla de lado—: se pide desplazar y se mira si
 // se desplazó. Antes se sale 1 si hay
 // desbordamiento. Uso: PUERTO=3311 node scripts/verificar-overflow.mjs
+//
+// Si el puerto no contesta, el script levanta `next dev` él mismo y lo apaga
+// al terminar: `npm run verificar` tiene que poder correrse de un tirón antes
+// de cada commit, sin acordarse de dejar un servidor encendido en otra
+// terminal. Si ya hay uno, lo reutiliza y no lo toca.
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
@@ -52,9 +57,64 @@ const ejecutable =
     : "chrome");
 
 const perfil = fs.mkdtempSync(path.join(os.tmpdir(), "tsw-chrome-"));
+const BASE = `http://localhost:${PUERTO}`;
 
 function esperar(ms) {
   return new Promise((res) => setTimeout(res, ms));
+}
+
+/** ¿Contesta algo en el puerto? Cualquier respuesta HTTP cuenta, incluido un 404. */
+async function servidorVivo() {
+  try {
+    await fetch(BASE, { signal: AbortSignal.timeout(1500) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Levanta `next dev` en PUERTO y espera a que conteste. Devuelve null si ya
+ * había uno vivo, para no apagar el servidor de nadie en el `finally`.
+ */
+async function encenderServidor() {
+  if (await servidorVivo()) {
+    console.log(`Reutilizando el servidor que ya contesta en ${BASE}.`);
+    return null;
+  }
+
+  console.log(`Levantando next dev en ${BASE} (el primer arranque compila).`);
+  const servidor = spawn(
+    process.execPath,
+    ["node_modules/next/dist/bin/next", "dev", "-p", String(PUERTO)],
+    { stdio: "ignore", detached: process.platform !== "win32" },
+  );
+
+  // 120 s: el primer `next dev` de un árbol limpio compila antes de contestar.
+  for (let i = 0; i < 240; i++) {
+    if (await servidorVivo()) return servidor;
+    await esperar(500);
+  }
+  apagarServidor(servidor);
+  throw new Error(`next dev no contestó en ${BASE}.`);
+}
+
+/**
+ * Apaga el servidor con todo su árbol. Next bifurca un proceso hijo para
+ * servir, así que matar solo al padre deja el puerto ocupado y la siguiente
+ * corrida "reutiliza" un servidor con el código viejo.
+ */
+function apagarServidor(servidor) {
+  if (!servidor) return;
+  try {
+    if (process.platform === "win32") {
+      spawn("taskkill", ["/PID", String(servidor.pid), "/T", "/F"], { stdio: "ignore" });
+    } else {
+      process.kill(-servidor.pid, "SIGTERM");
+    }
+  } catch {
+    /* ya estaba muerto */
+  }
 }
 
 /** Enciende Chrome headless con puerto de depuración y espera el endpoint. */
@@ -142,7 +202,50 @@ async function abrirPestana() {
   };
 }
 
+/**
+ * Segunda comprobación, porque la del desplazamiento tiene un punto ciego:
+ * con `overflow-x: hidden` en html o body la página NO se desplaza aunque
+ * haya contenido recortado fuera del viewport. El visitante no puede
+ * arrastrar, pero tampoco puede leer lo que quedó cortado.
+ *
+ * Se buscan elementos visibles cuyo borde derecho pase del viewport (o cuyo
+ * borde izquierdo quede por detrás del origen) y que NO cuelguen de un
+ * ancestro con scroll horizontal propio —`overflow-x: auto | scroll`—, que
+ * es contenido pensado para desplazarse dentro de su caja: el carrusel del
+ * hero, la tira de pestañas.
+ *
+ * `overflow-x: hidden` NO exime: es justo el caso que esta comprobación
+ * existe para encontrar.
+ */
+const SONDA_RECORTE = [
+  "(function () {",
+  "  var ancho = document.documentElement.clientWidth;",
+  "  var malos = [];",
+  "  var todos = document.body.querySelectorAll('*');",
+  "  for (var i = 0; i < todos.length; i++) {",
+  "    var el = todos[i];",
+  "    var r = el.getBoundingClientRect();",
+  "    if (r.width < 1 || r.height < 1) continue;",
+  "    var s = getComputedStyle(el);",
+  "    if (s.visibility === 'hidden' || s.display === 'none' || s.opacity === '0') continue;",
+  "    if (r.right <= ancho + 1 && r.left >= -1) continue;",
+  "    var n = el.parentElement, enScroller = false;",
+  "    while (n && n !== document.documentElement) {",
+  "      var ox = getComputedStyle(n).overflowX;",
+  "      if (ox === 'auto' || ox === 'scroll') { enScroller = true; break; }",
+  "      n = n.parentElement;",
+  "    }",
+  "    if (enScroller) continue;",
+  "    var clases = (el.getAttribute('class') || '').split(/\\s+/).slice(0, 3).join('.');",
+  "    malos.push(el.tagName + ' .' + clases + ' [' + Math.round(r.left) + '..' + Math.round(r.right) + ']');",
+  "    if (malos.length >= 4) break;",
+  "  }",
+  "  return malos.join(' | ');",
+  "})()",
+].join("\n");
+
 let fallos = 0;
+const servidor = await encenderServidor();
 const chrome = await encenderChrome();
 const pesta = await abrirPestana();
 
@@ -165,9 +268,19 @@ try {
             return movido;
           })()`,
         );
-        const ok = exceso !== null && exceso <= 0;
-        if (!ok) fallos++;
-        console.log(`${ancho}px ${ruta} -> ${ok ? "ok" : `DESPLAZA ${exceso}px en horizontal`}`);
+        const recortados = await pesta.evaluar(SONDA_RECORTE);
+
+        const seDesplaza = exceso === null || exceso > 0;
+        const hayRecorte = Boolean(recortados);
+        if (seDesplaza || hayRecorte) fallos++;
+
+        const problema = [
+          seDesplaza ? `DESPLAZA ${exceso}px en horizontal` : null,
+          hayRecorte ? `SE SALE DEL VIEWPORT: ${recortados}` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        console.log(`${ancho}px ${ruta} -> ${problema || "ok"}`);
       } catch (error) {
         fallos++;
         console.log(`${ancho}px ${ruta} -> ERROR: ${error.message}`);
@@ -178,6 +291,7 @@ try {
   await pesta.cerrar();
 } finally {
   chrome.kill();
+  apagarServidor(servidor);
   // Windows retiene archivos del perfil unos segundos tras kill(): la
   // limpieza es mejor esfuerzo y no debe tumbar la verificación.
   try {
@@ -188,7 +302,7 @@ try {
 }
 
 if (fallos > 0) {
-  console.log(`FALLO: ${fallos} medición(es) con desplazamiento horizontal.`);
+  console.log(`FALLO: ${fallos} medición(es) con desplazamiento horizontal o contenido fuera del viewport.`);
   process.exit(1);
 }
-console.log("VERIFICACIÓN LIMPIA: ninguna ruta se desplaza en horizontal.");
+console.log("VERIFICACIÓN LIMPIA: ninguna ruta se desplaza en horizontal ni deja contenido fuera de él.");

@@ -24,7 +24,8 @@
     "verificar:rls": "tsx scripts/verificar-rls.ts",
     "verificar:inventario": "tsx scripts/verificar-inventario.ts",
     "verificar:auditoria": "tsx scripts/verificar-auditoria.ts",
-    "verificar": "npm run verificar:rls && npm run verificar:inventario && npm run verificar:auditoria",
+    "verificar": "npm run verificar:paleta && npm run verificar:politicas && npm run verificar:parametros && npm run verificar:club && npm run verificar:overflow",
+    "verificar:remoto": "npm run verificar:rls && npm run verificar:inventario && npm run verificar:auditoria",
     "advisors": "supabase db advisors --linked --type all --level info"
   },
   "dependencies": {
