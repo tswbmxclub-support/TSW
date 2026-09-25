@@ -49,6 +49,7 @@ function leerTexto(nombre) {
 }
 
 const MUESTRA_PRECIOS = leerBooleano("TIENDA_MUESTRA_PRECIOS");
+const LEGALES_APROBADAS = leerBooleano("LEGALES_APROBADAS");
 const NIT_CONFIRMADO = leerBooleano("nitConfirmado");
 const NIT = leerTexto("nit");
 const NIT_DV = Number(configuracion.match(/nitDv\s*:\s*(\d)/)?.[1]);
@@ -61,6 +62,12 @@ const RUTAS_TIENDA = ["/tienda", "/tienda/uniforme-oficial", "/carrito"];
 
 /** Donde el NIT aparecería si estuviera confirmado. */
 const RUTAS_CON_NIT = ["/", "/legal/datos", "/legal/terminos", "/legal/devoluciones"];
+
+/** Las tres páginas legales. */
+const RUTAS_LEGALES = ["/legal/datos", "/legal/terminos", "/legal/devoluciones"];
+
+/** El aviso de borrador, tal como lo escribe la plantilla. */
+const AVISO_BORRADOR = "Borrador pendiente de revisión legal";
 
 /** Todas las públicas, para la comprobación en negativo del NIT. */
 const RUTAS_PUBLICAS = [
@@ -103,7 +110,10 @@ apagarAlRecibirSenal(servidor);
 
 try {
   console.log("");
-  console.log(`Interruptores: TIENDA_MUESTRA_PRECIOS=${MUESTRA_PRECIOS}, nitConfirmado=${NIT_CONFIRMADO}`);
+  console.log(
+    `Interruptores: TIENDA_MUESTRA_PRECIOS=${MUESTRA_PRECIOS}, nitConfirmado=${NIT_CONFIRMADO}, ` +
+      `LEGALES_APROBADAS=${LEGALES_APROBADAS}`,
+  );
   console.log("");
 
   // --- Precios ------------------------------------------------------------
@@ -133,6 +143,30 @@ try {
       // Intl pone un espacio duro tras el signo: "$ 45.000" sale como "$&nbsp;45.000".
       const moneda = html.match(/\$(?:&nbsp;|\s|&#x27;)\s*\d[\d.,]*/);
       comprobar(`${ruta}: ningún importe con signo de peso en el HTML`, !moneda, moneda?.[0]);
+    }
+  }
+
+  // --- Páginas legales sin aprobar -----------------------------------------
+  //
+  // Dos cosas juntas, porque cada una sola no basta: el aviso le dice a quien
+  // llega que el texto no es definitivo, y el `noindex` evita que sea el
+  // resultado que un comprador encuentre en Google. Un texto legal sin revisar
+  // indexado es un documento que obliga y que nadie aprobó.
+  for (const ruta of RUTAS_LEGALES) {
+    const html = await pedir(ruta);
+    const tieneAviso = html.includes(AVISO_BORRADOR);
+    const tieneNoindex = /<meta name="robots"[^>]*noindex/i.test(html);
+
+    if (LEGALES_APROBADAS) {
+      comprobar(`${ruta}: aprobada, sin aviso de borrador`, !tieneAviso);
+      comprobar(`${ruta}: aprobada, indexable`, !tieneNoindex);
+    } else {
+      comprobar(`${ruta}: sin aprobar, avisa que es borrador`, tieneAviso);
+      comprobar(
+        `${ruta}: sin aprobar, lleva noindex`,
+        tieneNoindex,
+        tieneNoindex ? "" : html.match(/<meta name="robots"[^>]*>/i)?.[0] ?? "no hay meta robots",
+      );
     }
   }
 

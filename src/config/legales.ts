@@ -88,7 +88,7 @@ export const POLITICA_DATOS: ContenidoLegal = {
         {
           tipo: "parrafo",
           texto:
-            "Este sitio web no tiene registro de usuarios ni formularios de inscripción: no pide ni almacena datos personales de deportistas ni de acudientes. Los formatos de matrícula se descargan, se diligencian y se entregan en la sede, en papel.",
+            "Este sitio web no tiene registro de usuarios, formularios de inscripción ni carrito con datos de facturación: navegar por él y descargar los formatos no requiere entregar ningún dato. Los formatos de matrícula se diligencian y se entregan en la sede, en papel.",
         },
         {
           tipo: "parrafo",
@@ -98,7 +98,52 @@ export const POLITICA_DATOS: ContenidoLegal = {
         {
           tipo: "parrafo",
           texto:
-            "Los pedidos de la tienda se acuerdan por WhatsApp: el sitio arma el mensaje con los artículos y las tallas, y el envío lo hace la persona desde su propia aplicación. El sitio no cobra, no pide datos de tarjeta y no guarda datos de envío.",
+            "El sitio no cobra ni pide datos de tarjeta: no hay pasarela de pago conectada. Lo que sí hay es un canal de contacto, y por ahí sí llegan datos personales: ver la sección siguiente.",
+        },
+      ],
+    },
+    {
+      id: "whatsapp",
+      titulo: "Datos que llegan por WhatsApp",
+      bloques: [
+        {
+          tipo: "parrafo",
+          texto:
+            "Los pedidos de la tienda y las consultas se atienden por WhatsApp. El sitio arma el mensaje con los artículos y las tallas, y la persona lo envía desde su propia aplicación; cuando ese mensaje llega al WhatsApp de la corporación, la corporación pasa a tratar los datos que contiene.",
+        },
+        {
+          tipo: "definiciones",
+          items: [
+            {
+              termino: "Qué datos",
+              texto:
+                "El nombre del perfil de WhatsApp, el número de teléfono desde el que escribe y el contenido del mensaje, con lo que la persona decida incluir: artículos y tallas, dirección o punto de entrega, y el texto de su consulta.",
+            },
+            {
+              termino: "Para qué",
+              texto:
+                "Únicamente para atender ese pedido o esa consulta: confirmar disponibilidad y precio, acordar el pago y la entrega, y responder lo que se pregunte.",
+            },
+            {
+              termino: "Para qué NO",
+              texto:
+                "Esos datos no se usan para ninguna otra finalidad sin autorización previa y expresa de la persona. No se envían promociones, no se agrega el número a listas de difusión y no se comparte con terceros, salvo obligación legal.",
+            },
+            {
+              termino: "Cuánto se conservan",
+              texto:
+                "Mientras sea necesario para atender el pedido o la consulta y para cumplir las obligaciones legales, contables y de garantía que se deriven de la venta.",
+            },
+            {
+              termino: "Cómo ejercer sus derechos",
+              texto: `Por el mismo WhatsApp ${CONTACTO.telefono} o escribiendo a ${CONTACTO.correo}, con los plazos y el procedimiento de la sección "Cómo ejercer sus derechos" de esta política. Puede pedir que se supriman la conversación y sus datos cuando no exista un deber legal o contractual de conservarlos.`,
+            },
+            {
+              termino: "WhatsApp es un servicio de un tercero",
+              texto:
+                "La conversación viaja por la infraestructura de WhatsApp (Meta Platforms), que trata los datos según sus propias políticas. La corporación no controla ese tratamiento y responde por lo que hace con el mensaje una vez recibido.",
+            },
+          ],
         },
       ],
     },
@@ -109,7 +154,7 @@ export const POLITICA_DATOS: ContenidoLegal = {
         {
           tipo: "parrafo",
           texto:
-            "Fuera del sitio web, en la relación deportiva y comercial, la corporación recolecta:",
+            "Además de lo anterior, en la relación deportiva y comercial —que ocurre en la sede y no en el sitio web—, la corporación recolecta:",
         },
         {
           tipo: "lista",

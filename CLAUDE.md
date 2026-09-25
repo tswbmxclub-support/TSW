@@ -649,7 +649,7 @@ cero si cae cualquiera:
 | `verificar:parametros` | Una llamada a RPC sin un parámetro que el cuerpo exige, aunque `tsc` pase |
 | `verificar:club` | Que `/semilleros` caiga a un club equivocado o a un programa sin niveles |
 | `verificar:legales` | Un NIT cuyo dígito de verificación no cuadra con el algoritmo DIAN |
-| `verificar:payload` | Que viaje al navegador lo que está oculto: precios en modo catálogo, NIT sin confirmar |
+| `verificar:payload` | Que viaje al navegador lo que está oculto: precios en modo catálogo, NIT sin confirmar, y que las páginas legales sin aprobar avisen y lleven `noindex` |
 | `verificar:overflow` | Scroll horizontal, y contenido recortado fuera del viewport |
 
 `verificar:overflow` levanta `next dev` él mismo si el puerto no contesta y lo
@@ -692,6 +692,22 @@ De ahí salió un fallo real: el token `--foco` da **1.62:1 sobre
 para los cuatro fondos de página y la franja es un quinto. Sobre franja el
 anillo va en blanco (6.61:1), y eso lo decide `ANILLO` en `Boton`, no cada
 página.
+
+### Antes de fusionar a main: `npm run verificar:completo`
+
+`npm run verificar && npm run build && npm run verificar:foco`, en ese orden y
+no en el del enunciado: `verificar` levanta `next dev`, que **pisa el id del
+build de producción**, y `verificar:foco` necesita `next start`. Con el build en
+medio se construye una vez y sirve para el foco.
+
+**No se fusiona a `main` con `LEGALES_APROBADAS` en `false`.** Mientras ese
+interruptor esté apagado, las tres páginas de `/legal` son borradores: abren con
+el aviso "Borrador pendiente de revisión legal" y llevan `noindex`. Eso está
+bien para la rama y para el preview que revisa la cliente, y no está bien en
+producción: un texto legal sin revisar, indexado, es un documento que obliga a
+la corporación y que nadie aprobó. Se enciende cuando el abogado devuelva las
+tres revisadas, y entonces `verificar:payload` cambia de lado solo y exige que
+el aviso ya no esté y que la página sea indexable.
 
 Además, al cerrar un bloque:
 

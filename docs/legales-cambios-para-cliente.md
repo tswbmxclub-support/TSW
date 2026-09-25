@@ -75,7 +75,32 @@ correspondiente.»
 guardar una foto de competencia si la autorización no está marcada; no depende de
 que alguien se acuerde.
 
-### 1.6 Retirado: la dirección de notificación
+### 1.6 Añadido: los datos que llegan por WhatsApp
+
+**Añadido** una sección propia, «Datos que llegan por WhatsApp», y **corregida** la
+sección anterior, que daba a entender demasiado.
+
+El texto nuevo dice qué datos son (el nombre del perfil, el número de teléfono y
+el contenido del mensaje, con lo que el comprador escriba: tallas, dirección de
+entrega, lo que pregunte), para qué se usan (atender ese pedido o esa consulta y
+nada más), que **no se usan para otra cosa sin autorización** —ni para enviar
+promociones, ni para agregarlos a una lista de difusión—, cuánto se conservan
+(mientras haga falta para el pedido y las obligaciones legales), y que los
+derechos se ejercen por el mismo canal o por correo.
+
+**Motivo, y es una corrección de algo que yo escribí mal.** La versión anterior
+decía que el sitio «no pide ni almacena datos personales» y que el envío del
+mensaje «lo hace la persona desde su propia aplicación». Las dos frases son
+ciertas sobre el sitio web, pero juntas **sugieren que no hay tratamiento de
+datos, y sí lo hay**: cuando el mensaje llega al WhatsApp de la corporación,
+usted recibe un nombre, un teléfono y un texto, y desde ese momento es
+responsable de esos datos ante la Ley 1581. Una política que insinúe lo
+contrario deja sin cubrir el único canal por el que hoy entran datos de verdad.
+
+Lo que sí sigue diciendo, porque es cierto y le conviene: el sitio no tiene
+formularios ni cuentas, y los formatos de matrícula se entregan en papel.
+
+### 1.7 Retirado: la dirección de notificación
 
 > «Dirección de notificación: [dirección que aparece en el RUT].»
 
@@ -83,7 +108,7 @@ que alguien se acuerde.
 de datos, y ponerlo mal es peor que no ponerlo. Mientras tanto figuran el correo
 y el teléfono como canal de atención. **Pendiente suyo.**
 
-### 1.7 Oculto: el NIT
+### 1.8 Oculto: el NIT
 
 **Oculto hasta que lo confirme con el RUT.** En su propia lista de pendientes
 anotó que el dígito de verificación lo calculó usted. Lo verifiqué con el
@@ -92,7 +117,7 @@ esté bien; pero el documento se publica con su NIT y prefiero que salga del RUT
 El día que lo confirme aparece en el pie y en las tres páginas legales con un
 solo cambio. **Pendiente suyo.**
 
-### 1.8 Cambiado: la fecha de vigencia
+### 1.9 Cambiado: la fecha de vigencia
 
 > «Esta política rige desde el [fecha de publicación].»
 
@@ -200,6 +225,26 @@ Un pedido acordado por WhatsApp es a distancia, así que mi lectura es que el
 derecho **sí aplica**. Pero esa lectura es mía y no soy abogado: es la frase que
 más conviene que revise un asesor, porque de ella depende si usted debe aceptar
 devoluciones sin motivo durante 5 días hábiles.
+
+> #### Pregunta para el abogado
+>
+> El artículo 47 de la Ley 1480 de 2011 excluye del derecho de retracto algunos
+> bienes. **¿Aplican esas excepciones a los productos de TSW?** Concretamente:
+>
+> 1. **Bienes confeccionados según especificaciones del consumidor o
+>    personalizados.** Un uniforme o un jersey con el nombre o el número del
+>    deportista se produce para esa persona y no se puede revender. ¿Cae en la
+>    excepción, y desde qué grado de personalización —talla elegida, nombre
+>    estampado, número de competencia—?
+> 2. **Bienes de uso personal.** Los guantes, el buso y el jersey son prendas de
+>    vestir de contacto directo. ¿Entran en esta excepción, y cambia algo que se
+>    devuelvan sin uso, con etiquetas y empaque?
+>
+> La respuesta decide si el texto publicado debe enumerar excepciones o quedarse
+> como está. **Hasta que la haya, la página NO las menciona**: prometer menos
+> derechos de los que la ley da es lo que se sanciona, y el texto actual concede
+> el retracto sin excepciones. Corregir a la baja es fácil; haberlo negado sin
+> base, no.
 
 ### 3.3 Cambiado: la reversión del pago
 

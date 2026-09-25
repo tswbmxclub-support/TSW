@@ -51,6 +51,21 @@ export const IDENTIDAD_LEGAL = {
   direccionNotificacion: null,
 } as const;
 
+/**
+ * Las tres páginas legales han pasado revisión de un abogado.
+ *
+ * En false —lo de hoy— cada una abre con un aviso visible de que es un borrador
+ * y lleva `noindex`. El texto es la adaptación técnica de los borradores de la
+ * cliente (ver docs/legales-cambios-para-cliente.md): sirve para que ella lo
+ * revise y para que los enlaces del pie no caigan en un 404, pero un texto legal
+ * sin revisar indexado en Google es un documento que obliga y que nadie aprobó.
+ *
+ * `noindex` y no bloquear la página: la cliente y su asesor tienen que poder
+ * leerla en el sitio. Lo que no debe pasar es que sea el resultado que un
+ * comprador encuentra buscando "política de devoluciones TSW".
+ */
+export const LEGALES_APROBADAS = false;
+
 /** Lo que `nitPublicable` necesita saber. Suelto, para poder probarlo en los dos estados. */
 export type IdentidadNit = {
   nit: string;

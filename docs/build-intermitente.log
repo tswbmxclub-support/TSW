@@ -1,0 +1,38 @@
+=== Intento de reproducir el fallo intermitente de `npm run build` ===
+
+Síntoma observado una sola vez, el 2026-09-24, durante el bloque de las páginas
+legales:
+
+    Export encountered an error on /admin/(panel)/page: /admin, exiting the build.
+     ⨯ Next.js build worker exited with code: 1 and signal: null
+
+El reintento inmediato, sin cambiar nada, pasó limpio.
+
+--- Prueba: 5 builds seguidos, borrando .next entre corridas -------------------
+fecha: 2026-09-25
+commit: b6ff4e1
+guion: scripts de la sesión, `rm -rf .next && npm run build` x5
+
+    corrida 1 -> codigo 0
+    corrida 2 -> codigo 0
+    corrida 3 -> codigo 0
+    corrida 4 -> codigo 0
+    corrida 5 -> codigo 0
+    RESUMEN: 0 de 5 corridas fallaron
+
+--- Conclusión ----------------------------------------------------------------
+**NO REPRODUCIDO en 5 corridas. No está arreglado: está sin reproducir.**
+
+No se cambió nada para intentar corregirlo, porque no hay causa identificada y
+un arreglo a ciegas sobre un fallo que no se reproduce solo añade código.
+
+Lo que sí se sabe del contexto en que ocurrió, para la próxima vez:
+
+- La ruta que falló, `/admin`, es la única del panel que Next intentó exportar y
+  la única que consulta el remoto durante el build.
+- Ocurrió justo después de matar un `next start` y con otro servidor de
+  desarrollo del proyecto vivo en otro puerto: dos procesos escribiendo en el
+  mismo `.next`. Esa es la hipótesis más probable y no se ha confirmado.
+- Si vuelve a pasar: guardar el log completo aquí, anotar qué servidores estaban
+  encendidos, y comprobar si `.next` tenía artefactos de dev mezclados con los
+  de producción.

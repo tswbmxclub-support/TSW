@@ -24,6 +24,7 @@
     "verificar:payload": "node scripts/verificar-payload.mjs",
     "verificar:overflow": "node scripts/verificar-overflow.mjs",
     "verificar:foco": "node scripts/verificar-foco.mjs",
+    "verificar:completo": "npm run verificar && npm run build && npm run verificar:foco",
     "verificar:rls": "tsx scripts/verificar-rls.ts",
     "verificar:inventario": "tsx scripts/verificar-inventario.ts",
     "verificar:auditoria": "tsx scripts/verificar-auditoria.ts",

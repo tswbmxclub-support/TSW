@@ -47,6 +47,9 @@ const RUTAS = process.env.RUTAS
       "/semilleros?club=bmx-mastercross",
       "/tienda",
       "/matriculas",
+      // Una legal: el índice del documento son ~10 enlaces nuevos y el aviso de
+      // borrador es un color que no aparece en ninguna otra vista.
+      "/legal/datos",
       "/admin/login",
     ];
 
