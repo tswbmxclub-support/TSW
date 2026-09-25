@@ -246,6 +246,16 @@ const SONDA_RECORTE = [
 
 let fallos = 0;
 const servidor = await encenderServidor();
+
+// Ctrl-C no pasa por el `finally`, y en Unix el servidor va en su propio grupo
+// de procesos —eso es lo que hace `detached`—, así que la señal del terminal no
+// le llega. Sin esto, cortar la verificación a mano dejaría el puerto ocupado.
+for (const senal of ["SIGINT", "SIGTERM"]) {
+  process.once(senal, () => {
+    apagarServidor(servidor);
+    process.exit(130);
+  });
+}
 const chrome = await encenderChrome();
 const pesta = await abrirPestana();
 

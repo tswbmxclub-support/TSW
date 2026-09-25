@@ -1,6 +1,6 @@
 import { PasosRuta, type PasoRuta } from "@/components/ui";
 import { MATRICULAS } from "@/config/contenido";
-import { CONTACTO } from "@/config/sitio";
+import { CONTACTO, SEDES_EN_LINEA, UBICACION } from "@/config/sitio";
 
 /**
  * Los cuatro pasos del proceso, en la hoja de ruta del rediseño. Lo que el
@@ -65,9 +65,9 @@ const PASOS: PasoRuta[] = [
         <p>Entrega la carpeta completa en la sede del club. No hay radicación en línea.</p>
         <dl className="mt-3 grid gap-2">
           <div>
-            <dt className="font-semibold text-azul-profundo">Dirección</dt>
+            <dt className="font-semibold text-azul-profundo">Sedes</dt>
             <dd>
-              {CONTACTO.direccion}, {CONTACTO.ciudad}
+              {SEDES_EN_LINEA} — {UBICACION}
             </dd>
           </div>
           <div>

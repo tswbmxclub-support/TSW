@@ -11,6 +11,16 @@ import type { CompetenciaConResultados } from "../types";
  * Bloque de resultados de la portada. Las pestañas de año refiltran de verdad:
  * los datos llegan completos desde el servidor y el filtrado es en memoria, sin
  * ida y vuelta a la red.
+ *
+ * Si no hay ni un resultado publicado, el bloque NO se renderiza: ni título ni
+ * estado vacío. Lo pidió la cliente ("ocultar Últimos resultados mientras no
+ * haya resultados"), y tiene razón: una portada que estrena con "Todavía no hay
+ * competencias publicadas" anuncia que el sitio está a medias.
+ *
+ * La condición es tener RESULTADOS, no competencias. Una competencia publicada
+ * sin podios cargados no da nada que mirar en este bloque —la tabla saldría con
+ * "Resultados pendientes de publicar"—, y sigue estando en /competencias, que es
+ * la página que sí las lista todas.
  */
 export function UltimosResultados({
   competencias,
@@ -19,30 +29,26 @@ export function UltimosResultados({
   competencias: CompetenciaConResultados[];
   limitePorAnio?: number;
 }) {
+  const conResultados = useMemo(
+    () => competencias.filter((c) => c.resultados.length > 0),
+    [competencias],
+  );
+
   const anios = useMemo(() => {
-    const unicos = new Set(competencias.map((c) => c.fecha.slice(0, 4)));
+    const unicos = new Set(conResultados.map((c) => c.fecha.slice(0, 4)));
     return [...unicos].sort((a, b) => Number(b) - Number(a));
-  }, [competencias]);
+  }, [conResultados]);
 
   const [anio, setAnio] = useState(anios[0] ?? "");
 
   const visibles = useMemo(
-    () => competencias.filter((c) => c.fecha.startsWith(anio)).slice(0, limitePorAnio),
-    [competencias, anio, limitePorAnio],
+    () => conResultados.filter((c) => c.fecha.startsWith(anio)).slice(0, limitePorAnio),
+    [conResultados, anio, limitePorAnio],
   );
 
-  if (competencias.length === 0) {
-    return (
-      <section aria-labelledby="titulo-resultados" className="contenedor py-16 lg:py-20">
-        <h2 id="titulo-resultados" className="text-3xl sm:text-4xl">
-          Últimos resultados
-        </h2>
-        <p className="mt-4 text-texto-sec">
-          Todavía no hay competencias publicadas. Aparecerán aquí en cuanto se carguen.
-        </p>
-      </section>
-    );
-  }
+  // Después de los hooks, nunca antes: el orden de los hooks no puede depender
+  // de los datos.
+  if (conResultados.length === 0) return null;
 
   return (
     <section aria-labelledby="titulo-resultados" className="bg-gris-frio">
@@ -80,39 +86,35 @@ export function UltimosResultados({
 
                         <h3 className="mt-3 text-xl">{competencia.titulo}</h3>
 
-                        {competencia.resultados.length === 0 ? (
-                          <p className="mt-4 text-texto-sec">Resultados pendientes de publicar.</p>
-                        ) : (
-                          <table className="mt-4 w-full text-left text-sm">
-                            <caption className="sr-only">
-                              Resultados de {competencia.titulo}
-                            </caption>
-                            <thead>
-                              <tr className="border-b border-gris-borde text-texto-sec">
-                                <th scope="col" className="py-2 pr-3 font-semibold">
-                                  Puesto
-                                </th>
-                                <th scope="col" className="py-2 pr-3 font-semibold">
-                                  Rider
-                                </th>
-                                <th scope="col" className="py-2 font-semibold">
-                                  Categoría
-                                </th>
+                        <table className="mt-4 w-full text-left text-sm">
+                          <caption className="sr-only">
+                            Resultados de {competencia.titulo}
+                          </caption>
+                          <thead>
+                            <tr className="border-b border-gris-borde text-texto-sec">
+                              <th scope="col" className="py-2 pr-3 font-semibold">
+                                Puesto
+                              </th>
+                              <th scope="col" className="py-2 pr-3 font-semibold">
+                                Rider
+                              </th>
+                              <th scope="col" className="py-2 font-semibold">
+                                Categoría
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {competencia.resultados.slice(0, 5).map((resultado) => (
+                              <tr key={resultado.id} className="border-b border-gris-borde/60">
+                                <td className="py-2 pr-3 font-display text-lg text-acento-oscuro">
+                                  {resultado.puesto}
+                                </td>
+                                <td className="py-2 pr-3">{resultado.rider}</td>
+                                <td className="py-2 text-texto-sec">{resultado.categoria}</td>
                               </tr>
-                            </thead>
-                            <tbody>
-                              {competencia.resultados.slice(0, 5).map((resultado) => (
-                                <tr key={resultado.id} className="border-b border-gris-borde/60">
-                                  <td className="py-2 pr-3 font-display text-lg text-acento-oscuro">
-                                    {resultado.puesto}
-                                  </td>
-                                  <td className="py-2 pr-3">{resultado.rider}</td>
-                                  <td className="py-2 text-texto-sec">{resultado.categoria}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
+                            ))}
+                          </tbody>
+                        </table>
 
                         <Boton href="/competencias" variante="fantasma" tamano="sm" className="mt-4 px-0">
                           Ver el historial completo

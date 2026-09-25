@@ -15,6 +15,8 @@
  * administran desde el panel y se leen de Supabase.
  */
 
+import { CONTACTO, IDENTIDAD_LEGAL, SEDES_EN_LINEA, UBICACION } from "./sitio";
+
 // --- Deportes ------------------------------------------------------------------
 
 export type Deporte = {
@@ -77,7 +79,9 @@ export const PORTADA = {
   /** Etiqueta pequeña sobre el titular: tipo de entidad. */
   etiquetaEntidad: "[Entidad deportiva]",
   presentacion: "[Presentación de la corporación en dos frases: qué deportes forma, para quién y con qué enfoque.]",
-  aval: "[Aval, reconocimiento o afiliación de la corporación]",
+  // Del documento de la cliente (seccion 1). Se arma con IDENTIDAD_LEGAL para
+  // no repetir las dos afiliaciones en dos archivos.
+  aval: `${IDENTIDAD_LEGAL.reconocimiento} · ${IDENTIDAD_LEGAL.afiliacion}`,
   cifras: [
     { valor: null, sufijo: "+", etiqueta: "[Deportistas formados]", detalle: "[Texto de apoyo de la cifra.]" },
     { valor: null, sufijo: "", etiqueta: "[Años de trayectoria]", detalle: "[Texto de apoyo de la cifra.]" },
@@ -104,10 +108,19 @@ export const PORTADA = {
     descripcion: "[Qué hay en la sede: pista, oficina, taquilla.]",
     imagen: "/imagenes/sede.jpg",
     imagenAlt: "[Foto o mapa de la sede]",
+    /**
+     * Los canales que el documento cubre. El de dirección de calle NO está: la
+     * cliente da dos pistas y un barrio, y nada más. Un canal "Sede
+     * administrativa" con "[Dirección completa]" dentro es peor que no tenerlo.
+     */
     canales: [
-      { id: "sede", titulo: "Sede administrativa", texto: "[Dirección completa y punto de referencia.]" },
-      { id: "horario", titulo: "Horarios", texto: "[Días y horas de atención y de entrenamiento.]" },
-      { id: "linea", titulo: "Línea directa y WhatsApp", texto: "[Teléfono y correo de atención.]" },
+      { id: "sedes", titulo: "Sedes de entrenamiento", texto: `${SEDES_EN_LINEA} — ${UBICACION}` },
+      { id: "horario", titulo: "Horario de atención", texto: CONTACTO.horario },
+      {
+        id: "linea",
+        titulo: "WhatsApp y correo",
+        texto: `${CONTACTO.telefono} · ${CONTACTO.telefonoSecundario} · ${CONTACTO.correo}`,
+      },
     ],
   },
 } as const;
@@ -154,7 +167,7 @@ export const MATRICULAS = {
     },
   ] satisfies CategoriaMatricula[],
   documentosBajada:
-    "Cada archivo indica su versión vigente y su fecha de publicación. [Los formatos por deporte llegarán con el esquema; hoy son comunes.]",
+    "Cada archivo indica su versión vigente y su fecha de publicación. Estos formatos aplican para todos los clubes y programas de la corporación.",
   /** Paso 2 de la hoja de ruta. */
   firmas: "[Indicar si se firman a mano o se aceptan firmas digitales.]",
   /** Paso 3: anexos que acompañan a los formatos. */

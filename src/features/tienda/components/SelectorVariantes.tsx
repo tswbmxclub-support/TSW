@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { Aviso, Boton, Stepper } from "@/components/ui";
 import { useCarrito } from "@/features/pedidos/carrito";
+import { TIENDA_MUESTRA_PRECIOS } from "@/config/sitio";
 import { formatearPrecio } from "@/lib/utils";
 import { disponible, type ProductoConVariantes } from "../types";
 
@@ -90,8 +91,8 @@ export function SelectorVariantes({ producto }: { producto: ProductoConVariantes
 
       {variante && (
         <p className="mt-3 text-sm text-texto-sec">
-          {unidades <= 5 ? `¡Quedan ${unidades} unidades!` : `${unidades} unidades disponibles`}{" "}
-          · {formatearPrecio(variante.precio_centavos)}
+          {unidades <= 5 ? `¡Quedan ${unidades} unidades!` : `${unidades} unidades disponibles`}
+          {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(variante.precio_centavos)}</>}
         </p>
       )}
 

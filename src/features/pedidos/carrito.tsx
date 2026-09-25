@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { TIENDA_MUESTRA_PRECIOS } from "@/config/sitio";
 import { formatearPrecio } from "@/lib/utils";
 import { consultarVariantesCarrito, type VarianteCarrito } from "./acciones-carrito";
 import { construirMensajePedido } from "./whatsapp-pedido";
@@ -163,7 +164,9 @@ export function ProveedorCarrito({ children }: { children: ReactNode }) {
         }
         const notas: string[] = [];
         const previo = previos[linea.varianteId];
-        if (previo && previo.precioCentavos !== fresco.precioCentavos) {
+        // Con la tienda en modo catálogo el visitante nunca vio un precio, así
+        // que avisarle de que "cambió" solo lo confundiría.
+        if (TIENDA_MUESTRA_PRECIOS && previo && previo.precioCentavos !== fresco.precioCentavos) {
           notas.push(`El precio cambió de ${formatearPrecio(previo.precioCentavos)} a ${formatearPrecio(fresco.precioCentavos)}.`);
         }
         let ajustada = linea;

@@ -5,6 +5,7 @@ import { BloqueCTA, BotonWhatsApp, Card, CardCuerpo, HeroPagina, Seccion, Seccio
 import { listarProductos } from "@/features/tienda/queries";
 import { CatalogoProductos } from "@/features/tienda/components/CatalogoProductos";
 import { TIENDA } from "@/config/contenido";
+import { TIENDA_QUE_CONFIRMA } from "@/config/sitio";
 import { SelectorDeportePublico } from "@/features/publico/components/SelectorDeportePublico";
 import { DEPORTES_PUBLICO, deporteDeParametros, type ParametrosBusqueda } from "@/features/publico/deporte-publico";
 
@@ -37,7 +38,7 @@ export default async function PaginaTienda({ searchParams }: Props) {
       <HeroPagina
         antetitulo="Dotación oficial"
         titulo={`Tienda · ${deporte.nombre}`}
-        bajada="Uniformes, protección y merchandising de la corporación. Elige producto y talla, y envía el pedido por WhatsApp: el club confirma disponibilidad y te indica cómo pagar."
+        bajada={`Uniformes, protección y merchandising de la corporación. Elige producto y talla, y envía el pedido por WhatsApp: ${TIENDA_QUE_CONFIRMA}.`}
         lateral={<SelectorDeportePublico deportes={DEPORTES_PUBLICO} valor={deporte.id} />}
       />
 

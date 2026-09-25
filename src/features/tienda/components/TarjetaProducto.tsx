@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { Badge, CardEnlace, CardCuerpo } from "@/components/ui";
 import { urlPublicaStorage } from "@/lib/supabase/storage";
+import { TIENDA_MUESTRA_PRECIOS } from "@/config/sitio";
 import { formatearPrecio } from "@/lib/utils";
 import {
   BUCKET_PRODUCTOS,
@@ -67,16 +68,20 @@ export function TarjetaProducto({
         )}
         <div className="mt-2 flex items-start justify-between gap-3">
           <h3 className="text-lg leading-snug">{producto.nombre}</h3>
-          <p className="shrink-0 text-right font-display text-xl text-azul-profundo">
-            {desde === null ? (
-              <span className="text-sm font-normal text-texto-sec">Precio pendiente</span>
-            ) : (
-              <>
-                <span className="block text-xs font-normal uppercase tracking-wide text-texto-sec">Desde</span>
-                {formatearPrecio(desde)}
-              </>
-            )}
-          </p>
+          {/* Con la tienda en modo catálogo no se reserva el hueco de la cifra:
+              un "Precio pendiente" en cada tarjeta es ruido repetido seis veces. */}
+          {TIENDA_MUESTRA_PRECIOS && (
+            <p className="shrink-0 text-right font-display text-xl text-azul-profundo">
+              {desde === null ? (
+                <span className="text-sm font-normal text-texto-sec">Precio pendiente</span>
+              ) : (
+                <>
+                  <span className="block text-xs font-normal uppercase tracking-wide text-texto-sec">Desde</span>
+                  {formatearPrecio(desde)}
+                </>
+              )}
+            </p>
+          )}
         </div>
         {producto.descripcion && <p className="mt-2 line-clamp-2 text-sm text-texto-sec">{producto.descripcion}</p>}
 

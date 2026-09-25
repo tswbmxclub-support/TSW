@@ -15,7 +15,7 @@ import {
   SeccionTitulo,
 } from "@/components/ui";
 import { MATRICULAS } from "@/config/contenido";
-import { CONTACTO } from "@/config/sitio";
+import { CONTACTO, SEDES_EN_LINEA, UBICACION } from "@/config/sitio";
 import { ListaDocumentos } from "@/features/matriculas/components/ListaDocumentos";
 import { PasosMatricula } from "@/features/matriculas/components/PasosMatricula";
 import { listarDocumentosPublicados } from "@/features/matriculas/queries";
@@ -84,9 +84,9 @@ export default async function PaginaMatriculas({ searchParams }: Props) {
             <Indicador
               variante="cifra"
               oscuro
-              etiqueta="Sede de radicación"
-              valor={<span className="text-3xl sm:text-4xl">{CONTACTO.direccion}</span>}
-              detalle={`${CONTACTO.ciudad} · ${CONTACTO.horario}`}
+              etiqueta="Sedes de radicación"
+              valor={<span className="text-2xl sm:text-3xl">{SEDES_EN_LINEA}</span>}
+              detalle={`${UBICACION} · ${CONTACTO.horario}`}
               className="h-full"
             />
           </Aparece>

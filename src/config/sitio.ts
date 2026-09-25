@@ -1,31 +1,118 @@
 /**
  * Identidad, contacto y navegación del sitio.
  *
- * Todo lo que aparece entre corchetes es un placeholder: se reemplaza aquí
- * cuando el club entregue la información. Ninguna página inventa teléfonos ni
- * direcciones. El resto del contenido fijo (portada, matrículas, semilleros,
- * tienda, deportes) vive en ./contenido.ts.
+ * Los datos de contacto salen del documento de la cliente (sección 1,
+ * "Elementos globales"), y solo de ahí. Lo que el documento no trae —dirección
+ * de calle, dirección de notificación del RUT— no aparece: no hay placeholder
+ * entre corchetes que lo tape, porque un `[Dirección]` publicado es un error
+ * visible y un dato inventado es un error invisible. El resto del contenido
+ * fijo (portada, matrículas, semilleros, tienda) vive en ./contenido.ts.
  */
 
 export const SITIO = {
   nombre: "TSW",
-  nombreLargo: "[Corporación Deportiva TSW]",
+  nombreLargo: "Corporación Deportiva TSW",
   /** Texto corto bajo el logo: qué es la entidad. */
   subtitulo: "Corporación deportiva",
-  lema: "[Lema de la corporación]",
+  lema: "No dudamos de las cosas maravillosas que puede hacer el deporte en el ser humano.",
   descripcion:
     "Corporación deportiva: matrículas, semilleros, competencias y dotación oficial de cada deporte.",
 } as const;
 
-export const CONTACTO = {
-  telefono: "[+57 300 000 0000]",
-  telefonoEnlace: "tel:",
-  correo: "[correo@dominio.com]",
-  direccion: "[Dirección de la sede]",
-  ciudad: "[Ciudad]",
-  horario: "[Horario de atención]",
-  // El WhatsApp no va aquí: sale de NEXT_PUBLIC_WHATSAPP_NUMERO (src/lib/whatsapp.ts).
+/**
+ * Identificación legal de la corporación, para las páginas de /legal.
+ *
+ * `nitConfirmado` en false mantiene el NIT OCULTO en todo el sitio. El
+ * documento de la cliente trae `902.072.786-0`, pero su propia lista de
+ * pendientes dice que el dígito de verificación lo calculó ella y hay que
+ * confirmarlo con el RUT. Un NIT con el dígito equivocado en la política de
+ * datos es peor que no ponerlo: identifica a otra entidad, o a ninguna.
+ *
+ * El dígito coincide con el algoritmo de la DIAN —lo cruza
+ * `npm run verificar:legales` contra `calcularDvNit`—, así que lo que falta no
+ * es la aritmética: es que la cliente confirme que el NIT base es ese. Cuando
+ * mande el RUT, esto pasa a true y aparece; si al teclearlo se cambia una
+ * cifra, la verificación corta antes del commit.
+ */
+export const IDENTIDAD_LEGAL = {
+  /** NIT base, sin dígito de verificación. */
+  nit: "902.072.786",
+  /** Dígito de verificación, tal como lo escribió la cliente. */
+  nitDv: 0,
+  nitConfirmado: false,
+  /** Del documento, sección 1: son afiliaciones, no un registro tributario. */
+  reconocimiento: "Reconocimiento deportivo INDER Medellín",
+  afiliacion: "Afiliada a la Liga Antioqueña de Ciclismo",
+  /**
+   * Dirección de notificación de las páginas legales. La cliente anotó "la del
+   * RUT" y no la mandó, así que sigue en su lista de pendientes y las páginas
+   * legales no la muestran.
+   */
+  direccionNotificacion: null,
 } as const;
+
+/**
+ * Contacto, del documento de la cliente (sección 1).
+ *
+ * Dos números, los dos de WhatsApp. El primero es el de los botones de todo el
+ * sitio —el documento lo fija en `wa.me/573227073535`, y ese número vive en
+ * `NEXT_PUBLIC_WHATSAPP_NUMERO`, no aquí: `src/lib/whatsapp.ts` es el único
+ * sitio que construye enlaces de WhatsApp—. Lo de aquí es el número escrito,
+ * para leerlo y para el enlace `tel:`.
+ *
+ * No hay dirección de calle: el documento da sedes (dos pistas) y barrio, y
+ * nada más. Por eso `sedes` es una lista y no un campo `direccion`: con dos
+ * pistas, un solo renglón obligaría a elegir una, y elegir sería inventar.
+ */
+export const CONTACTO = {
+  telefono: "+57 322 707 3535",
+  telefonoSecundario: "+57 321 688 5078",
+  correo: "tswclubbmx@gmail.com",
+  sedes: ["Pista Antonio Roldán Betancur", "Pista Mariana Pajón"],
+  barrio: "Barrio Belén",
+  ciudad: "Medellín",
+  horario: "Lunes a sábado, de 10:00 a. m. a 9:00 p. m.",
+} as const;
+
+/** "Barrio Belén, Medellín", en un solo sitio para no repetir la coma. */
+export const UBICACION = `${CONTACTO.barrio}, ${CONTACTO.ciudad}`;
+
+/** Las dos sedes en un renglón, para cuando no cabe una lista. */
+export const SEDES_EN_LINEA = CONTACTO.sedes.join(" · ");
+
+/**
+ * Número para el atributo `href` de un enlace `tel:`: sin espacios ni signos
+ * que el marcador del teléfono no entiende.
+ */
+export function enlaceTelefono(numero: string): string {
+  return `tel:${numero.replace(/[^\d+]/g, "")}`;
+}
+
+/**
+ * La tienda enseña precios o no.
+ *
+ * En false, el catálogo y el detalle no muestran ninguna cifra y el pedido sale
+ * por WhatsApp sin importes: la cliente lo pidió así en su lista de ajustes
+ * ("Tienda: ocultarla o convertirla en catálogo con el botón Pedir por WhatsApp
+ * hasta que haya precios") porque los seis productos todavía no tienen precio
+ * ni tallas definitivas.
+ *
+ * Es un interruptor y no un borrado del código de precios: el esquema, las
+ * variantes y `formatearPrecio` siguen intactos, y el panel sí muestra los
+ * precios. Cuando lleguen, esto pasa a true y la tienda vuelve a ser tienda.
+ */
+export const TIENDA_MUESTRA_PRECIOS = false;
+
+/**
+ * Qué confirma el club cuando llega el pedido. En un solo sitio porque lo dicen
+ * cuatro textos —tienda, detalle, carrito y el aviso del resumen— y con la
+ * tienda en modo catálogo hay que nombrar el precio: prometer solo "cómo pagar"
+ * donde no se ve ninguna cifra deja al comprador esperando un total que nunca
+ * apareció.
+ */
+export const TIENDA_QUE_CONFIRMA = TIENDA_MUESTRA_PRECIOS
+  ? "el club confirma disponibilidad y te indica cómo pagar"
+  : "el club confirma disponibilidad, te da el precio y te indica cómo pagar";
 
 /**
  * Las tres cuentas de Instagram del documento del cliente (22-09-2026). No hay

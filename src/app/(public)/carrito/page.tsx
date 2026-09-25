@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { HeroPagina } from "@/components/ui";
+import { TIENDA_QUE_CONFIRMA } from "@/config/sitio";
 import { ListaCarrito } from "@/features/pedidos/components/ListaCarrito";
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function PaginaCarrito() {
         tono="oscuro"
         antetitulo="Tienda"
         titulo="Carrito"
-        bajada="Revisa tallas y cantidades y envía el pedido por WhatsApp. El club confirma disponibilidad y te indica cómo pagar."
+        bajada={`Revisa tallas y cantidades y envía el pedido por WhatsApp: ${TIENDA_QUE_CONFIRMA}.`}
       />
 
       <div className="contenedor py-12 sm:py-16 lg:py-20">

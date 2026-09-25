@@ -7,11 +7,11 @@ import { Aparece } from "@/lib/animaciones";
 import { Aviso, Badge, BotonWhatsApp, Seccion, SeccionTitulo } from "@/components/ui";
 import { ErrorNoEncontrado } from "@/lib/errors/errores";
 import { urlPublicaStorage } from "@/lib/supabase/storage";
+import { TIENDA_MUESTRA_PRECIOS, TIENDA_QUE_CONFIRMA } from "@/config/sitio";
 import { formatearPrecio } from "@/lib/utils";
 import { obtenerProductoPorSlug, listarProductos } from "@/features/tienda/queries";
 import {
   BUCKET_PRODUCTOS,
-  ETIQUETA_CATEGORIA,
   disponible,
   precioDesde,
   etiquetaCategoria,
@@ -116,16 +116,18 @@ export default async function PaginaProducto({ params }: Props) {
                 {producto.nombre}
               </h1>
 
-              <p className="mt-4 font-display text-3xl text-azul-profundo">
-                {desde === null ? (
-                  <span className="text-lg font-normal text-texto-sec">Precio pendiente</span>
-                ) : (
-                  <>
-                    <span className="text-base font-normal text-texto-sec">Desde </span>
-                    {formatearPrecio(desde)}
-                  </>
-                )}
-              </p>
+              {TIENDA_MUESTRA_PRECIOS && (
+                <p className="mt-4 font-display text-3xl text-azul-profundo">
+                  {desde === null ? (
+                    <span className="text-lg font-normal text-texto-sec">Precio pendiente</span>
+                  ) : (
+                    <>
+                      <span className="text-base font-normal text-texto-sec">Desde </span>
+                      {formatearPrecio(desde)}
+                    </>
+                  )}
+                </p>
+              )}
 
               {producto.descripcion && (
                 <p className="mt-4 leading-relaxed text-texto-sec">{producto.descripcion}</p>
@@ -144,7 +146,7 @@ export default async function PaginaProducto({ params }: Props) {
               <div className="mt-8 flex flex-col gap-4">
                 <Aviso tono="info" titulo="Cómo funciona el pedido">
                   Elige talla y cantidad, agrégalo al carrito y envía el pedido por WhatsApp con
-                  el mensaje ya escrito. El club confirma la disponibilidad y te indica cómo pagar.
+                  el mensaje ya escrito: {TIENDA_QUE_CONFIRMA}.
                 </Aviso>
                 <div>
                   <BotonWhatsApp variante="secundario">¿Tienes dudas? Escríbenos</BotonWhatsApp>

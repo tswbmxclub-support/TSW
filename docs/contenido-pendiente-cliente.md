@@ -20,18 +20,31 @@ Hay dos tipos de contenido:
 
 ## Datos generales (aparecen en todo el sitio)
 
-| Dato | Ejemplo de formato |
-|---|---|
-| Nombre completo de la corporación | Corporación Deportiva … |
-| Lema o frase corta (opcional) | "Formamos …" |
-| Dirección de la sede | Calle 00 # 00-00, barrio … |
-| Ciudad | … |
-| Horario de atención | Lunes a viernes, 8:00 a. m. a 5:00 p. m. |
-| Teléfono fijo o celular de atención | 300 000 0000 |
-| Correo de contacto | contacto@… |
-| **Número de WhatsApp para pedidos y dudas** | 300 000 0000 (celular con WhatsApp activo) |
-| Instagram, Facebook y YouTube (los que tengan) | enlace completo a cada perfil |
-| Título del enlace del pie "Estatutos y reglamentos" | ¿Existe un documento así? Si no, se retira |
+**Ya recibidos y publicados**, del documento del 22 de septiembre: nombre de la
+corporación, lema, las dos sedes de entrenamiento, barrio y ciudad, horario de
+atención, los dos números de WhatsApp, el correo, las tres cuentas de Instagram
+y las afiliaciones (INDER y Liga Antioqueña de Ciclismo). El enlace del pie que
+se llamaba "Estatutos y reglamentos" ahora dice "Reglamento interno" y lleva a
+Matrículas, que es donde se descarga.
+
+**Lo que sigue pendiente.** Nada de esto aparece hoy en el sitio: está oculto,
+no puesto con un dato de relleno.
+
+| Dato | Por qué falta | Dónde aparecería |
+|---|---|---|
+| **Dígito de verificación del NIT** | En su documento quedó como "lo calculé como 0, confirmar con el RUT". El cálculo da 0, así que lo más probable es que esté bien; falta confirmarlo contra el RUT | Pie de página y las tres páginas legales |
+| **Dirección de notificación** (la del RUT) | No estaba en el documento | Política de tratamiento de datos y términos |
+| **Dirección de calle de la sede administrativa** | El documento da las dos pistas y el barrio, no una dirección | Portada, canales de atención |
+| **Título de la pestaña del navegador** | Hoy dice "Corporación Deportiva TSW — BMX en Medellín", como en su documento. Si la corporación va a sumar otros deportes, conviene "Corporación Deportiva TSW — Medellín" | Todas las páginas |
+| **Nombre exacto de la pista** | Su documento lo marcó para confirmar: "Antonio Roldán Betancur" | Pie de página, portada y matrículas |
+
+### Sobre la tienda
+
+Queda como **catálogo sin precios**, como usted pidió: se ven los productos y
+las tallas, y el botón dice **Pedir por WhatsApp**. El chat llega con los
+artículos y las tallas, y pidiendo precio y forma de pago. Cuando lleguen los
+precios de los seis productos se enciende un interruptor y la tienda vuelve a
+mostrar importes y totales: no hay que rehacer nada.
 
 ---
 

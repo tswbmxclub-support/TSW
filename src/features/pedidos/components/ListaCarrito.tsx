@@ -4,7 +4,10 @@ import Link from "next/link";
 
 import { Aviso, Boton, BotonWhatsApp, EstadoVacio, Skeleton, Stepper } from "@/components/ui";
 import { useCarrito } from "@/features/pedidos/carrito";
+import { TIENDA_MUESTRA_PRECIOS, TIENDA_QUE_CONFIRMA } from "@/config/sitio";
 import { formatearPrecio } from "@/lib/utils";
+
+const ETIQUETA_PEDIDO = TIENDA_MUESTRA_PRECIOS ? "Enviar pedido por WhatsApp" : "Pedir por WhatsApp";
 
 /**
  * Vista del carrito. Isla de cliente: los items viven en localStorage vía
@@ -83,7 +86,8 @@ export function ListaCarrito() {
                     {item.nombreProducto}
                   </Link>
                   <p className="mt-1 text-sm text-texto-sec">
-                    Talla {item.talla} · {formatearPrecio(item.precioCentavos)} c/u
+                    Talla {item.talla}
+                    {TIENDA_MUESTRA_PRECIOS && <> · {formatearPrecio(item.precioCentavos)} c/u</>}
                   </p>
                 </div>
 
@@ -98,12 +102,14 @@ export function ListaCarrito() {
                       ayuda={item.disponible <= 5 ? `Máximo ${item.disponible}` : undefined}
                     />
                   )}
-                  <div className="text-right">
-                    <p className="text-sm text-texto-sec">Subtotal</p>
-                    <p className="font-display text-xl text-azul-profundo">
-                      {item.estado === "disponible" ? formatearPrecio(item.cantidad * item.precioCentavos) : "—"}
-                    </p>
-                  </div>
+                  {TIENDA_MUESTRA_PRECIOS && (
+                    <div className="text-right">
+                      <p className="text-sm text-texto-sec">Subtotal</p>
+                      <p className="font-display text-xl text-azul-profundo">
+                        {item.estado === "disponible" ? formatearPrecio(item.cantidad * item.precioCentavos) : "—"}
+                      </p>
+                    </div>
+                  )}
                   <Boton variante="fantasma" onClick={() => quitar(item.varianteId)}>
                     <span aria-hidden="true">✕</span>
                     <span className="sr-only">
@@ -143,22 +149,27 @@ export function ListaCarrito() {
               <dd className="font-semibold text-azul-profundo">{agotados}</dd>
             </div>
           )}
-          <div className="flex justify-between border-t border-gris-borde pt-3 text-base">
-            <dt className="font-semibold text-azul-profundo">Total</dt>
-            <dd className="font-display text-2xl text-azul-profundo">
-              {formatearPrecio(subtotalCentavos)}
-            </dd>
-          </div>
+          {TIENDA_MUESTRA_PRECIOS && (
+            <div className="flex justify-between border-t border-gris-borde pt-3 text-base">
+              <dt className="font-semibold text-azul-profundo">Total</dt>
+              <dd className="font-display text-2xl text-azul-profundo">
+                {formatearPrecio(subtotalCentavos)}
+              </dd>
+            </div>
+          )}
         </dl>
 
         <div className="mt-6 flex flex-col gap-3">
+          {/* "Pedir por WhatsApp" con la tienda en modo catálogo: es el botón que
+              la cliente pidió por ese nombre, y sin precios "enviar el pedido"
+              promete más de lo que es —esto pide, no compra—. */}
           {mensajeWhatsApp ? (
             <BotonWhatsApp texto={mensajeWhatsApp} completo>
-              Enviar pedido por WhatsApp
+              {ETIQUETA_PEDIDO}
             </BotonWhatsApp>
           ) : (
             <Boton disabled completo>
-              Enviar pedido por WhatsApp
+              {ETIQUETA_PEDIDO}
             </Boton>
           )}
           <Boton variante="fantasma" onClick={vaciar} completo>
@@ -168,9 +179,8 @@ export function ListaCarrito() {
 
         <div className="mt-4">
           <Aviso tono="info" titulo="Cómo funciona el pedido">
-            Al enviar se abre WhatsApp con el pedido ya escrito. El club confirma la
-            disponibilidad y te indica cómo pagar. El carrito no se vacía solo: vacíalo cuando
-            el club te confirme.
+            Al enviar se abre WhatsApp con el pedido ya escrito: {TIENDA_QUE_CONFIRMA}. El
+            carrito no se vacía solo: vacíalo cuando el club te confirme.
           </Aviso>
         </div>
       </aside>

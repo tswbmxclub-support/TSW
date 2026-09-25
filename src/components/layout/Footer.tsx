@@ -1,7 +1,17 @@
 import Link from "next/link";
 
 import { Boton } from "@/components/ui";
-import { CONTACTO, ENLACES_LEGALES, PIE_INSTITUCIONAL, PIE_SERVICIOS, REDES, SITIO } from "@/config/sitio";
+import {
+  CONTACTO,
+  ENLACES_LEGALES,
+  IDENTIDAD_LEGAL,
+  PIE_INSTITUCIONAL,
+  PIE_SERVICIOS,
+  REDES,
+  SITIO,
+  UBICACION,
+  enlaceTelefono,
+} from "@/config/sitio";
 
 const ENLACE =
   "inline-flex min-h-[44px] items-center text-blanco/85 underline-offset-4 hover:text-blanco hover:underline " +
@@ -22,7 +32,19 @@ export function Footer() {
           <p className="font-display text-3xl">TSW</p>
           <p className="mt-3 text-sm text-blanco/70">{SITIO.nombreLargo}</p>
           <p className="mt-1 text-sm text-blanco/70">{SITIO.lema}</p>
-          <p className="mt-4 text-xs text-blanco/60">[NIT y personería jurídica de la corporación]</p>
+          {/* El NIT solo aparece confirmado con el RUT: ver IDENTIDAD_LEGAL.
+              Las afiliaciones sí están en el documento de la cliente. */}
+          <p className="mt-4 text-xs text-blanco/60">
+            {IDENTIDAD_LEGAL.nitConfirmado && (
+              <>
+                NIT {IDENTIDAD_LEGAL.nit}-{IDENTIDAD_LEGAL.nitDv}
+                <span aria-hidden="true"> · </span>
+              </>
+            )}
+            {IDENTIDAD_LEGAL.reconocimiento}
+            <span aria-hidden="true"> · </span>
+            {IDENTIDAD_LEGAL.afiliacion}
+          </p>
         </div>
 
         <nav aria-labelledby="pie-institucional">
@@ -56,13 +78,22 @@ export function Footer() {
         </nav>
 
         <div>
-          <h2 className="text-sm uppercase tracking-widest text-blanco/60">Sede y atención</h2>
+          <h2 className="text-sm uppercase tracking-widest text-blanco/60">Sedes y atención</h2>
           <address className="mt-4 flex flex-col gap-2 not-italic text-blanco/85">
-            <span>{CONTACTO.direccion}</span>
-            <span>{CONTACTO.ciudad}</span>
-            <a href={`tel:${CONTACTO.telefono.replace(/[^\d+]/g, "")}`} className={ENLACE}>
-              {CONTACTO.telefono}
-            </a>
+            {/* Dos pistas, las del documento. No hay dirección de calle, así que
+                no se pone ninguna: el barrio y la ciudad es lo que hay. */}
+            <span>Sedes de entrenamiento:</span>
+            <ul className="flex flex-col gap-1">
+              {CONTACTO.sedes.map((sede) => (
+                <li key={sede}>{sede}</li>
+              ))}
+            </ul>
+            <span>{UBICACION}</span>
+            {[CONTACTO.telefono, CONTACTO.telefonoSecundario].map((numero) => (
+              <a key={numero} href={enlaceTelefono(numero)} className={ENLACE}>
+                {numero}
+              </a>
+            ))}
             <a href={`mailto:${CONTACTO.correo}`} className={ENLACE}>
               {CONTACTO.correo}
             </a>
