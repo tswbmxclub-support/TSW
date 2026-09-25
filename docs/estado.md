@@ -46,6 +46,38 @@ desbloquea.
 Los tres chequeos se adaptan solos al estado del interruptor: al encenderlo
 exigen lo contrario, sin tocar el script.
 
+## Orden de despliegue
+
+El orden importa: los pasos (a) y (c) son de configuración de Supabase, no de
+código, y entre ellos queda una ventana en la que cualquiera podría registrarse.
+
+**(a) Desactivar el registro público en Supabase.** Authentication → Providers →
+Email → **"Allow new users to sign up" apagado**. Va primero a propósito: el paso
+(c) enciende el proveedor Email, y con el registro abierto cualquiera podría
+crearse una cuenta en ese momento. Una cuenta de usuario es `authenticated`, y
+hasta la migración 20 eso bastaba para escribir en los buckets.
+
+**(b) `supabase db push` y `supabase gen types`, en el mismo paso.** Aplica las
+migraciones 19 (contenido editable) y 20 (Storage solo para administradores).
+Nunca uno sin el otro: los tipos regenerados sin la base al día hacen compilar
+código contra funciones que no existen.
+
+**(c) Encender el proveedor Email.** Con registro apagado (paso a) y "Confirm
+email" apagado, y registrando `${NEXT_PUBLIC_SITE_URL}/admin/auth/callback` en
+Authentication → URL Configuration → Redirect URLs. Esto es lo que hoy impide
+entrar al panel en producción.
+
+**(d) Mis comprobaciones contra el remoto**, que no puedo hacer antes de (b):
+
+1. Lectura de `contenido_sitio` con la anon key: debe funcionar sin tocar `es_admin()`.
+2. `insert` con la anon key: debe fallar (no hay política de escritura).
+3. `guardar_contenido` por RPC y consulta de `evento_auditoria`: `entidad = 'contenido_sitio'` y `actor_id` no nulo.
+4. Las siete políticas de escritura de Storage endurecidas, contra el remoto.
+
+El paso 3 necesita además el login funcionando, así que depende de (c). Probar
+que un usuario **con sesión** y sin rol de administrador no escribe exige un
+usuario temporal y permiso explícito de Samuel en ese momento.
+
 ## Para fusionar a `main`
 
 1. `npm run verificar:completo` en **0** (build, los 7 chequeos, foco).
@@ -76,9 +108,28 @@ exigen lo contrario, sin tocar el script.
 - **Build intermitente: sin reproducir.** Falló una vez con `Export encountered an error on /admin`; 5 corridas limpias después. No está arreglado, está sin reproducir. Detalle e hipótesis —dos procesos escribiendo el mismo `.next`, que es justo lo que el punto anterior evita— en [build-intermitente.log](build-intermitente.log).
 - Añadir un archivo a un barrel con el dev encendido rompe el bundle con `__webpack_modules__[moduleId] is not a function`. No es import circular: reiniciar.
 
-## Parte G
+## Parte G — en curso
 
-**Sin empezar, a la espera de decisión de alcance.** Sería la migración 19 y
-`/admin/sitio`: pasar al panel el contenido que hoy vive en
-`src/config/contenido.ts` y `src/config/sitio.ts`. No se toca hasta que Samuel
-lo diga.
+**Hecho: solo el SQL.** Migraciones 19 y 20 escritas y validadas, **sin aplicar a
+remoto** (ver el orden de despliegue).
+
+- **19** `contenido_sitio`: una fila por sección en jsonb, clave con lista
+  cerrada, RLS con lectura pública y **cero políticas de escritura**,
+  `guardar_contenido` y `restablecer_contenido`, y el bucket `sitio` (PNG, JPEG y
+  WebP; sin SVG ni AVIF) con escritura que exige `es_admin()`.
+- **20** endurece las siete políticas de escritura de Storage de la migración 09
+  para que exijan `es_admin()`. Eran `to authenticated` a secas, de cuando eso era
+  sinónimo de administrador; desde la 13 una sesión de deportista también lo es.
+  Agujero latente, no explotable hoy —el módulo de usuario está apagado y el panel
+  sube con service role—, y por eso no lo cazó ninguna prueba.
+- `npm run verificar:contenido`: 55 casos. `verificar:politicas`: 27, con las doce
+  políticas de Storage cruzadas por las dos reglas.
+
+**Falta:** la capa de lectura (con `safeParse` por clave y caída al valor de
+`contenido.ts`, ya vigilada por `verificar:contenido`) y la pantalla
+`/admin/sitio`. No se empieza hasta que Samuel confirme el `db push`: la regla del
+proyecto es no escribir código contra RPC que no están en la base.
+
+`TIENDA_MUESTRA_PRECIOS` y `LEGALES_APROBADAS` **no** pasaron a la configuración
+editable, a propósito: el primero se enciende una vez en la vida del proyecto, y
+el segundo es una puerta de cumplimiento legal que debe exigir un commit.

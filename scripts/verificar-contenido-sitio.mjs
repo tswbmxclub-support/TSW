@@ -13,6 +13,9 @@
  *     migración 18) y CERO políticas de escritura,
  *   · las dos RPC: actor primero, definer, search_path, revoke y grant con la
  *     firma exacta, y que `guardar_contenido` no lleve coalesce sobre el valor,
+ *   · que la capa de lectura, cuando exista, valide cada clave con safeParse y
+ *     caiga al valor de contenido.ts para ESA clave registrando el error: una
+ *     fila con forma vieja no puede romper una página pública,
  *   · el bucket: alta con tope y MIME, lectura propia, y que las tres políticas
  *     de escritura exijan es_admin(), que es lo que las del bucket viejo no
  *     hacen.
@@ -20,7 +23,7 @@
  * `node scripts/verificar-contenido-sitio.mjs`. Termina en "VALIDACIÓN LIMPIA"
  * solo si todo cruza. Lo que queda fuera está declarado al final.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const DIR = "supabase/migrations";
 const RUTA_19 = `${DIR}/20260925120000_contenido_editable_del_sitio.sql`;
@@ -250,9 +253,20 @@ verificar(
   ref(RUTA_19, lineaDe(RUTA_19, "10485760")),
   altaBucket?.[1],
 );
+const mimes = altaBucket ? [...altaBucket[2].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort() : [];
 verificar(
-  "solo tipos de imagen",
-  altaBucket && !/application|text|video/i.test(altaBucket[2]),
+  "los tipos permitidos son exactamente PNG, JPEG y WebP",
+  mimes.join(",") === "image/jpeg,image/png,image/webp",
+  ref(RUTA_19, lineaDe(RUTA_19, "allowed_mime_types")),
+  mimes.join(", "),
+);
+// SVG por separado y por su nombre: es un documento XML que puede llevar
+// <script>, y el bucket es público. Un solo archivo ahí sería XSS servido desde
+// infraestructura de confianza, así que este caso no se deduce del anterior: se
+// escribe aparte para que se lea en el reporte.
+verificar(
+  "sin image/svg+xml",
+  !/svg/i.test(altaBucket?.[2] ?? "svg"),
   ref(RUTA_19, lineaDe(RUTA_19, "allowed_mime_types")),
 );
 verificar(
@@ -292,6 +306,54 @@ for (const [politica, operacion, exigeAdmin] of POLITICAS_BUCKET) {
       r,
     );
   }
+}
+
+// --- 7. La capa de lectura: una fila con forma vieja no rompe una página ----
+//
+// Requisito de Samuel, y es el riesgo real de guardar contenido como jsonb: la
+// base solo garantiza que sea un objeto o una lista. El día que un tipo de
+// `contenido.ts` cambie, la fila guardada tendrá la forma anterior; si la página
+// confía en ella, revienta en producción para todos los visitantes a la vez.
+//
+// La regla: cada clave se valida con `safeParse` y, si falla, se usa el valor de
+// `contenido.ts` PARA ESA CLAVE —no para todas— y el error se registra en el
+// servidor.
+//
+// Este caso se activa solo. Mientras la capa de lectura no exista, informa de
+// que está pendiente; en cuanto aparezca el archivo, exige las tres cosas. Así
+// el requisito no depende de que alguien se acuerde al escribirla.
+const CANDIDATAS_LECTURA = [
+  "src/features/sitio/contenido.ts",
+  "src/features/sitio/queries.ts",
+  "src/config/contenido-remoto.ts",
+];
+const rutaLectura = CANDIDATAS_LECTURA.find((r) => existsSync(r));
+
+if (rutaLectura === undefined) {
+  verificar(
+    "capa de lectura: el caso se activará cuando exista",
+    true,
+    "—",
+    `todavía no existe (se busca en ${CANDIDATAS_LECTURA.join(", ")})`,
+  );
+} else {
+  const lectura = readFileSync(rutaLectura, "utf8");
+  verificar("capa de lectura: valida con safeParse", /\.safeParse\(/.test(lectura), rutaLectura);
+  verificar(
+    "capa de lectura: al fallar usa el valor por defecto de esa clave",
+    /porDefecto|por_defecto|POR_DEFECTO|defecto\[/.test(lectura),
+    rutaLectura,
+  );
+  verificar(
+    "capa de lectura: registra el error en el servidor",
+    /console\.(error|warn)\(/.test(lectura),
+    rutaLectura,
+  );
+  verificar(
+    "capa de lectura: un fallo de lectura tampoco rompe la página (try/catch)",
+    /try\s*\{/.test(lectura) && /catch/.test(lectura),
+    rutaLectura,
+  );
 }
 
 // Contraste con el bucket viejo: esto no falla, informa. Si algún día se

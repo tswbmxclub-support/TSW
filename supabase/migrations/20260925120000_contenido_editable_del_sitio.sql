@@ -201,13 +201,25 @@ grant  execute on function public.restablecer_contenido(uuid, text) to service_r
 -- Fotos de la portada, de la sede y de las tarjetas de deporte, que hoy son
 -- archivos del repositorio en /public/imagenes.
 --
--- Público como los otros tres, con el mismo tope de 10 MB y los mismos tipos.
--- Las imágenes de este bucket son institucionales —instalaciones, grupos en
--- plano general—; si alguna vez se sube un primer plano de un menor, aplica el
--- mismo control documental que `competencias`.
+-- Público, con el mismo tope de 10 MB que los otros tres. Las imágenes de este
+-- bucket son institucionales —instalaciones, grupos en plano general—; si alguna
+-- vez se sube un primer plano de un menor, aplica el mismo control documental
+-- que `competencias`.
+--
+-- Tres tipos y nada más: PNG, JPEG y WebP.
+--
+-- **Sin SVG**, y esto es lo importante de la lista. Un SVG es un documento XML
+-- que puede llevar `<script>`, y el bucket es público: el archivo se serviría
+-- desde el dominio de Supabase con `image/svg+xml`, que el navegador ejecuta. Un
+-- solo archivo subido ahí sería XSS alojado en infraestructura de confianza.
+--
+-- Tampoco AVIF, que sí estaba en el borrador de esta migración: los otros tres
+-- buckets lo aceptan, pero aquí no aporta nada —`next/image` ya sirve AVIF
+-- convirtiendo desde PNG o JPEG— y cada tipo admitido es un decodificador más
+-- que tiene que aguantar un archivo hostil.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('sitio', 'sitio', true, 10485760, array['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+values ('sitio', 'sitio', true, 10485760, array['image/png', 'image/jpeg', 'image/webp'])
 on conflict (id) do update
   set public             = excluded.public,
       file_size_limit    = excluded.file_size_limit,
