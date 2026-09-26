@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { crearClientePublico } from "@/lib/supabase/publico";
 import { TIENDA_MUESTRA_PRECIOS } from "@/config/sitio";
 import { disponible } from "@/features/tienda/types";
 
@@ -33,7 +33,7 @@ export async function consultarVariantesCarrito(ids: string[]): Promise<Variante
   const validos = esquemaIds.safeParse(ids);
   if (!validos.success || validos.data.length === 0) return [];
 
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const filtrada = supabase.from("variante");
 
   // Dos ramas con la lista de columnas ESCRITA EN CADA UNA, y no una cadena

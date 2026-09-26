@@ -1,4 +1,4 @@
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { crearClientePublico } from "@/lib/supabase/publico";
 import type { Nivel } from "./types";
 
 /**
@@ -11,7 +11,7 @@ import type { Nivel } from "./types";
  * "Intermedio" dos veces, que es exactamente lo que se veía al aplicarla.
  */
 export async function listarNiveles(clubId: string): Promise<Nivel[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("nivel")
     .select("*")

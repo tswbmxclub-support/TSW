@@ -1,4 +1,4 @@
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { crearClientePublico } from "@/lib/supabase/publico";
 import type { Club, ClubMenu } from "./types";
 
 /**
@@ -8,7 +8,7 @@ import type { Club, ClubMenu } from "./types";
  * política es la barrera, no la única defensa.
  */
 export async function listarClubes(): Promise<Club[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("club")
     .select("*")
@@ -26,7 +26,7 @@ export async function listarClubes(): Promise<Club[]> {
  * el menú no usa.
  */
 export async function listarClubesParaMenu(): Promise<ClubMenu[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("club")
     .select("id, nombre, slug, tipo, etiqueta")
@@ -49,7 +49,7 @@ export async function listarClubesParaMenu(): Promise<ClubMenu[]> {
 
 /** Un club por su slug, o null. Solo activos, por la misma razón de arriba. */
 export async function obtenerClub(slug: string): Promise<Club | null> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("club")
     .select("*")

@@ -1,4 +1,4 @@
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { crearClientePublico } from "@/lib/supabase/publico";
 import type { DocumentoConVersion } from "./types";
 
 /**
@@ -7,7 +7,7 @@ import type { DocumentoConVersion } from "./types";
  * filtros de aquí se repiten a propósito: la política no es la única defensa.
  */
 export async function listarDocumentosPublicados(): Promise<DocumentoConVersion[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("documento")
     .select("*, documento_version(*)")

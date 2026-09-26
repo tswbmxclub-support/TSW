@@ -1,4 +1,4 @@
-import { crearClienteServidor } from "@/lib/supabase/server";
+import { crearClientePublico } from "@/lib/supabase/publico";
 import { ErrorNoEncontrado } from "@/lib/errors";
 import type { Competencia, CompetenciaConResultados } from "./types";
 
@@ -7,7 +7,7 @@ import type { Competencia, CompetenciaConResultados } from "./types";
  * borradores y archivadas; el filtro se repite para no depender solo de ella.
  */
 export async function listarCompetencias(): Promise<Competencia[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("competencia")
     .select("*")
@@ -20,7 +20,7 @@ export async function listarCompetencias(): Promise<Competencia[]> {
 
 /** La competencia destacada, con sus resultados. Solo puede haber una. */
 export async function obtenerCompetenciaDestacada(): Promise<CompetenciaConResultados | null> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("competencia")
     .select("*, resultado(*)")
@@ -39,7 +39,7 @@ export async function obtenerCompetenciaDestacada(): Promise<CompetenciaConResul
 export async function obtenerCompetenciaPorSlug(
   slug: string,
 ): Promise<CompetenciaConResultados> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("competencia")
     .select("*, resultado(*)")
@@ -60,7 +60,7 @@ export async function obtenerCompetenciaPorSlug(
  * para la página de competencias. RLS ya deja fuera borradores y archivadas.
  */
 export async function listarCompetenciasConResultados(): Promise<CompetenciaConResultados[]> {
-  const supabase = await crearClienteServidor();
+  const supabase = crearClientePublico();
   const { data, error } = await supabase
     .from("competencia")
     .select("*, resultado(*)")
