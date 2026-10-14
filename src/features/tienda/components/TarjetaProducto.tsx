@@ -39,8 +39,9 @@ export function TarjetaProducto({
   const tallas = activas.filter((v) => disponible(v) > 0).map((v) => v.talla);
   const esMarca = esDeLaMarca(producto);
   const prenda = etiquetaCategoria(producto.categoria);
-  const foto = producto.imagen_path
-    ? urlPublicaStorage(BUCKET_PRODUCTOS, producto.imagen_path)
+  const principal = producto.imagenes[0];
+  const foto = principal
+    ? urlPublicaStorage(BUCKET_PRODUCTOS, principal.storage_path)
     : "/imagenes/producto.jpg";
 
   return (
@@ -48,7 +49,7 @@ export function TarjetaProducto({
       <div className="relative aspect-square bg-gris-frio">
         <Image
           src={foto}
-          alt={producto.imagen_path ? `Foto de ${producto.nombre}` : `[Foto de ${producto.nombre}]`}
+          alt={principal ? (principal.texto_alt ?? `Foto de ${producto.nombre}`) : `[Foto de ${producto.nombre}]`}
           fill
           priority={prioridad}
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

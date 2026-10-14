@@ -3,6 +3,10 @@ import type { Enums, Tables } from "@/lib/supabase/database.types";
 
 export type Producto = Tables<"producto">;
 export type Variante = Tables<"variante">;
+export type ProductoImagen = Tables<"producto_imagen">;
+
+/** Foto de la galería tal como la ve el sitio público. La de orden 0 es la principal. */
+export type FotoProducto = Pick<ProductoImagen, "storage_path" | "texto_alt" | "orden">;
 export type CategoriaProducto = Enums<"categoria_producto">;
 
 /**
@@ -20,8 +24,8 @@ export type CategoriaProducto = Enums<"categoria_producto">;
  * la unión de literales, `tsc` sigue viendo `stock: number`.
  */
 export const CAMPOS_PRODUCTO_PUBLICO = TIENDA_MUESTRA_PRECIOS
-  ? ("*, variante(*)" as const)
-  : ("*, variante(id, producto_id, talla, sku, stock, stock_reservado, activo, creado_en, actualizado_en)" as const);
+  ? ("*, variante(*), producto_imagen(storage_path, texto_alt, orden)" as const)
+  : ("*, variante(id, producto_id, talla, sku, stock, stock_reservado, activo, creado_en, actualizado_en), producto_imagen(storage_path, texto_alt, orden)" as const);
 
 /**
  * Variante tal como la ve el sitio público: **el precio puede no venir**.
@@ -36,6 +40,8 @@ export type VariantePublica = Omit<Variante, "precio_centavos"> & { precio_centa
 /** Producto con sus variantes, tal como se muestra en la tienda pública. */
 export type ProductoConVariantes = Producto & {
   variantes: VariantePublica[];
+  /** Galería ordenada; vacía si el producto no tiene fotos. */
+  imagenes: FotoProducto[];
 };
 
 /**
@@ -48,6 +54,7 @@ export type ProductoConVariantes = Producto & {
  */
 export type ProductoConVariantesCompletas = Producto & {
   variantes: Variante[];
+  imagenes: ProductoImagen[];
 };
 
 /** Unidades que se pueden vender ahora mismo. */

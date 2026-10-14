@@ -1,6 +1,23 @@
 import { crearClientePublico } from "@/lib/supabase/publico";
 import { ErrorNoEncontrado } from "@/lib/errors";
-import { CAMPOS_PRODUCTO_PUBLICO, type ProductoConVariantes } from "./types";
+import {
+  CAMPOS_PRODUCTO_PUBLICO,
+  type FotoProducto,
+  type Producto,
+  type ProductoConVariantes,
+  type VariantePublica,
+} from "./types";
+
+/** Fila tal como la devuelve CAMPOS_PRODUCTO_PUBLICO. */
+type FilaProductoPublico = Producto & { variante: VariantePublica[]; producto_imagen: FotoProducto[] };
+
+function aProducto({ variante, producto_imagen, ...producto }: FilaProductoPublico): ProductoConVariantes {
+  return {
+    ...producto,
+    variantes: variante,
+    imagenes: [...producto_imagen].sort((a, b) => a.orden - b.orden),
+  };
+}
 
 /** Catálogo público. RLS deja fuera productos y variantes inactivos. */
 export async function listarProductos(): Promise<ProductoConVariantes[]> {
@@ -12,10 +29,7 @@ export async function listarProductos(): Promise<ProductoConVariantes[]> {
 
   if (error) throw error;
 
-  return (data ?? []).map(({ variante, ...producto }) => ({
-    ...producto,
-    variantes: variante,
-  }));
+  return (data ?? []).map(aProducto);
 }
 
 export async function obtenerProductoPorSlug(slug: string): Promise<ProductoConVariantes> {
@@ -29,8 +43,7 @@ export async function obtenerProductoPorSlug(slug: string): Promise<ProductoConV
   if (error) throw error;
   if (!data) throw new ErrorNoEncontrado("Ese producto no existe o no está disponible.");
 
-  const { variante, ...producto } = data;
-  return { ...producto, variantes: variante };
+  return aProducto(data);
 }
 
 /**
@@ -48,9 +61,5 @@ export async function listarProductosDestacados(limite = 4): Promise<ProductoCon
 
   if (error) throw error;
 
-  return (data ?? []).map(({ variante, ...producto }) => ({
-    ...producto,
-    variantes: variante,
-  }));
+  return (data ?? []).map(aProducto);
 }
-

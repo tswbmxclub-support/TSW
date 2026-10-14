@@ -94,7 +94,7 @@ Otras acciones:
 
 ---
 
-## Crear un producto con tallas y foto
+## Crear un producto con tallas y fotos
 
 1. Menú **Productos** → **Nuevo producto**.
 2. Escriba el nombre, elija la categoría (uniformes, protección o
@@ -103,7 +103,19 @@ Otras acciones:
    - **Agregar tallas**: pulse **Agregar talla** y escriba la talla, el
      precio (en pesos) y el stock en bodega. Pulse **Agregar**. Cada talla
      tiene su propio precio y stock.
-   - **Subir la foto**: elija la imagen (JPG, PNG o WebP, máximo 10 MB).
+   - **Fotos** (hasta 8 por producto): en la sección **Fotos**, pulse
+     **Agregar foto** y elija la imagen (JPG, PNG, WebP o AVIF, máximo
+     10 MB). Cada foto se guarda al instante; no hace falta pulsar Guardar.
+     - **La primera es la principal**: es la que sale en el catálogo y al
+       compartir el producto por WhatsApp. Cambie el orden con las flechas
+       **↑** y **↓**.
+     - **Texto alternativo**: describa la foto en una frase («Camiseta azul,
+       vista de frente»). Lo leen las personas que usan lector de pantalla.
+       Se guarda al salir del campo.
+     - **Quitar** pide confirmación y borra el archivo: no se puede deshacer.
+     - Con 8 fotos, **Agregar foto** se desactiva: quite una para subir otra.
+   - En la tienda, la ficha del producto muestra la foto grande y, debajo,
+     las miniaturas para cambiar de foto. Con una sola foto no hay miniaturas.
 4. El producto aparece en la tienda cuando está activo y tiene al menos una
    talla activa con stock.
 

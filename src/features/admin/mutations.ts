@@ -95,6 +95,8 @@ export function revalidarPublico(entidad: EntidadRevalidable, extra: string[] = 
     revalidatePath(ruta);
     // /semilleros y /semilleros/<club> son la misma página (segmento opcional): se invalidan juntas.
     if (ruta === "/semilleros") revalidatePath("/semilleros/[[...club]]", "page");
+    // Las fichas /tienda/<slug> cuelgan de /tienda: foto, precio o stock cambian ahí también.
+    if (ruta === "/tienda") revalidatePath("/tienda/[slug]", "page");
   }
 }
 
@@ -164,6 +166,8 @@ const MENSAJE_POR_CONSTRAINT: Record<string, Traduccion> = {
   club_vinetas_maximo: validacion("Un club admite como máximo 4 viñetas."),
   club_vinetas_sin_vacias: validacion("Hay una viñeta vacía: escribe el texto o quítala."),
   club_subtitulo_tarjeta_no_vacio: validacion("El texto de la tarjeta no puede ser solo espacios."),
+  // migración 20261014: galería de producto
+  producto_imagen_alt_largo: validacion("El texto alternativo admite como máximo 200 caracteres."),
 
   // --- UNIQUE (23505) --------------------------------------------------------
   // migración 02: catálogo
@@ -171,6 +175,9 @@ const MENSAJE_POR_CONSTRAINT: Record<string, Traduccion> = {
   nivel_orden_unico: conflicto("Ya hay un nivel con ese orden. Recarga la página e inténtalo de nuevo."),
   variante_talla_unica_por_producto: validacion("Ese producto ya tiene una variante con esa talla."),
   variante_sku_unico: validacion("Ese SKU ya lo usa otra variante. Déjalo vacío o cambia el código."),
+  // Galería: la ruta la genera el servidor con un UUID, así que solo salta por un doble envío.
+  producto_imagen_ruta_unica: conflicto("Esa foto ya está en la galería. Recarga la página."),
+  producto_imagen_orden_unico: conflicto("La galería cambió mientras la editabas. Recarga la página e inténtalo de nuevo."),
   // migración 03: documentos
   documento_version_unica: conflicto("Esa versión ya existe. Recarga la página e inténtalo de nuevo."),
   // migración 04: contenido

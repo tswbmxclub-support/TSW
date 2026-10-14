@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -18,6 +17,7 @@ import {
 } from "@/features/tienda/types";
 import { TarjetaProducto } from "@/features/tienda/components/TarjetaProducto";
 import { SelectorVariantes } from "@/features/tienda/components/SelectorVariantes";
+import { GaleriaProducto, type FotoGaleria } from "@/features/tienda/components/GaleriaProducto";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,6 +40,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${producto.nombre} | TSW`,
         description: producto.descripcion ?? undefined,
         type: "website",
+        // La principal, para que el enlace compartido por WhatsApp lleve foto.
+        ...(producto.imagenes[0] && {
+          images: [{ url: urlPublicaStorage(BUCKET_PRODUCTOS, producto.imagenes[0].storage_path) }],
+        }),
       },
     };
   } catch {
@@ -65,9 +69,15 @@ export default async function PaginaProducto({ params }: Props) {
   }
 
   const relacionados = (await listarProductos()).filter((p) => p.id !== producto.id).slice(0, 4);
-  const foto = producto.imagen_path
-    ? urlPublicaStorage(BUCKET_PRODUCTOS, producto.imagen_path)
-    : "/imagenes/producto.jpg";
+  const fotos: FotoGaleria[] =
+    producto.imagenes.length > 0
+      ? producto.imagenes.map((f, i) => ({
+          src: urlPublicaStorage(BUCKET_PRODUCTOS, f.storage_path),
+          alt:
+            f.texto_alt ??
+            (producto.imagenes.length > 1 ? `Foto ${i + 1} de ${producto.nombre}` : `Foto de ${producto.nombre}`),
+        }))
+      : [{ src: "/imagenes/producto.jpg", alt: `[Foto de ${producto.nombre}]` }];
   const unidades = producto.variantes.reduce((t, v) => t + (v.activo ? disponible(v) : 0), 0);
   const desde = precioDesde(producto);
 
@@ -94,16 +104,7 @@ export default async function PaginaProducto({ params }: Props) {
       <Seccion tituloId="titulo-producto">
         <div className="grid gap-10 lg:grid-cols-2">
           <Aparece>
-            <div className="relative aspect-square overflow-hidden rounded-lg border border-gris-borde bg-gris-frio">
-              <Image
-                src={foto}
-                alt={producto.imagen_path ? `Foto de ${producto.nombre}` : `[Foto de ${producto.nombre}]`}
-                fill
-                priority
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
-              />
-            </div>
+            <GaleriaProducto fotos={fotos} nombre={producto.nombre} />
           </Aparece>
 
           <Aparece indice={1}>

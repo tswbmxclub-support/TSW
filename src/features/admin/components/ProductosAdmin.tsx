@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
   Aviso,
   AreaTexto,
-  Archivo,
   Boton,
   Campo,
   CampoMoneda,
@@ -18,9 +16,7 @@ import {
   TablaResponsiva,
   type ColumnaTabla,
 } from "@/components/ui";
-import { urlPublicaStorage } from "@/lib/supabase/storage";
 import { aSlug } from "@/lib/utils";
-import { MAXIMO_IMAGEN_BYTES, MIMES_IMAGEN } from "../constantes";
 import { disponible, type ProductoConVariantesCompletas } from "@/features/tienda/types";
 import type { Club } from "@/features/clubes/types";
 import {
@@ -29,10 +25,8 @@ import {
   eliminarProducto,
   guardarProducto,
   guardarVariante,
-  confirmarImagenProducto,
-  prepararImagenProducto,
 } from "../acciones-productos";
-import { subirDirecto } from "../subir-directo";
+import { FotosProducto } from "./FotosProducto";
 
 type ResultadoAccion = { ok: boolean; error?: string; mensaje?: string };
 type VariantesBorrador = {
@@ -238,7 +232,7 @@ export function ProductosAdmin({
         }
       >
         <p className="text-texto-sec">
-          Se borran el producto, sus variantes y su foto. <strong className="text-azul-profundo">No se puede deshacer.</strong>{" "}
+          Se borran el producto, sus variantes y sus fotos. <strong className="text-azul-profundo">No se puede deshacer.</strong>{" "}
           Si ya tiene pedidos, la eliminación se rechaza y puedes desactivarlo.
         </p>
       </Modal>
@@ -289,11 +283,6 @@ function ModalProducto({
   );
   const [resultadoVariante, setResultadoVariante] = useState<ResultadoAccion | null>(null);
   const [varianteEnCurso, setVarianteEnCurso] = useState<string | null>(null);
-
-  // Foto: la subida exige un producto guardado (la ruta lleva su id).
-  const [imagenPath, setImagenPath] = useState<string | null>(existente?.imagen_path ?? null);
-  const [mensajeImagen, setMensajeImagen] = useState<ResultadoAccion | null>(null);
-  const [subiendoImagen, setSubiendoImagen] = useState(false);
 
   const router = useRouter();
 
@@ -365,25 +354,6 @@ function ModalProducto({
     if (resultado.ok) router.refresh();
   }
 
-  async function subirImagen(archivo: File | null) {
-    if (!archivo || !existente) return;
-    setMensajeImagen(null);
-    setSubiendoImagen(true);
-    const id = existente.id;
-    const resultado = await subirDirecto(
-      archivo,
-      { mimesPermitidos: MIMES_IMAGEN, maximoBytes: MAXIMO_IMAGEN_BYTES },
-      (mime, tamano) => prepararImagenProducto(id, mime, tamano),
-      (ruta) => confirmarImagenProducto(id, ruta),
-    );
-    setSubiendoImagen(false);
-    setMensajeImagen(resultado);
-    if (resultado.ok) {
-      setImagenPath(resultado.imagenPath ?? imagenPath);
-      router.refresh();
-    }
-  }
-
   return (
     <Modal
       abierto={producto !== null}
@@ -438,38 +408,11 @@ function ModalProducto({
           Producto activo (visible en la tienda)
         </label>
 
-        {/* Foto: exige el producto guardado, igual que las variantes. */}
+        {/* Fotos: exigen el producto guardado, igual que las variantes. */}
         {existente ? (
-          <div className="flex flex-col gap-2">
-            {imagenPath && (
-              <div className="relative h-32 w-32 overflow-hidden rounded-md border border-gris-borde bg-gris-frio">
-                <Image
-                  src={urlPublicaStorage("productos", imagenPath)}
-                  alt={`Foto de ${existente.nombre}`}
-                  fill
-                  sizes="128px"
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-            )}
-            <Archivo
-              etiqueta="Foto del producto"
-              mimesPermitidos={MIMES_IMAGEN}
-              descripcionTipos="JPEG, PNG, WebP o AVIF"
-              maximoBytes={MAXIMO_IMAGEN_BYTES}
-              ayuda="Se renombra a un identificador interno; el nombre original no llega al servidor de archivos."
-              alSeleccionar={(a) => void subirImagen(a as File | null)}
-              disabled={subiendoImagen}
-            />
-            {subiendoImagen && <p className="text-sm text-texto-sec">Subiendo imagen…</p>}
-            {mensajeImagen?.error && <Aviso tono="error">{mensajeImagen.error}</Aviso>}
-            {mensajeImagen?.ok && <Aviso tono="exito">{mensajeImagen.mensaje}</Aviso>}
-          </div>
+          <FotosProducto productoId={existente.id} nombre={existente.nombre} inicial={existente.imagenes} />
         ) : (
-          <p className="text-sm text-texto-sec">
-            Guarda el producto para habilitar la foto y las variantes.
-          </p>
+          <p className="text-sm text-texto-sec">Guarda el producto para habilitar las fotos y las variantes.</p>
         )}
 
         {/* --- Variantes en línea -------------------------------------- */}

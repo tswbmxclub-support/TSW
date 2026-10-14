@@ -209,14 +209,15 @@ export async function listarProductosPanel(): Promise<ProductoConVariantesComple
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase
     .from("producto")
-    .select("*, variante(*)")
+    .select("*, variante(*), producto_imagen(*)")
     .order("orden", { ascending: true })
     .order("nombre", { ascending: true });
 
   if (error) throw error;
 
-  return (data ?? []).map(({ variante, ...producto }) => ({
+  return (data ?? []).map(({ variante, producto_imagen, ...producto }) => ({
     ...producto,
     variantes: (variante ?? []).sort((a, b) => a.talla.localeCompare(b.talla, "es", { numeric: true })),
+    imagenes: (producto_imagen ?? []).sort((a, b) => a.orden - b.orden),
   }));
 }

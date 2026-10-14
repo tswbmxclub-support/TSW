@@ -39,6 +39,32 @@ el contenido del sitio editable desde el panel.
   `borrar_pedido_de_prueba`) esperan filas y archivos que solo existen en
   producción y abortan en una base vacía.
 
+## Galería de fotos por producto (2026-10-14)
+
+- Migración `20261014120000_producto_imagen.sql` **aplicada en remoto** (tipos
+  regenerados). Tabla `producto_imagen` (máx. 8 por producto, orden 0 = principal),
+  RLS: `anon` lee solo fotos de productos activos, `authenticated` exige
+  `es_admin_aal2()`, sin políticas de escritura. RPC solo `service_role`, con
+  `search_path = ''`: `agregar_imagen_producto`, `quitar_imagen_producto`,
+  `reordenar_imagenes_producto`, `establecer_texto_alt_imagen_producto`.
+  `eliminar_producto` devuelve ahora `text[]` (todas las rutas). Reversa:
+  `supabase/reversas/20261014120000_revertir_producto_imagen.sql.borrador`.
+- **`producto.imagen_path` queda como columna DERIVADA**: la mantienen las RPC de la
+  galería igual a la foto de orden 0. Nadie debe escribirla por fuera. Se retira
+  en una migración posterior, cuando nada la lea.
+- **Pendiente tras desplegar el código**:
+  1. Correr `supabase/consultas/consistencia_producto_imagen.sql` (solo lectura).
+     Debe dar 0 y 0; si no, arreglar con las RPC de la galería, nunca con UPDATE.
+  2. Pasar `supabase/pendientes/retirar_establecer_imagen_producto.sql.borrador`
+     a `supabase/migrations/` y aplicarla: hace DROP de `establecer_imagen_producto`,
+     que sigue viva y escribe `imagen_path` por fuera de la galería. No antes del
+     deploy: el panel viejo la llama.
+- Sin verificar: **concurrencia del tope de 8** (`FOR UPDATE` sobre la fila del
+  producto) con dos conexiones vivas; aquí no hay `psql` ni Docker.
+- Producto de prueba del E2E, **desactivado**, con 2 fotos:
+  `8c58ba82-03e3-48c2-a225-8350dd958dc8` (`zz-galeria-1792000290793`). Se borra
+  desde el panel (Eliminar) cuando ya no haga falta.
+
 ## Deportes: crear sí, eliminar no (2026-10-10)
 
 - «Agregar deporte» en la lista de `/admin/sitio` → `crearDeporte` → `guardar_deporte`

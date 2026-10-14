@@ -68,6 +68,7 @@ async function main(): Promise<void> {
   }
 
   await insertProducto(reporte, anon, servicio);
+  await insertProductoImagen(reporte, anon, servicio);
   await updateVariante(reporte, anon);
   await deleteCompetencia(reporte, anon, servicio);
 
@@ -96,6 +97,8 @@ async function main(): Promise<void> {
   console.log("\n=== DEBE PERMITIRSE ===");
   await lecturaPermitida(reporte, anon, servicio, "productos activos con sus variantes",
     "producto", "*, variante(*)", (f) => f.length > 0 && f.some((p) => (p as { variante: unknown[] }).variante.length > 0));
+  await lecturaPermitida(reporte, anon, servicio, "fotos de la galería de productos activos",
+    "producto_imagen", "id, orden", (f) => f.length > 0);
   await lecturaPermitida(reporte, anon, servicio, "competencias publicadas con sus resultados",
     "competencia", "*, resultado(*)", (f) => f.length > 0);
   await lecturaPermitida(reporte, anon, servicio, "niveles activos en su orden",
@@ -193,6 +196,42 @@ async function insertProducto(reporte: Reporte, anon: Cliente, servicio: Cliente
   const creado = (data ?? [])[0] as { id: string } | undefined;
   if (creado) await servicio.from("producto").delete().eq("id", creado.id);
   reporte.fallido(nombre, "la anon key pudo crear un producto (fila creada y borrada por el script)", true);
+}
+
+/** La galería solo se escribe por RPC (service role): la anon key no inserta ni llama a las RPC. */
+async function insertProductoImagen(reporte: Reporte, anon: Cliente, servicio: Cliente): Promise<void> {
+  const nombre = "insert sobre producto_imagen";
+  const { data: productos } = await servicio.from("producto").select("id").limit(1);
+  const productoId = (productos ?? [])[0]?.id as string | undefined;
+  if (!productoId) {
+    reporte.fallido(nombre, "INDETERMINADA: no hay ningún producto contra el que probar", false);
+    return;
+  }
+
+  const ruta = `productos/${crypto.randomUUID()}.jpg`;
+  const { data, error } = await anon
+    .from("producto_imagen")
+    .insert({ producto_id: productoId, storage_path: ruta, orden: 99 })
+    .select("id");
+
+  if (error || (data ?? []).length === 0) {
+    reporte.aprobado(nombre, `rechazado: ${error?.message ?? "0 filas"}`);
+  } else {
+    await servicio.from("producto_imagen").delete().eq("storage_path", ruta);
+    reporte.fallido(nombre, "la anon key pudo insertar una foto (fila creada y borrada por el script)", true);
+  }
+
+  const rpc = await anon.rpc("agregar_imagen_producto", {
+    p_actor_id: crypto.randomUUID(),
+    p_producto_id: productoId,
+    p_storage_path: `productos/${crypto.randomUUID()}.jpg`,
+  });
+  if (rpc.error) {
+    reporte.aprobado("rpc agregar_imagen_producto con anon", `rechazada: ${rpc.error.message}`);
+  } else {
+    await servicio.from("producto_imagen").delete().eq("id", rpc.data as string);
+    reporte.fallido("rpc agregar_imagen_producto con anon", "la anon key pudo ejecutar la RPC", true);
+  }
 }
 
 async function updateVariante(reporte: Reporte, anon: Cliente): Promise<void> {

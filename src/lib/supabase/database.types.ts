@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   graphql_public: {
     Tables: {
@@ -632,6 +632,41 @@ export type Database = {
           },
         ]
       }
+      producto_imagen: {
+        Row: {
+          creado_en: string
+          id: string
+          orden: number
+          producto_id: string
+          storage_path: string
+          texto_alt: string | null
+        }
+        Insert: {
+          creado_en?: string
+          id?: string
+          orden: number
+          producto_id: string
+          storage_path: string
+          texto_alt?: string | null
+        }
+        Update: {
+          creado_en?: string
+          id?: string
+          orden?: number
+          producto_id?: string
+          storage_path?: string
+          texto_alt?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "producto_imagen_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "producto"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resultado: {
         Row: {
           categoria: string
@@ -795,6 +830,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      agregar_imagen_producto: {
+        Args: {
+          p_actor_id: string
+          p_producto_id: string
+          p_storage_path: string
+          p_texto_alt?: string
+        }
+        Returns: string
       }
       alternar_club_activo: {
         Args: { p_activo: boolean; p_actor_id: string; p_id: string }
@@ -1034,7 +1078,7 @@ export type Database = {
       }
       eliminar_producto: {
         Args: { p_actor_id: string; p_id: string }
-        Returns: string
+        Returns: string[]
       }
       eliminar_resultado: {
         Args: { p_actor_id: string; p_id: string }
@@ -1187,6 +1231,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      establecer_texto_alt_imagen_producto: {
+        Args: { p_actor_id: string; p_id: string; p_texto_alt: string }
+        Returns: undefined
       }
       generar_referencia_pedido: { Args: never; Returns: string }
       guardar_club: {
@@ -1578,6 +1626,14 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      quitar_imagen_producto: {
+        Args: { p_actor_id: string; p_id: string }
+        Returns: string
+      }
+      reordenar_imagenes_producto: {
+        Args: { p_actor_id: string; p_ids: string[]; p_producto_id: string }
+        Returns: undefined
       }
       reordenar_niveles: {
         Args: { p_actor_id: string; p_club_id: string; p_ids: string[] }

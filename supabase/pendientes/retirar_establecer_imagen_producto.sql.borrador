@@ -1,0 +1,29 @@
+-- BORRADOR. NO está en supabase/migrations/ a propósito: aplicarla antes de que
+-- el código de la galería esté desplegado en producción rompería la subida de
+-- fotos del panel viejo (que todavía llama a establecer_imagen_producto).
+--
+-- Cuándo: con el código de la galería ya desplegado y la consulta
+-- supabase/consultas/consistencia_producto_imagen.sql dando 0 y 0. Entonces se
+-- copia a supabase/migrations/<timestamp de ese día>_retirar_establecer_imagen_producto.sql
+-- y se aplica con db push + db:types:remote.
+--
+-- Por qué: establecer_imagen_producto (migración 12) escribe producto.imagen_path
+-- por fuera de la galería. Desde 20261014120000 esa columna es derivada (la
+-- mantienen las RPC de producto_imagen = foto de orden 0); una llamada a esta
+-- función la desincronizaría. Ningún código la llama desde el commit de la
+-- galería (comprobado con grep en src/).
+--
+-- DROP y no solo REVOKE: una función sin uso y sin EXECUTE sigue siendo una
+-- trampa para el próximo que la vea en los tipos generados. Reversa: recrearla
+-- copiando su bloque de 20260919120000_producto_imagen_path.sql (con su
+-- REVOKE/GRANT).
+
+drop function public.establecer_imagen_producto(uuid, uuid, text);
+
+do $$
+begin
+  if to_regprocedure('public.establecer_imagen_producto(uuid, uuid, text)') is not null then
+    raise exception 'establecer_imagen_producto sigue existiendo.';
+  end if;
+end
+$$;

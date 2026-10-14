@@ -79,12 +79,14 @@ export async function prepararImagenProducto(id: string, mime: string, tamano: n
 
 /**
  * Paso 3: verifica el archivo ya subido por firma de bytes y, solo entonces,
- * escribe la ruta por RPC con el actor. Si la RPC falla, el archivo se borra.
+ * lo agrega a la galería por RPC con el actor (máximo 8; la base lo controla).
+ * Si la RPC falla, el archivo se borra. `producto.imagen_path` ya no se escribe
+ * desde aquí: la RPC la deja igual a la foto de orden 0.
  */
 export async function confirmarImagenProducto(
   id: string,
   ruta: string,
-): Promise<ResultadoEscritura & { imagenPath?: string }> {
+): Promise<ResultadoEscritura & { foto?: { id: string; storage_path: string; texto_alt: null } }> {
   try {
     await exigirAdmin();
     if (!UUID.test(id)) return { ok: false, error: "Producto inválido." };
@@ -93,15 +95,66 @@ export async function confirmarImagenProducto(
     const verificada = await verificarSubida(BUCKET_PRODUCTOS, ruta, OPCIONES_IMAGEN);
     if (!verificada.ok) return verificada;
 
+    let fotoId: string;
     try {
-      // La única forma de escribir producto.imagen_path (migración 12).
-      await ejecutarRpc("establecer_imagen_producto", { p_id: id, p_imagen_path: ruta });
+      fotoId = await ejecutarRpc("agregar_imagen_producto", { p_producto_id: id, p_storage_path: ruta });
     } catch (error) {
       await descartarSubida(BUCKET_PRODUCTOS, ruta);
       throw error;
     }
     revalidarPublico("producto");
-    return { ok: true, mensaje: "Imagen cargada.", imagenPath: ruta };
+    return { ok: true, mensaje: "Foto agregada.", foto: { id: fotoId, storage_path: ruta, texto_alt: null } };
+  } catch (error) {
+    return { ok: false, error: mensajeDe(error) };
+  }
+}
+
+/**
+ * Borra archivos del bucket DESPUÉS de que la base ya los soltó. Si el borrado
+ * falla se registra y no se revierte nada: un archivo huérfano en el bucket es
+ * mejor que una foto rota en el sitio.
+ */
+async function descartarArchivos(rutas: string[]): Promise<void> {
+  const resultados = await Promise.allSettled(rutas.map((r) => descartarSubida(BUCKET_PRODUCTOS, r)));
+  resultados.forEach((r, i) => {
+    if (r.status === "rejected") console.error("[acciones productos] archivo huérfano:", rutas[i], r.reason);
+  });
+}
+
+/** Quita una foto de la galería: primero la RPC y, si sale bien, el archivo. */
+export async function quitarImagenProducto(id: string): Promise<ResultadoEscritura> {
+  if (!UUID.test(id)) return { ok: false, error: "Foto inválida." };
+  try {
+    const ruta = await ejecutarRpc("quitar_imagen_producto", { p_id: id });
+    if (ruta) await descartarArchivos([ruta]);
+    revalidarPublico("producto");
+    return { ok: true, mensaje: "Foto quitada." };
+  } catch (error) {
+    return { ok: false, error: mensajeDe(error) };
+  }
+}
+
+/** Recibe la lista COMPLETA de ids en el orden nuevo; la primera es la principal. */
+export async function reordenarImagenesProducto(productoId: string, ids: string[]): Promise<ResultadoEscritura> {
+  if (!UUID.test(productoId) || ids.length === 0 || !ids.every((i) => UUID.test(i))) {
+    return { ok: false, error: "Lista de fotos inválida." };
+  }
+  try {
+    await ejecutarRpc("reordenar_imagenes_producto", { p_producto_id: productoId, p_ids: ids });
+    revalidarPublico("producto");
+    return { ok: true, mensaje: "Orden guardado." };
+  } catch (error) {
+    return { ok: false, error: mensajeDe(error) };
+  }
+}
+
+export async function establecerTextoAltImagen(id: string, texto: string): Promise<ResultadoEscritura> {
+  if (!UUID.test(id)) return { ok: false, error: "Foto inválida." };
+  if (texto.length > 200) return { ok: false, error: "El texto alternativo admite como máximo 200 caracteres." };
+  try {
+    await ejecutarRpc("establecer_texto_alt_imagen_producto", { p_id: id, p_texto_alt: texto });
+    revalidarPublico("producto");
+    return { ok: true, mensaje: "Texto alternativo guardado." };
   } catch (error) {
     return { ok: false, error: mensajeDe(error) };
   }
@@ -136,8 +189,8 @@ export async function alternarProducto(id: string, activo: boolean): Promise<Res
 export async function eliminarProducto(id: string): Promise<ResultadoEscritura> {
   if (!UUID.test(id)) return { ok: false, error: "Producto inválido." };
   try {
-    const imagen = await ejecutarRpc("eliminar_producto", { p_id: id });
-    if (imagen) await descartarSubida(BUCKET_PRODUCTOS, imagen);
+    const rutas = await ejecutarRpc("eliminar_producto", { p_id: id });
+    await descartarArchivos(rutas ?? []);
     revalidarPublico("producto");
     return { ok: true, mensaje: "Producto eliminado." };
   } catch (error) {

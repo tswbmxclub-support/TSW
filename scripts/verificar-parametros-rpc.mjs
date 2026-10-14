@@ -58,7 +58,7 @@ const firmas = new Map();
 for (const archivo of readdirSync(DIR).filter((f) => f.endsWith(".sql")).sort()) {
   const texto = sinComentarios(readFileSync(`${DIR}/${archivo}`, "utf8"));
 
-  for (const m of texto.matchAll(/create\s+or\s+replace\s+function\s+public\.([a-z_]+)\s*\(([\s\S]*?)\)\s*\n\s*returns[\s\S]*?\n\$\$;/gi)) {
+  for (const m of texto.matchAll(/create\s+(?:or\s+replace\s+)?function\s+public\.([a-z_]+)\s*\(([\s\S]*?)\)\s*\n\s*returns[\s\S]*?\n\$\$;/gi)) {
     const nombre = m[1];
     const listaCruda = m[2];
     const cuerpo = m[0];
