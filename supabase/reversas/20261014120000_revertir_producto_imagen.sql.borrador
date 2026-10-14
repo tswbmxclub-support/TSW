@@ -1,0 +1,85 @@
+-- BORRADOR de reversa de 20261014120000_producto_imagen.sql. No es una migración:
+-- vive fuera de supabase/migrations/ a propósito. Se corre a mano si hace falta.
+--
+-- Antes: desplegar el código anterior al de la galería (lee producto.imagen_path
+-- y llama eliminar_producto esperando un text). producto.imagen_path se mantuvo
+-- sincronizada con la foto de orden 0, así que NO hay que copiar nada de vuelta:
+-- la foto principal de cada producto ya está ahí. Las fotos 2..8 quedan como
+-- archivos en el bucket sin fila (se pierden de la galería); si importan,
+-- listarlas ANTES de borrar la tabla:
+--   select producto_id, orden, storage_path from public.producto_imagen order by 1, 2;
+
+begin;
+
+drop function public.agregar_imagen_producto(uuid, uuid, text, text);
+drop function public.quitar_imagen_producto(uuid, uuid);
+drop function public.reordenar_imagenes_producto(uuid, uuid, uuid[]);
+drop function public.establecer_texto_alt_imagen_producto(uuid, uuid, text);
+
+drop function public.eliminar_producto(uuid, uuid);
+
+-- eliminar_producto como estaba en 20261001120000 (devuelve text, search_path public).
+create function public.eliminar_producto(
+  p_actor_id uuid,
+  p_id       uuid
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_imagen text;
+begin
+  perform public.establecer_actor(p_actor_id);
+
+  select imagen_path into v_imagen
+    from public.producto
+   where id = p_id
+   for update;
+
+  if not found then
+    raise exception 'El producto % no existe.', p_id
+      using errcode = 'foreign_key_violation';
+  end if;
+
+  if exists (
+    select 1
+      from public.pedido_item i
+      join public.variante v on v.id = i.variante_id
+     where v.producto_id = p_id
+  ) then
+    raise exception 'Este producto ya tiene pedidos y no se puede eliminar. Desactívalo: deja de verse en la tienda y conserva su historial.'
+      using errcode = 'restrict_violation';
+  end if;
+
+  delete from public.variante where producto_id = p_id;
+  delete from public.producto where id = p_id;
+
+  return v_imagen;
+end;
+$$;
+
+comment on function public.eliminar_producto(uuid, uuid) is
+  'Elimina un producto y sus variantes solo si ninguna tiene pedidos. Devuelve imagen_path (o NULL) para que la aplicación borre el archivo.';
+
+revoke execute on function public.eliminar_producto(uuid, uuid) from public, anon, authenticated;
+grant  execute on function public.eliminar_producto(uuid, uuid) to service_role;
+
+-- La tabla (con sus políticas, trigger de auditoría y constraints).
+drop table public.producto_imagen;
+
+-- Aserción: nada de lo nuevo sobrevive y eliminar_producto no es ejecutable por anon/authenticated.
+do $$
+begin
+  if to_regclass('public.producto_imagen') is not null then
+    raise exception 'producto_imagen sigue existiendo.';
+  end if;
+  if has_function_privilege('anon', 'public.eliminar_producto(uuid, uuid)', 'execute')
+     or has_function_privilege('authenticated', 'public.eliminar_producto(uuid, uuid)', 'execute') then
+    raise exception 'eliminar_producto quedó ejecutable por anon/authenticated.';
+  end if;
+end
+$$;
+
+commit;
